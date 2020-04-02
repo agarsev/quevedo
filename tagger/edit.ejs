@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+        svg {
+            width: 50vw;
+            height: 40vw;
+            background: gray;
+        }
+    </style>
+</head>
+<body>
+    <h1>Editar <%= id %></h1>
+    <ul>
+        <%- meanings.map(meaning => `<li><meaning-entry value="${meaning}" />`) %>
+        <button onClick="add_meaning()">➕</button>
+    </ul>
+    <svg>
+        <image href="/img/<%=id %>.png" width="100%" height="100%" />
+    </svg>
+    <ul id="symbol_list">
+        <%- symbols.map(symbol => `<li><symbol-entry />`) %>
+        <button onClick="add_symbol()">➕</button>
+    </ul>
+
+    <script>
+        const meaning_list = document.getElementById("meaning_list");
+        function add_meaning () {
+            const li = document.createElement("li");
+            li.innerHTML = "<meaning-entry />";
+            meaning_list.appendChild(li);
+        }
+        class MeaningEntry extends HTMLElement {
+            constructor () {
+                super();
+                this.innerHTML = `<input type="text" value="${this.getAttribute("value")}" />`;
+            }
+        }
+        customElements.define('meaning-entry', MeaningEntry);
+
+        const symbol_list = document.getElementById("symbol_list");
+        function add_symbol () {
+            const li = document.createElement("li");
+            li.innerHTML = "<symbol-entry />";
+            symbol_list.appendChild(li);
+        }
+        class SymbolEntry extends HTMLElement {
+            constructor () {
+                super();
+                this.innerHTML = `<input type="text" />`;
+            }
+        }
+        customElements.define('symbol-entry', SymbolEntry);
+    </script>
+</body>
+</html>

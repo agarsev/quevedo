@@ -16,40 +16,46 @@
             flex-wrap: wrap;
             justify-content: space-between;
         }
-        li {
+        ul li {
             list-style-type: none;
             border: 1px solid black;
             margin: 2px;
             display: flex;
             flex-direction: column;
         }
-        h2 {
+        ul h2 {
             font-size: 1em;
             border-bottom: 1px solid black;
         }
-        img {
+        ul a {
+            font-size: 1.6em;
+            text-decoration: none;
+        }
+        ul img {
             max-width: 100%;
             max-height: 70%;
             margin: auto;
         }
         @media screen and (max-width: 300px) {
-            li { flex: 0 0 90vw; }
+            ul li { flex: 0 0 90vw; }
         }
         @media screen and (min-width: 300px) and (max-width: 700px) {
-            li { flex: 1 0 30vw; }
+            ul li { flex: 1 0 30vw; }
         }
         @media screen and (min-width: 700px) {
-            li { flex: 1 0 200px; }
+            ul li { flex: 1 0 200px; }
         }
     </style>
 </head>
 <body>
+    <h1>Name of the dataset</h1>
+    <p>Other dataset info</p>
     <ul>
         <% trans.forEach(function ({ id, meanings }) { %>
             <li>
                 <h2><%=meanings[0] %></h2>
                 <img src="/img/<%=id %>.png" />
-                <p>📝</p>
+                <p><a href="/edit/<%=id %>">📝</a></p>
             </li>
         <% }); %>
     </ul>

@@ -26,6 +26,13 @@ app.get('/', (req, res, next) => {
         .catch(next);
 });
 
+app.get('/edit/:id', (req, res, next) => {
+    const id = req.params.id;
+    fs.readJson(`${data_dir}/${id}.json`)
+        .then(info => res.render('edit', { id, ...info }))
+        .catch(next);
+});
+
 app.get('/img/:img', (req, res) => res.sendFile(req.params.img, { root: data_dir }));
 
 app.listen(3000, () => {
