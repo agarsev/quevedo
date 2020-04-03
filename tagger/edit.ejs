@@ -7,6 +7,9 @@
             height: 40vw;
             background: gray;
         }
+        symbol-entry {
+            border: 1px solid gray;
+        }
     </style>
 </head>
 <body>
@@ -15,8 +18,10 @@
         <%- meanings.map(meaning => `<li><meaning-entry value="${meaning}" />`) %>
         <button onClick="add_meaning()">➕</button>
     </ul>
-    <svg>
+    <svg id="annot_svg" xmlns="http://www.w3.org/2000/svg" >
         <image href="/img/<%=id %>.png" width="100%" height="100%" />
+        <g id="boxes">
+        </g>
     </svg>
     <ul id="symbol_list">
         <%- symbols.map(symbol => `<li><symbol-entry />`) %>
@@ -24,6 +29,16 @@
     </ul>
 
     <script>
+        function create (parent, tag, attrs, inner) {
+            const el = document.createElement(tag);
+            for (key in attrs) {
+                el.setAttribute(key, attrs[key]);
+            }
+            if (inner) el.innerHTML = inner;
+            parent.appendChild(el);
+            return el;
+        }
+
         const meaning_list = document.getElementById("meaning_list");
         function add_meaning () {
             const li = document.createElement("li");
@@ -38,6 +53,46 @@
         }
         customElements.define('meaning-entry', MeaningEntry);
 
+        let current_box = null, draw = null;
+        const svg = document.querySelector("#annot_svg");
+        const trans = document.querySelector("#annot_svg image");
+        const boxes_layer = document.getElementById("boxes");
+        trans.addEventListener('mousedown', e => {
+            if (current_box) {
+                const { left, top } = trans.getBoundingClientRect();
+                const x = e.clientX - left;
+                const y = e.clientY - top;
+                draw = { x, y };
+                current_box.setAttributeNS(null, 'x', x);
+                current_box.setAttributeNS(null, 'y', y);
+                current_box.setAttributeNS(null, 'width', 0);
+                current_box.setAttributeNS(null, 'height', 0);
+            }
+            e.preventDefault();
+        });
+        trans.addEventListener('mousemove', e => {
+            if (draw !== null) {
+                const { left, top } = trans.getBoundingClientRect();
+                const x = e.clientX - left;
+                const y = e.clientY - top;
+                if (x >= draw.x) {
+                    current_box.setAttributeNS(null, 'x', draw.x);
+                    current_box.setAttributeNS(null, 'width', x-draw.x);
+                } else {
+                    current_box.setAttributeNS(null, 'x', x);
+                    current_box.setAttributeNS(null, 'width', draw.x-x);
+                }
+                if (y >= draw.y) {
+                    current_box.setAttributeNS(null, 'y', draw.y);
+                    current_box.setAttributeNS(null, 'height', y-draw.y);
+                } else {
+                    current_box.setAttributeNS(null, 'y', y);
+                    current_box.setAttributeNS(null, 'height', draw.y-y);
+                }
+            }
+        });
+        document.addEventListener('mouseup', () => draw = null);
+
         const symbol_list = document.getElementById("symbol_list");
         function add_symbol () {
             const li = document.createElement("li");
@@ -47,7 +102,19 @@
         class SymbolEntry extends HTMLElement {
             constructor () {
                 super();
-                this.innerHTML = `<input type="text" />`;
+                const col = create(this, 'input', { type: 'color' });
+                const text = create(this, 'input', { type: 'text' });
+                const edit = create(this, 'button', {}, '📏');
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttributeNS(null, 'x', '100');
+                rect.setAttributeNS(null, 'y', '100');
+                rect.setAttributeNS(null, 'width', '100');
+                rect.setAttributeNS(null, 'height', '50');
+                rect.setAttributeNS(null, 'fill', 'none');
+                rect.setAttributeNS(null, 'stroke', 'red');
+                boxes_layer.appendChild(rect);
+                current_box = rect;
+                edit.onClick = () => current_box = rect;
             }
         }
         customElements.define('symbol-entry', SymbolEntry);
