@@ -2,13 +2,24 @@
 <html>
 <head>
     <style>
-        svg {
-            width: 50vw;
-            height: 40vw;
-            background: gray;
+		#boxes, #boxes * {
+			padding: 0;
+			margin: 0;
+		}
+        #transcr {
+            max-width: 50vw;
+            max-height: 40vw;
         }
-        svg rect {
-            stroke-width: 2px;
+		#boxes {
+			display: inline-block;
+			position: relative;
+			border: 1px solid black;
+		}
+        .anot {
+			display: block;
+			position: absolute;
+			pointer-events: none;
+			border: 2px solid black;
         }
     </style>
 </head>
@@ -24,16 +35,18 @@
         %>
         <li><button>➕</button></li>
     </ul>
-    <svg id="annot_svg" xmlns="http://www.w3.org/2000/svg" >
-        <image href="/img/<%=id %>.png" width="100%" height="100%" />
-        <g id="boxes">
-        </g>
-    </svg>
+	<div id="boxes">
+    	<img id="transcr" src="/img/<%=id %>.png"/>
+	</div>
     <ul id="symbol_list">
-        <%- symbols.map(symbol => `<li><symbol-entry />`) %>
+        <%- symbols
+                .map(({ name, box }) => `<li><symbol-entry name="${name}"
+                    x="${box[0]}" y="${box[1]}" w="${box[2]}" h="${box[3]}" />`)
+                .join('')
+        %>
     </ul>
 
-    <script>
+    <script>window.onload = function () {
         /* Helper for creating DOM elements */
         function create (parent, tag, attrs, inner) {
             const el = document.createElement(tag);
@@ -67,6 +80,8 @@
 
         /* List of symbols */
         
+        const trans = document.getElementById("transcr");
+        const boxes_layer = document.getElementById("boxes");
         let current_box = null; // symbol being edited
 
         const symbol_list = document.getElementById("symbol_list");
@@ -84,23 +99,32 @@
                 super();
                 const color_val = color_list[(i++)%color_list.length];
                 const col = create(this, 'input', { type: 'color', value: color_val });
-                const text = create(this, 'input', { type: 'text' });
+                const text = create(this, 'input', { type: 'text',
+					value: this.getAttribute('name') || '' });
+                this.text = text;
                 const edit = create(this, 'button', {}, '📐');
                 const del = create(this, 'button', {}, '🗑️');
-                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+				const rect = create(boxes_layer, 'span', { class: 'anot' });
                 this.rect = rect;
-                rect.setAttributeNS(null, 'x', '100');
-                rect.setAttributeNS(null, 'y', '100');
-                rect.setAttributeNS(null, 'width', '100');
-                rect.setAttributeNS(null, 'height', '50');
-                rect.setAttributeNS(null, 'fill', 'none');
-                rect.setAttributeNS(null, 'stroke', color_val);
+                const x = this.getAttribute('x');
+                if (x !== undefined) {
+                    const y = this.getAttribute('y');
+                    const w = this.getAttribute('w');
+                    const h = this.getAttribute('h');
+                    const { width, height } = trans.getBoundingClientRect();
+                    rect.style.left = Math.round((x-w/2.0)*width)+'px';
+                    rect.style.top = Math.round((y-h/2.0)*height)+'px';
+                    rect.style.width = Math.round(w*1.0*width)+'px';
+                    rect.style.height = Math.round(h*1.0*height)+'px';
+                }
+				rect.style.borderColor = color_val;
+				rect.dirty_box = false;
                 boxes_layer.appendChild(rect);
-                col.oninput = () => rect.setAttributeNS(null, 'stroke', col.value);
+                col.oninput = () => rect.style.borderColor = col.value;
                 current_box = rect;
                 edit.onclick = () => {
-                    rect.setAttributeNS(null, 'width', '0');
-                    rect.setAttributeNS(null, 'height', '0');
+                    rect.style.width = 0;
+                    rect.style.height = 0;
                     current_box = rect;
                 };
                 del.onclick = () => {
@@ -114,19 +138,17 @@
         /* Bounding boxes of symbols */
 
         let draw = null;
-        const svg = document.querySelector("#annot_svg");
-        const trans = document.querySelector("#annot_svg image");
-        const boxes_layer = document.getElementById("boxes");
         trans.addEventListener('mousedown', e => {
             if (!current_box) add_symbol();
+			current_box.dirty_box = true;
             const { left, top } = trans.getBoundingClientRect();
             const x = e.clientX - left;
             const y = e.clientY - top;
             draw = { x, y };
-            current_box.setAttributeNS(null, 'x', x);
-            current_box.setAttributeNS(null, 'y', y);
-            current_box.setAttributeNS(null, 'width', 0);
-            current_box.setAttributeNS(null, 'height', 0);
+            current_box.style.left = x+'px';
+            current_box.style.top = y+'px';
+            current_box.style.width = 0;
+            current_box.style.height = 0;
             e.preventDefault();
         });
         trans.addEventListener('mousemove', e => {
@@ -135,18 +157,18 @@
                 const x = e.clientX - left;
                 const y = e.clientY - top;
                 if (x >= draw.x) {
-                    current_box.setAttributeNS(null, 'x', draw.x);
-                    current_box.setAttributeNS(null, 'width', x-draw.x);
+                    current_box.style.left = draw.x+'px';
+                    current_box.style.width = x-draw.x+'px';
                 } else {
-                    current_box.setAttributeNS(null, 'x', x);
-                    current_box.setAttributeNS(null, 'width', draw.x-x);
+                    current_box.style.left = x+'px';
+                    current_box.style.width = draw.x-x+'px';
                 }
                 if (y >= draw.y) {
-                    current_box.setAttributeNS(null, 'y', draw.y);
-                    current_box.setAttributeNS(null, 'height', y-draw.y);
+                    current_box.style.top = draw.y+'px';
+                    current_box.style.height = y-draw.y+'px';
                 } else {
-                    current_box.setAttributeNS(null, 'y', y);
-                    current_box.setAttributeNS(null, 'height', draw.y-y);
+                    current_box.style.top = y+'px';
+                    current_box.style.height = draw.y-y+'px';
                 }
             }
         });
@@ -154,6 +176,8 @@
             current_box = null;
             draw = null;
         });
+
+		current_box = null;
 
         document.getElementById("save").onclick = function () {
             const data = {
@@ -163,7 +187,22 @@
             meaning_list.querySelectorAll("meaning-entry").forEach(m => {
                 data.meanings.push(m.text.value);
             });
-            console.log(data);
+			const { left: off_x, top: off_y } = trans.getBoundingClientRect();
+			const { clientWidth: off_w, clientHeight: off_h } = trans;
+            symbol_list.querySelectorAll("symbol-entry").forEach(s => {
+				let box;
+				if (s.rect.dirty_box) {
+                	const r = s.rect.getBoundingClientRect();
+					const { clientWidth: w, clientHeight: h } = s.rect;
+                    box = [ (r.left+w/2.0-off_x)/off_w,
+                        (r.top+h/2.0-off_y)/off_h,
+                        w*1.0/off_w, h*1.0/off_h ];
+				} else {
+					box = [ s.getAttribute('x'), s.getAttribute('y'),
+							s.getAttribute('w'), s.getAttribute('h') ];
+				}
+                data.symbols.push({ name: s.text.value, box });
+            });
             fetch(window.location, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -172,6 +211,6 @@
             .then(r => alert(r.ok?"OK":`Error: ${r.statusText}`))
             .catch(e => alert(`Error: ${e}`));
         }
-    </script>
+    }</script>
 </body>
 </html>
