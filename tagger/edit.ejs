@@ -7,8 +7,8 @@
             height: 40vw;
             background: gray;
         }
-        symbol-entry {
-            border: 1px solid gray;
+        svg rect {
+            stroke-width: 2px;
         }
     </style>
 </head>
@@ -31,10 +31,10 @@
     </svg>
     <ul id="symbol_list">
         <%- symbols.map(symbol => `<li><symbol-entry />`) %>
-        <button onClick="add_symbol()">➕</button>
     </ul>
 
     <script>
+        /* Helper for creating DOM elements */
         function create (parent, tag, attrs, inner) {
             const el = document.createElement(tag);
             for (key in attrs) {
@@ -44,6 +44,8 @@
             parent.appendChild(el);
             return el;
         }
+
+        /* List of meanings for the transcribed sign */
 
         const meaning_list = document.getElementById("meaning_list");
         const meaning_list_button = document.querySelector("#meaning_list button");
@@ -63,21 +65,68 @@
         }
         customElements.define('meaning-entry', MeaningEntry);
 
-        let current_box = null, draw = null;
+        /* List of symbols */
+        
+        let current_box = null; // symbol being edited
+
+        const symbol_list = document.getElementById("symbol_list");
+        function add_symbol () {
+            const li = document.createElement("li");
+            li.innerHTML = "<symbol-entry />";
+            symbol_list.appendChild(li);
+            return li.firstChild;
+        }
+        const color_list = [ '#FF0000', '#00FF00', '#0000FF', '#FF00FF',
+            '#00FFFF', '#880000', '#008800', '#000088', '#888800', '#008888' ];
+        let i = 0;
+        class SymbolEntry extends HTMLElement {
+            constructor () {
+                super();
+                const color_val = color_list[(i++)%color_list.length];
+                const col = create(this, 'input', { type: 'color', value: color_val });
+                const text = create(this, 'input', { type: 'text' });
+                const edit = create(this, 'button', {}, '📐');
+                const del = create(this, 'button', {}, '🗑️');
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                this.rect = rect;
+                rect.setAttributeNS(null, 'x', '100');
+                rect.setAttributeNS(null, 'y', '100');
+                rect.setAttributeNS(null, 'width', '100');
+                rect.setAttributeNS(null, 'height', '50');
+                rect.setAttributeNS(null, 'fill', 'none');
+                rect.setAttributeNS(null, 'stroke', color_val);
+                boxes_layer.appendChild(rect);
+                col.oninput = () => rect.setAttributeNS(null, 'stroke', col.value);
+                current_box = rect;
+                edit.onclick = () => {
+                    rect.setAttributeNS(null, 'width', '0');
+                    rect.setAttributeNS(null, 'height', '0');
+                    current_box = rect;
+                };
+                del.onclick = () => {
+                    symbol_list.removeChild(this.parentElement);
+                    boxes_layer.removeChild(rect);
+                };
+            }
+        }
+        customElements.define('symbol-entry', SymbolEntry);
+
+        /* Bounding boxes of symbols */
+
+        let draw = null;
         const svg = document.querySelector("#annot_svg");
         const trans = document.querySelector("#annot_svg image");
         const boxes_layer = document.getElementById("boxes");
         trans.addEventListener('mousedown', e => {
-            if (current_box) {
-                const { left, top } = trans.getBoundingClientRect();
-                const x = e.clientX - left;
-                const y = e.clientY - top;
-                draw = { x, y };
-                current_box.setAttributeNS(null, 'x', x);
-                current_box.setAttributeNS(null, 'y', y);
-                current_box.setAttributeNS(null, 'width', 0);
-                current_box.setAttributeNS(null, 'height', 0);
-            }
+            if (!current_box) add_symbol();
+            const { left, top } = trans.getBoundingClientRect();
+            const x = e.clientX - left;
+            const y = e.clientY - top;
+            draw = { x, y };
+            current_box.setAttributeNS(null, 'x', x);
+            current_box.setAttributeNS(null, 'y', y);
+            current_box.setAttributeNS(null, 'width', 0);
+            current_box.setAttributeNS(null, 'height', 0);
             e.preventDefault();
         });
         trans.addEventListener('mousemove', e => {
@@ -101,33 +150,10 @@
                 }
             }
         });
-        document.addEventListener('mouseup', () => draw = null);
-
-        const symbol_list = document.getElementById("symbol_list");
-        function add_symbol () {
-            const li = document.createElement("li");
-            li.innerHTML = "<symbol-entry />";
-            symbol_list.appendChild(li);
-        }
-        class SymbolEntry extends HTMLElement {
-            constructor () {
-                super();
-                const col = create(this, 'input', { type: 'color' });
-                const text = create(this, 'input', { type: 'text' });
-                const edit = create(this, 'button', {}, '📏');
-                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                rect.setAttributeNS(null, 'x', '100');
-                rect.setAttributeNS(null, 'y', '100');
-                rect.setAttributeNS(null, 'width', '100');
-                rect.setAttributeNS(null, 'height', '50');
-                rect.setAttributeNS(null, 'fill', 'none');
-                rect.setAttributeNS(null, 'stroke', 'red');
-                boxes_layer.appendChild(rect);
-                current_box = rect;
-                edit.onClick = () => current_box = rect;
-            }
-        }
-        customElements.define('symbol-entry', SymbolEntry);
+        document.addEventListener('mouseup', () => {
+            current_box = null;
+            draw = null;
+        });
 
         document.getElementById("save").onclick = function () {
             const data = {
