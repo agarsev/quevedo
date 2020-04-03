@@ -8,6 +8,7 @@ const app = express();
 
 app.set('views', '.');
 app.set('view engine', 'ejs');
+app.use(express.json());
 
 async function list_trans (dir) {
     const files = await fs.readdir(dir);
@@ -30,6 +31,15 @@ app.get('/edit/:id', (req, res, next) => {
     const id = req.params.id;
     fs.readJson(`${data_dir}/${id}.json`)
         .then(info => res.render('edit', { id, ...info }))
+        .catch(next);
+});
+
+app.post('/edit/:id', (req, res, next) => {
+    const info_file = `${data_dir}/${req.params.id}.json`;
+    fs.readJson(info_file)
+        .then(info => ({ ...info, ...req.body }))
+        .then(new_info => fs.writeJson(info_file, new_info))
+        .then(() => res.send('ok'))
         .catch(next);
 });
 
