@@ -15,7 +15,6 @@ DIR=$1 # Directory where files to be processed are
 
 EXTENSION="png" # Extension for images
 NUMBER=1 # Starting index for transcriptions
-NEW_NAME_PATTERN="T%03d" # Pattern for filename given index of transcription
 
 if [ -z "$DIR" ]; then
     echo "Usage: $0 [DATA DIRECTORY]"
@@ -27,7 +26,7 @@ pushd "$DIR" >/dev/null
 for file in *; do
     base="${file%.*}" # Remove extension
     base="${base%_*}" # Remove possible duplicate markers (eg eye_1.png -> eye)
-    new_name=$(printf $NEW_NAME_PATTERN $NUMBER)
+    new_name=$(printf "%03d" $NUMBER)
 
     echo "{ \"meanings\": [ \"$base\" ], \"symbols\": [] }" >"$new_name.json"
     mv "$file" "$new_name.$EXTENSION"

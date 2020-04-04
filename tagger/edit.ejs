@@ -21,12 +21,19 @@
 			pointer-events: none;
 			border: 2px solid black;
         }
+        a {
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
-    <h1>Edit <%= id %></h1>
-
-    <button id="save">💾</button>
+    <h1>
+        <%= id %>
+        <button id="save">💾</button>
+        <a href="<%= prev_link %>">⬅️</a>
+        <a href="/">⬆️</a>
+        <a href="<%= next_link %>">➡️</a>
+    </h1>
 
     <ul id="meaning_list">
         <%- meanings

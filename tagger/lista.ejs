@@ -48,14 +48,17 @@
     </style>
 </head>
 <body>
-    <h1>Name of the dataset</h1>
-    <p>Other dataset info</p>
+    <h1><%= info.title %></h1>
+    <p><%= info.description %></p>
     <ul>
-        <% trans.forEach(function ({ id, meanings }) { %>
+        <% trans.forEach(function ({ id, meanings, annotated }) { %>
             <li>
                 <h2><%=meanings[0] %></h2>
                 <img src="/img/<%=id %>.png" />
-                <p><a href="/edit/<%=id %>">📝</a></p>
+                <p>
+                    <a href="/edit/<%=id %>">📝</a>
+                    <% if (annotated) { %>✔️<% } %>
+                </p>
             </li>
         <% }); %>
     </ul>
