@@ -69,7 +69,7 @@
                 <img src="/img/<%=id %>.png" />
                 <p>
                     <a href="/edit/<%=id %>">📝</a>
-                    <% if (annotated) { %>✔️<% } %>
+                    <% if (annotated>0) { %>✔️ (<%=annotated %>)<% } %>
                 </p>
             </li>
         <% }); %>

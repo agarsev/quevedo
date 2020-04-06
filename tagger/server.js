@@ -12,7 +12,7 @@ app.use(express.json());
 let config = {};
 
 function annotated_status (d) {
-    return d.symbols.length>0;
+    return d.symbols.length;
 }
 
 async function load_dataset (dir) {
