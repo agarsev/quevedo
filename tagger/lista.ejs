@@ -1,31 +1,36 @@
 <!doctype html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <title>SW Tagger: <%= info.title %></title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-        body {
-            text-align: center;
-        }
         ul {
+            text-align: center;
             width: 99vw;
+            padding: 0 3vw 1em 1.5vw;
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-between;
         }
         ul li {
             list-style-type: none;
-            border: 1px solid black;
-            margin: 2px;
+            border: 1px solid gray;
+            border-radius: 3px;
+            margin: 4px 2px;
             display: flex;
             flex-direction: column;
         }
+        .extra-space {
+            border: none;
+            flex: 1000 1000 0;
+        }
         ul h2 {
             font-size: 1em;
-            border-bottom: 1px solid black;
+            border-bottom: 1px solid gray;
         }
         ul a {
             font-size: 1.6em;
@@ -36,6 +41,12 @@
             max-height: 70%;
             margin: auto;
         }
+        h1 {
+            margin: 1ex 3vw 1ex 2vw;
+            padding: 0 0 0.5vw 1vw;
+            border-bottom: 1px solid gray;
+        }
+        pre { margin: 0 4vw 2ex 2vw; }
         @media screen and (max-width: 300px) {
             ul li { flex: 0 0 90vw; }
         }
@@ -49,7 +60,8 @@
 </head>
 <body>
     <h1><%= info.title %></h1>
-    <p><%= info.description %></p>
+    <pre><b>(<%= path %>)</b></pre>
+    <pre><%= info.description %></pre>
     <ul>
         <% trans.forEach(function ({ id, meanings, annotated }) { %>
             <li>
@@ -61,6 +73,7 @@
                 </p>
             </li>
         <% }); %>
+        <li class="extra-space"></li>
     </ul>
 </body>
 </html>
