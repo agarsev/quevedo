@@ -11,6 +11,10 @@ app.use(express.json());
 
 let config = {};
 
+function annotated_status (d) {
+    return d.symbols.length>0;
+}
+
 async function load_dataset (dir) {
     config.path = await fs.realpath(dir);
     config.data_dir = `${dir}/real`;
@@ -23,7 +27,7 @@ async function load_dataset (dir) {
     config.last_id = ids[ids.length-1];
     config.trans = await Promise.all(ids.map(async id => {
         const data = await fs.readJson(`${config.data_dir}/${id}.json`);
-        return { id, annotated: data.symbols.length>0, meanings: data.meanings };
+        return { id, annotated: annotated_status(data), meanings: data.meanings };
     }));
 }
 
@@ -32,20 +36,25 @@ app.get('/', (req, res, next) => res.render('lista', config));
 app.get('/edit/:id', (req, res, next) => {
     const id = req.params.id;
     fs.readJson(`${config.data_dir}/${id}.json`)
-        .then(info => res.render('edit', {
+        .then(annotation => res.render('edit', {
             id,
             prev_link:`/edit/${+id>1?id-1:config.last_id}`,
             next_link: `/edit/${+id<config.last_id?+id+1:1}`,
-            ...info }))
+            info: config.info,
+            ...annotation }))
         .catch(next);
 });
 
 app.post('/edit/:id', (req, res, next) => {
     const info_file = `${config.data_dir}/${req.params.id}.json`;
     fs.readJson(info_file)
-        .then(info => ({ ...info, ...req.body }))
-        .then(new_info => fs.writeJson(info_file, new_info))
-        .then(() => res.send('ok'))
+        .then(info => {
+            const new_info = { ...info, ...req.body };
+            config.trans.find(el => el.id==req.params.id)
+                .annotated = annotated_status(new_info);
+            return fs.writeJson(info_file, new_info);
+        })
+        .then(() => res.sendStatus(200))
         .catch(next);
 });
 

@@ -1,57 +1,132 @@
 <!doctype html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <title>SW Tagger: <%= info.title %> (<%= id %>)</title>
     <style>
-		#boxes, #boxes * {
-			padding: 0;
-			margin: 0;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body { padding: 2vw; }
+        h1 {
+            margin-bottom: 1ex;
+            padding: 0 0 0.5vw 1vw;
+            border-bottom: 1px solid gray;
+            display: flex;
+            align-items: center;
+        }
+        h2 {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 1ex;
+        }
+        h1 > *, h2 > * {
+            flex: 0;
+            margin: 0 1vw;
+        }
+        a, a:visited {
+            text-decoration: none;
+            color: #00A;
+        }
+        a:hover { color: #00F; }
+        h1 button { margin-left: 3em; }
+        #message_text {
+            flex: 1;
+            padding-top: 0.5em;
+            font-weight: normal;
+            font-size: 50%;
+        }
+        li {
+            list-style-type: none;
+            margin-bottom: 0.5ex;
+        }
+        li > * {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+        }
+        li > * > * { margin: 0 0.5ex; }
+        input[type="text"] { flex: 1; }
+        #meanings {
+            align-items: start;
+            display: flex;
+        }
+        #meaning_list {
+            flex: 1;
+            display: inline-block;
+        }
+        #symbols {
+            display: flex;
+            justify-content: space-around;
+        }
+		#boxes {
+			display: inline-block;
+			position: relative;
+            border: 1px solid black;
 		}
         #transcr {
             max-width: 50vw;
             max-height: 40vw;
         }
-		#boxes {
-			display: inline-block;
-			position: relative;
-			border: 1px solid black;
-		}
         .anot {
 			display: block;
 			position: absolute;
 			pointer-events: none;
 			border: 2px solid black;
         }
-        a {
-            text-decoration: none;
+        #symbol_list {
+            padding-left: 2vw;
+            flex: 1;
+        }
+        pre {
+            margin: 2em 0;
+            padding: 1ex 0;
+            border-top: 1px solid gray;
+            color: gray;
         }
     </style>
 </head>
 <body>
     <h1>
-        <%= id %>
-        <button id="save">💾</button>
         <a href="<%= prev_link %>">⬅️</a>
         <a href="/">⬆️</a>
+        <%= id %>
         <a href="<%= next_link %>">➡️</a>
+        <button id="save">💾</button>
+        <span id="message_text"></span>
     </h1>
 
-    <ul id="meaning_list">
-        <%- meanings
-                .map(meaning => `<li><meaning-entry value="${meaning}" /></li>`)
-                .join('')
-        %>
-        <li><button>➕</button></li>
-    </ul>
-	<div id="boxes">
-    	<img id="transcr" src="/img/<%=id %>.png"/>
+    <div id="meanings">
+        <h2>Meanings <button id="add_meaning">➕</button></h2>
+
+        <ul id="meaning_list">
+            <%- meanings
+                    .map(meaning => `<li><meaning-entry value="${meaning}" /></li>`)
+                    .join('')
+            %>
+        </ul>
+    </div>
+
+    <h2>Symbols (drag to draw)</h2>
+
+	<div id="symbols">
+        <div>
+            <div id="boxes">
+                <img id="transcr" src="/img/<%=id %>.png"/>
+            </div>
+        </div>
+        <ul id="symbol_list">
+            <%- symbols
+                    .map(({ name, box }) => `<li><symbol-entry name="${name}"
+                        x="${box[0]}" y="${box[1]}" w="${box[2]}" h="${box[3]}" />`)
+                    .join('')
+            %>
+        </ul>
 	</div>
-    <ul id="symbol_list">
-        <%- symbols
-                .map(({ name, box }) => `<li><symbol-entry name="${name}"
-                    x="${box[0]}" y="${box[1]}" w="${box[2]}" h="${box[3]}" />`)
-                .join('')
-        %>
-    </ul>
+
+    <pre><%= info.annotation_help %></pre>
 
     <script>window.onload = function () {
         /* Helper for creating DOM elements */
@@ -68,11 +143,11 @@
         /* List of meanings for the transcribed sign */
 
         const meaning_list = document.getElementById("meaning_list");
-        const meaning_list_button = document.querySelector("#meaning_list button");
+        const meaning_list_button = document.getElementById("add_meaning");
         meaning_list_button.addEventListener("click", function () {
             const li = document.createElement("li");
             li.innerHTML = "<meaning-entry />";
-            meaning_list.insertBefore(li, meaning_list.lastElementChild);
+            meaning_list.appendChild(li);
         });
         class MeaningEntry extends HTMLElement {
             constructor () {
@@ -186,7 +261,9 @@
 
 		current_box = null;
 
+        const msg = document.getElementById("message_text");
         document.getElementById("save").onclick = function () {
+            msg.innerHTML = "Saving...";
             const data = {
                 meanings: [],
                 symbols: []
@@ -215,8 +292,12 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             })
-            .then(r => alert(r.ok?"OK":`Error: ${r.statusText}`))
-            .catch(e => alert(`Error: ${e}`));
+            .then(r => {
+                if (r.ok) {
+                    msg.innerHTML = "Saved";
+                } else throw r.statusText;
+            })
+            .catch(e => msg.innerHTML = `Error: ${e}`);
         }
     }</script>
 </body>
