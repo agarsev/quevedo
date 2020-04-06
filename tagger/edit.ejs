@@ -129,6 +129,21 @@
     <pre><%= info.annotation_help %></pre>
 
     <script>window.onload = function () {
+        let dirty = false;
+        const save_button = document.getElementById("save");
+        save_button.style.visibility = 'hidden';
+        function mark_dirty () {
+            save_button.style.visibility = '';
+            dirty = true;
+        }
+        function mark_clean () { dirty = false; }
+        window.addEventListener('beforeunload', e => {
+            if (dirty) {
+                e.preventDefault();
+                e.returnValue = "Warning: unsaved changes will be lost";
+            }
+        });
+
         /* Helper for creating DOM elements */
         function create (parent, tag, attrs, inner) {
             const el = document.createElement(tag);
@@ -148,6 +163,7 @@
             const li = document.createElement("li");
             li.innerHTML = "<meaning-entry />";
             meaning_list.appendChild(li);
+            mark_dirty();
         });
         class MeaningEntry extends HTMLElement {
             constructor () {
@@ -155,7 +171,10 @@
                 this.text = create(this, 'input', { type: 'text',
                     value: this.getAttribute('value') || '' });
                 const del = create(this, 'button', {}, '🗑️');
-                del.onclick = () => meaning_list.removeChild(this.parentElement);
+                del.onclick = () => {
+                    mark_dirty();
+                    meaning_list.removeChild(this.parentElement);
+                };
             }
         }
         customElements.define('meaning-entry', MeaningEntry);
@@ -171,6 +190,7 @@
             const li = document.createElement("li");
             li.innerHTML = "<symbol-entry />";
             symbol_list.appendChild(li);
+            mark_dirty();
             return li.firstChild;
         }
         const color_list = [ '#FF0000', '#00FF00', '#0000FF', '#FF00FF',
@@ -208,10 +228,12 @@
                     rect.style.width = 0;
                     rect.style.height = 0;
                     current_box = rect;
+                    mark_dirty();
                 };
                 del.onclick = () => {
                     symbol_list.removeChild(this.parentElement);
                     boxes_layer.removeChild(rect);
+                    mark_dirty();
                 };
             }
         }
@@ -261,8 +283,10 @@
 
 		current_box = null;
 
+        /* saving */
+
         const msg = document.getElementById("message_text");
-        document.getElementById("save").onclick = function () {
+        save_button.onclick = function () {
             msg.innerHTML = "Saving...";
             const data = {
                 meanings: [],
@@ -295,6 +319,7 @@
             .then(r => {
                 if (r.ok) {
                     msg.innerHTML = "Saved";
+                    mark_clean();
                 } else throw r.statusText;
             })
             .catch(e => msg.innerHTML = `Error: ${e}`);
