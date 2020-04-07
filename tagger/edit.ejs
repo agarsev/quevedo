@@ -93,8 +93,8 @@
         <a href="<%= prev_link %>">⬅️</a>
         <a href="/">⬆️</a>
         <%= id %>
-        <a href="<%= next_link %>">➡️</a>
-        <button id="save">💾</button>
+        <a href="<%= next_link %>" tabIndex="3">➡️</a>
+        <button id="save" tabIndex="2">💾</button>
         <span id="message_text"></span>
     </h1>
 
@@ -170,6 +170,7 @@
                 super();
                 this.text = create(this, 'input', { type: 'text',
                     value: this.getAttribute('value') || '' });
+                text.oninput = mark_dirty;
                 const del = create(this, 'button', {}, '🗑️');
                 del.onclick = () => {
                     mark_dirty();
@@ -201,7 +202,7 @@
                 super();
                 const color_val = color_list[(i++)%color_list.length];
                 const col = create(this, 'input', { type: 'color', value: color_val });
-                const text = create(this, 'input', { type: 'text',
+                const text = create(this, 'input', { type: 'text', tabIndex: 1,
 					value: this.getAttribute('name') || '' });
                 this.text = text;
                 const edit = create(this, 'button', {}, '📐');
@@ -222,6 +223,7 @@
 				rect.style.borderColor = color_val;
 				rect.dirty_box = false;
                 boxes_layer.appendChild(rect);
+                text.oninput = mark_dirty;
                 col.oninput = () => rect.style.borderColor = col.value;
                 current_box = rect;
                 edit.onclick = () => {
