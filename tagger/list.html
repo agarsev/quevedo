@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>SW Tagger: <%= info.title %></title>
+    <title>SW Tagger: {{ info.title }}</title>
     <style>
         * {
             box-sizing: border-box;
@@ -59,20 +59,20 @@
     </style>
 </head>
 <body>
-    <h1><%= info.title %></h1>
-    <pre><b>(<%= path %>)</b></pre>
-    <pre><%= info.description %></pre>
+    <h1>{{ info.title }}</h1>
+    <pre><b>({{ path }})</b></pre>
+    <pre>{{ info.description }}</pre>
     <ul>
-        <% trans.forEach(function ({ id, meanings, annotated }) { %>
+        {%- for t in trans %}
             <li>
-                <h2><%=meanings[0] %></h2>
-                <img src="/img/<%=id %>.png" />
+                <h2>{{t.meanings[0]}}</h2>
+                <img src="/img/{{t.id}}.png" />
                 <p>
-                    <a href="/edit/<%=id %>">📝</a>
-                    <% if (annotated>0) { %>✔️ (<%=annotated %>)<% } %>
+                    <a href="/edit/{{t.id}}">📝</a>
+                    {%- if (t.annotated>0) %}✔️ ({{t.annotated}}){%- endif %}
                 </p>
             </li>
-        <% }); %>
+        {%- endfor %}
         <li class="extra-space"></li>
     </ul>
 </body>

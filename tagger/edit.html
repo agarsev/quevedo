@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>SW Tagger: <%= info.title %> (<%= id %>)</title>
+    <title>SW Tagger: {{ info.title }} ({{ id }})</title>
     <style>
         * {
             box-sizing: border-box;
@@ -90,10 +90,10 @@
 </head>
 <body>
     <h1>
-        <a href="<%= prev_link %>">⬅️</a>
+        <a href="{{ prev_link }}">⬅️</a>
         <a href="/">⬆️</a>
-        <%= id %>
-        <a href="<%= next_link %>" tabIndex="3">➡️</a>
+        {{ id }}
+        <a href="{{ next_link }}" tabIndex="3">➡️</a>
         <button id="save" tabIndex="2">💾</button>
         <span id="message_text"></span>
     </h1>
@@ -102,10 +102,9 @@
         <h2>Meanings <button id="add_meaning">➕</button></h2>
 
         <ul id="meaning_list">
-            <%- meanings
-                    .map(meaning => `<li><meaning-entry value="${meaning}" /></li>`)
-                    .join('')
-            %>
+            {%- for m in meanings %}
+                <li><meaning-entry value="{{m}}" /></li>
+            {%- endfor %}
         </ul>
     </div>
 
@@ -114,19 +113,18 @@
 	<div id="symbols">
         <div>
             <div id="boxes">
-                <img id="transcr" src="/img/<%=id %>.png"/>
+                <img id="transcr" src="/img/{{id}}.png"/>
             </div>
         </div>
         <ul id="symbol_list">
-            <%- symbols
-                    .map(({ name, box }) => `<li><symbol-entry name="${name}"
-                        x="${box[0]}" y="${box[1]}" w="${box[2]}" h="${box[3]}" />`)
-                    .join('')
-            %>
+            {%- for s in symbols %}
+                <li><symbol-entry name="{{s.name}}" x="{{s.box[0]}}" y="{{s.box[1]}}"
+                         w="{{s.box[2]}}" h="{{s.box[3]}}" />
+            {%- endfor %}
         </ul>
 	</div>
 
-    <pre><%= info.annotation_help %></pre>
+    <pre>{{ info.annotation_help }}</pre>
 
     <script>window.onload = function () {
         let dirty = false;
