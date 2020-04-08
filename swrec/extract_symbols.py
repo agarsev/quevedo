@@ -2,11 +2,10 @@
 
 import click
 import json
-from pathlib import Path
 from PIL import Image
 
 @click.command()
-@click.argument('dataset', type=click.Path(exists=True))
+@click.pass_obj
 def extract_symbols(dataset):
     ''' Extracts the symbols from the *real* transcriptions into their own files.
 
@@ -21,8 +20,8 @@ def extract_symbols(dataset):
     `symbol_name.trans_id.symbol_index.png`
     '''
 
-    real_d = Path(dataset) / 'real'
-    symbol_d = Path(dataset) / 'symbols'
+    real_d = dataset.path / 'real'
+    symbol_d = dataset.path / 'symbols'
     try:
         symbol_d.mkdir()
     except FileExistsError:
@@ -41,7 +40,3 @@ def extract_symbols(dataset):
             u = float(symb['box'][1])*height - h/2
             region = transcription.crop((l, u, l+w, u+h))
             region.save(symbol_d / '{}.{}.{}.png'.format(name, number, idx))
-
-
-if __name__ == '__main__':
-    extract_symbols()

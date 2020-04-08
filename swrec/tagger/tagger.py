@@ -1,11 +1,9 @@
 # 2020-04-07 Antonio F. G. Sevilla <afgs@ucm.es>
 
-import click
 from flask import Flask, render_template, send_from_directory, request
 import json
 import logging
 import os
-from pathlib import Path 
 import yaml
 
 os.environ['WERKZEUG_RUN_MAIN'] = 'true'
@@ -62,25 +60,3 @@ def edit_post (idx):
     trans['annotated'] = annotated_status(new_info)
     anot_file.write_text(json.dumps(new_info))
     return 'OK'
-
-@click.command()
-@click.argument('dataset', type=click.Path(exists=True))
-@click.option('-h','--host',default='localhost')
-@click.option('-p','--port',default='5000')
-def run_tagger(dataset, host, port):
-    ''' Runs a tagger web application for tagging a dataset.
-
-    The files in the `real` directory will be listed. For each, bounding boxes
-    of symbols can be added, along with their class/name, and meanings for the
-    whole transcription. The information will be saved along the real
-    transcription with a `json` extension.
-    '''
-
-    click.echo("Loading dataset...")
-    load_dataset(Path(dataset))
-    click.echo("Starting tagger at http://{}:{}".format(host, port));
-    click.launch("http://{}:{}".format(host, port));
-    app.run()
-
-if __name__ == '__main__':
-    run_tagger()

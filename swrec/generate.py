@@ -1,7 +1,6 @@
 # 2020-04-08 Antonio F. G. Sevilla <afgs@ucm.es>
 
 import click
-from pathlib import Path
 from PIL import Image
 from PIL.ImageOps import invert, grayscale
 import random
@@ -108,7 +107,7 @@ def create_transcription (path, symbols):
     (path.with_suffix(".txt")).write_text("\n".join(bboxes))
 
 @click.command()
-@click.argument('dataset', type=click.Path(exists=True))
+@click.pass_obj
 def generate (dataset):
     ''' Generates artificial "transcriptions" for training.
 
@@ -118,16 +117,15 @@ def generate (dataset):
     placed in the `generated` directory.
     '''
 
-    dataset = Path(dataset)
-    symbol_d = dataset / 'symbols'
+    symbol_d = dataset.path / 'symbols'
 
-    gen_d = dataset / 'generated'
+    gen_d = dataset.path / 'generated'
     try:
         gen_d.mkdir()
     except FileExistsError:
         click.confirm('Generated directory already exists. Overwrite?', abort=True)
 
-    info = (dataset / 'info.yaml').read_text()
+    info = (dataset.path / 'info.yaml').read_text()
     config.update(yaml.safe_load(info).get('generate', {}))
 
     if config['seed'] is not None:
@@ -156,6 +154,3 @@ def generate (dataset):
     # Generate as many transcriptions as requested, numbering them incrementally
     for i in range(config['count']):
         create_transcription(gen_d / str(i+1), symbols)
-
-if __name__ == '__main__':
-    generate()
