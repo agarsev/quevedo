@@ -14,6 +14,9 @@ pyyaml = { version = "^5.3.1", optional = true }
 [tool.poetry.extras]
 tagger = [ "flask", "pyyaml" ]
 
+[tool.poetry.scripts]
+tagger = "swrec.tagger.tagger:run_tagger"
+
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"

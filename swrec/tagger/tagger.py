@@ -26,10 +26,11 @@ def get_transcription_info (idx):
         }
 
 def load_dataset (path):
-    config['path'] = path.resolve();
-    data_dir = path / 'real';
+    resolved = path.resolve();
+    config['path'] = resolved;
+    data_dir = resolved / 'real';
     config['data_dir'] = data_dir
-    config['info'] = yaml.safe_load((path / 'info.yaml').read_text());
+    config['info'] = yaml.safe_load((resolved / 'info.yaml').read_text());
     ids = sorted(int(trans.stem) for trans in data_dir.glob("*.png"))
     config['last_id'] = ids[-1]
     config['trans'] = list(map(get_transcription_info, ids))
