@@ -54,7 +54,7 @@ def put_symbol (canvas, x, y, filename, name, rotate=False):
     sim.putalpha(invert(sim.convert("L")))
 
     canvas.alpha_composite(sim, (x, y))
-    return "{} {} {} {} {}\n".format(name,
+    return "{} {} {} {} {}".format(name,
         (x+w/2)/canvas_w, (y+h/2)/canvas_h,
         w/canvas_w, h/canvas_h)
 

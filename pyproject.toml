@@ -17,6 +17,7 @@ tagger = [ "flask" ]
 force_layout = [ "forcelayout" ]
 
 [tool.poetry.scripts]
+cli = "swrec.cli:cli"
 tagger = "swrec.tagger.tagger:run_tagger"
 
 [build-system]
