@@ -23,8 +23,10 @@ def extract_symbols(dataset):
 
     real_d = Path(dataset) / 'real'
     symbol_d = Path(dataset) / 'symbols'
-    if symbol_d.exists():
-        click.confirm('Symbol directory exists. Overwrite?', abort=True)
+    try:
+        symbol_d.mkdir()
+    except FileExistsError:
+        click.confirm('Symbol directory already exists. Overwrite?', abort=True)
 
     for an in real_d.glob('*.json'):
         number = an.stem

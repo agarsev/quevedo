@@ -79,6 +79,7 @@ def run_tagger(dataset, host, port):
     click.echo("Loading dataset...")
     load_dataset(Path(dataset))
     click.echo("Starting tagger at http://{}:{}".format(host, port));
+    click.launch("http://{}:{}".format(host, port));
     app.run()
 
 if __name__ == '__main__':
