@@ -1,23 +1,23 @@
 # 2020-04-08 Antonio F. G. Sevilla <afgs@ucm.es>
 
 import click
-from pathlib import Path
 from swrec import extract_symbols, generate, yolo
-
-class Dataset:
-    def __init__ (self, path):
-        self.path = Path(path)
+from swrec.dataset import info, Dataset
 
 @click.group(commands={
         'extract_symbols': extract_symbols.extract_symbols,
         'generate': generate.generate,
-        'make_yolo_files': yolo.make_yolo_files
-    }, chain=True)
+        'make_yolo_files': yolo.make_yolo_files,
+        'info': info
+    }, chain=True, invoke_without_command=True)
 @click.argument('dataset', type=click.Path(exists=True))
 @click.pass_context
 def cli (ctx, dataset):
     '''Command line application for managing a SW deep learning dataset.'''
     ctx.obj = Dataset(dataset)
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(info)
+        click.echo(cli.get_help(ctx))
 
 @cli.command()
 @click.pass_obj
