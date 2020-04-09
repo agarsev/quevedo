@@ -1,20 +1,19 @@
 # 2020-04-08 Antonio F. G. Sevilla <afgs@ucm.es>
 
 import click
-from swrec import extract_symbols, generate, yolo
-from swrec.dataset import info, Dataset
+from swrec import extract_symbols, generate, yolo, dataset as ds
 
 @click.group(commands={
         'extract_symbols': extract_symbols.extract_symbols,
         'generate': generate.generate,
         'make_yolo_files': yolo.make_yolo_files,
-        'info': info
+        'info': ds.info, 'create': ds.create, 'add_images': ds.add_images,
     }, chain=True, invoke_without_command=True)
-@click.argument('dataset', type=click.Path(exists=True))
+@click.argument('dataset', type=click.Path())
 @click.pass_context
 def cli (ctx, dataset):
     '''Command line application for managing a SW deep learning dataset.'''
-    ctx.obj = Dataset(dataset)
+    ctx.obj = ds.Dataset(dataset)
     if ctx.invoked_subcommand is None:
         ctx.invoke(info)
         click.echo(cli.get_help(ctx))
@@ -34,7 +33,7 @@ def tagger(dataset, host, port):
     from swrec.tagger import tagger
 
     click.echo("Loading dataset...")
-    tagger.load_dataset(dataset.path)
+    tagger.load_dataset(dataset)
     click.echo("Starting tagger at http://{}:{}".format(host, port));
     click.launch("http://{}:{}".format(host, port));
     tagger.app.run(host=host, port=port)

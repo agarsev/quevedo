@@ -5,7 +5,6 @@ from PIL import Image
 from PIL.ImageOps import invert, grayscale
 import random
 import re
-import yaml
 
 # Used only if force layout
 try:
@@ -125,8 +124,7 @@ def generate (dataset):
     except FileExistsError:
         click.confirm('Generated directory already exists. Overwrite?', abort=True)
 
-    info = (dataset.path / 'info.yaml').read_text()
-    config.update(yaml.safe_load(info).get('generate', {}))
+    config.update(dataset.info.get('generate', {}))
 
     if config['seed'] is not None:
         random.seed(seed)

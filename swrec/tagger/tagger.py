@@ -4,7 +4,6 @@ from flask import Flask, render_template, send_from_directory, request
 import json
 import logging
 import os
-import yaml
 
 os.environ['WERKZEUG_RUN_MAIN'] = 'true'
 app = Flask(__name__, template_folder='.')
@@ -23,12 +22,12 @@ def get_transcription_info (idx):
         'meanings': anot.get('meanings', [])
         }
 
-def load_dataset (path):
-    resolved = path.resolve();
+def load_dataset (dataset):
+    resolved = dataset.path.resolve();
     config['path'] = resolved;
     data_dir = resolved / 'real';
     config['data_dir'] = data_dir
-    config['info'] = yaml.safe_load((resolved / 'info.yaml').read_text());
+    config['info'] = dataset.info
     ids = sorted(int(trans.stem) for trans in data_dir.glob("*.png"))
     config['last_id'] = ids[-1]
     config['trans'] = list(map(get_transcription_info, ids))

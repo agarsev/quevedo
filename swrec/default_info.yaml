@@ -1,0 +1,20 @@
+annotation_help: |
+  Write here any help for annotators, like lists of symbols or other
+  instructions. For example:
+
+  Make boxes slightly larger than the symbols, not too tight.
+
+# Configuration for the artificial transcription generation
+generate:
+  count: 500
+  width_range: [ 200, 300 ]
+  height_range: [ 200, 300 ]
+  params:
+    - match: 'one'
+      mode: 'one'
+      freq: 0.4
+      rotate: false
+    - match: '.*'
+      mode: 'many'
+      prob: 0.6
+      rotate: true
