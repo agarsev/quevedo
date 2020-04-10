@@ -9,7 +9,7 @@ SignWriting RECognition tool.
 
 ## Usage
 
-Base requirements: [python 3] and [poetry].
+Base requirements: [python 3], [poetry], [darknet].
 
 Install: `poetry install`.
 
@@ -35,5 +35,6 @@ Datasets are plain directories with a specified structure inside:
 Antonio F. G. Sevilla <afgs@ucm.es>
 
 
-[python 3]: https://www.python.org/
+[darknet]: https://pjreddie.com/darknet/install/
 [poetry]: https://python-poetry.org/
+[python 3]: https://www.python.org/

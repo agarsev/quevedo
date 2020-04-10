@@ -103,4 +103,10 @@ def info (dataset):
 
     gen = path / 'generated'
     num_gen = sum(1 for _ in gen.glob('*.png'))
-    click.echo('Transcriptions generated: {}\n'.format(style(gen.exists(), num_gen, 'no')))
+    click.echo('Transcriptions generated: {}'.format(style(gen.exists(), num_gen, 'no')))
+
+    darknet = path / 'darknet'
+    click.echo('Darknet configuration {}'.format(style(darknet.exists(),
+        'exists', "doesn't exist")))
+
+    click.echo('')

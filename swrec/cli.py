@@ -1,12 +1,12 @@
 # 2020-04-08 Antonio F. G. Sevilla <afgs@ucm.es>
 
 import click
-from swrec import extract_symbols, generate, yolo, dataset as ds
+from swrec import extract_symbols, generate, darknet, dataset as ds
 
 @click.group(commands={
         'extract_symbols': extract_symbols.extract_symbols,
         'generate': generate.generate,
-        'make_yolo_files': yolo.make_yolo_files,
+        'configure_darknet': darknet.configure,
         'info': ds.info, 'create': ds.create, 'add_images': ds.add_images,
     }, chain=True, invoke_without_command=True)
 @click.argument('dataset', type=click.Path())
