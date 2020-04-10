@@ -4,6 +4,7 @@ import click
 import json
 from pathlib import Path
 from string import Template
+from subprocess import run
 
 @click.command()
 @click.pass_obj
@@ -65,3 +66,19 @@ def configure (dataset):
     (dn_dir / 'darknet.cfg').write_text(net_config)
 
     click.echo("Darknet configuration ready")
+
+@click.command()
+@click.option('--darknetpath','-d',type=click.Path(exists=True),
+        required=True, default="darknet/darknet",
+        help="Path to the darknet executable")
+@click.pass_obj
+def train (dataset, darknetpath):
+
+    dn_dir = dataset.path / 'darknet'
+    if not dn_dir.exists():
+        raise SystemExit("Darknet not configured for this dataset, configure it first")
+
+    darknet_data = (dn_dir / 'darknet.data').resolve()
+    darknet_cfg = (dn_dir / 'darknet.cfg').resolve()
+    run([darknetpath, 'detector', 'train', darknet_data, darknet_cfg])
+
