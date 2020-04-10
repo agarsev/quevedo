@@ -16,7 +16,7 @@ def cli (ctx, dataset):
     '''Command line application for managing a SW deep learning dataset.'''
     ctx.obj = ds.Dataset(dataset)
     if ctx.invoked_subcommand is None:
-        ctx.invoke(info)
+        ctx.invoke(ds.info)
         click.echo(cli.get_help(ctx))
 
 @cli.command()

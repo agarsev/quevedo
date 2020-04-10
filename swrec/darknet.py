@@ -73,6 +73,10 @@ def configure (dataset):
         help="Path to the darknet executable")
 @click.pass_obj
 def train (dataset, darknetpath):
+    ''' Trains a neural network to recognize the SW in this dataset.
+
+    Uses the transcriptions and configuration created, and calls the darknet
+    binary with the appropriate information.'''
 
     dn_dir = dataset.path / 'darknet'
     if not dn_dir.exists():
