@@ -86,3 +86,27 @@ def train (dataset, darknetpath):
     darknet_cfg = (dn_dir / 'darknet.cfg').resolve()
     run([darknetpath, 'detector', 'train', darknet_data, darknet_cfg])
 
+@click.command()
+@click.option('--darknetpath','-d',type=click.Path(exists=True),
+        required=True, default="darknet/darknet",
+        help="Path to the darknet executable")
+@click.option('--image','-i',type=click.Path(exists=True),
+        required=True, help="Image to predict")
+@click.pass_obj
+def test (dataset, darknetpath, image):
+    ''' Test the neural network on an image.'''
+
+    dn_dir = dataset.path / 'darknet'
+    if not dn_dir.exists():
+        raise SystemExit("Darknet not configured for this dataset, configure it first")
+
+    darknet_data = (dn_dir / 'darknet.data').resolve()
+    darknet_cfg = (dn_dir / 'darknet.cfg').resolve()
+    weights = (dataset.path / 'weights' / 'darknet_final.weights').resolve()
+    
+    if not weights.exists():
+        raise SystemExit("Neural network has not been trained")
+
+    run([darknetpath, 'detector', 'test', darknet_data, darknet_cfg,
+        weights, image])
+

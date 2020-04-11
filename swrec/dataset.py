@@ -109,4 +109,8 @@ def info (dataset):
     click.echo('Darknet configuration {}'.format(style(darknet.exists(),
         'exists', "doesn't exist")))
 
+    weights = path / 'weights' / 'darknet_final.weights'
+    click.echo('Neural network {}'.format(style(weights.exists(),
+        'has been trained', "hasn't been trained")))
+
     click.echo('')

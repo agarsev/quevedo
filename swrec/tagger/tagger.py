@@ -46,8 +46,11 @@ def edit_page (idx):
     anot_file = config['data_dir'] / '{}.json'.format(idx)
     anot = json.loads(anot_file.read_text())
     return render_template('edit.html', **{ 'id': idx,
-        'prev_link': '/edit/{}'.format(idn-1 if idn>1 else config['last_id']),
-        'next_link': '/edit/{}'.format(idn+1 if idn<config['last_id'] else 1),
+        'mount': config['mount'],
+        'prev_link': '{}/edit/{}'.format(config['mount'],
+            idn-1 if idn>1 else config['last_id']),
+        'next_link': '{}/edit/{}'.format(config['mount'],
+            idn+1 if idn<config['last_id'] else 1),
         'info': config['info'], **anot })
 
 @app.route('/edit/<idx>', methods=["POST"])
@@ -59,3 +62,7 @@ def edit_post (idx):
     trans['annotated'] = annotated_status(new_info)
     anot_file.write_text(json.dumps(new_info))
     return 'OK'
+
+def run (host, port, path):
+    config['mount'] = '/'+path
+    app.run(host=host, port=port)

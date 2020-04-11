@@ -7,7 +7,7 @@ from swrec import extract_symbols, generate, darknet, dataset as ds
         'extract_symbols': extract_symbols.extract_symbols,
         'generate': generate.generate,
         'configure_darknet': darknet.configure,
-        'train': darknet.train,
+        'train': darknet.train, 'test': darknet.test,
         'info': ds.info, 'create': ds.create, 'add_images': ds.add_images,
     }, chain=True, invoke_without_command=True)
 @click.argument('dataset', type=click.Path())
@@ -21,9 +21,11 @@ def cli (ctx, dataset):
 
 @cli.command()
 @click.pass_obj
-@click.option('-h','--host',default='localhost')
-@click.option('-p','--port',default='5000')
-def tagger(dataset, host, port):
+@click.option('-h','--host', default='localhost')
+@click.option('-p','--port', default='5000')
+@click.option('-m','--mount-path', default='', help="Mount path for the tagger application")
+@click.option('--browser/--no-browser',default=True, help="Launch browser at the tagger location")
+def tagger(dataset, host, port, browser, mount_path):
     ''' Run a web application for annotating the transcriptions in the dataset.
 
     The files in the `real` directory will be listed. For each, bounding boxes
@@ -35,6 +37,10 @@ def tagger(dataset, host, port):
 
     click.echo("Loading dataset...")
     tagger.load_dataset(dataset)
-    click.echo("Starting tagger at http://{}:{}".format(host, port));
-    click.launch("http://{}:{}".format(host, port));
-    tagger.app.run(host=host, port=port)
+    url = "http://{}:{}".format(host, port)
+
+    click.echo("Starting tagger at {}".format(url));
+    if browser:
+        click.launch(url);
+
+    tagger.run(host, port, mount_path)
