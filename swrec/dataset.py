@@ -79,6 +79,8 @@ def add_images(dataset, image_dir):
         click.echo("imported {}".format(style(count>0, count)))
     click.echo("\n")
 
+def count (l):
+    return sum(1 for _ in l)
 
 @click.command()
 @click.pass_obj
@@ -90,24 +92,27 @@ def info (dataset):
     click.secho('{}\n{}\n'.format(info["title"], '='*len(info['title'])), bold=True)
     click.echo(info["description"])
 
-    num_real = sum(1 for _ in (path / 'real').glob('*.png'))
+    real = path / 'real'
+    num_real = count(real.glob('*.png'))
     click.echo('Real transcriptions: {}'.format(style(num_real>0, num_real)))
     num_annot = sum(len(json.loads(annot.read_text())['symbols'])>0
-            for annot in (path / 'real').glob('*.json'))
+            for annot in real.glob('*.json'))
     click.echo('Annotated: {}/{}\n'.format(style(num_annot==num_real, num_annot),
         num_real))
 
     symbols = path / 'symbols'
-    num_sym = sum(1 for _ in symbols.glob('*.png'))
+    num_sym = count(symbols.glob('*.png'))
     click.echo('Symbols extracted: {}'.format(style(symbols.exists(), num_sym, 'no')))
 
     gen = path / 'generated'
-    num_gen = sum(1 for _ in gen.glob('*.png'))
+    num_gen = count(gen.glob('*.png'))
     click.echo('Transcriptions generated: {}'.format(style(gen.exists(), num_gen, 'no')))
 
     darknet = path / 'darknet'
-    click.echo('Darknet configuration {}'.format(style(darknet.exists(),
-        'exists', "doesn't exist")))
+    num_txt = count(real.glob('*.txt')) + count(gen.glob('*.txt'))
+    click.echo('Darknet {} configured and ready'.format(style(
+        darknet.exists() and num_txt == num_gen+num_real,
+        'is', "is not")))
 
     weights = path / 'weights' / 'darknet_final.weights'
     click.echo('Neural network {}'.format(style(weights.exists(),

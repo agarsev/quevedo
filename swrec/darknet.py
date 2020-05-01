@@ -20,28 +20,32 @@ def configure (dataset):
 
     # Collect all symbol names/classes used while making darknet/yolo bounding
     # box files
-    symbol_set = set()
-    annotation_files = list(real_d.glob('*.json'))
+    symbols = []
+    annotation_files = (list(real_d.glob('*.json')) +
+                        list((dataset.path / 'generated').glob('*.json')))
 
     for an in annotation_files:
         annotation = json.loads(an.read_text())
         bboxes = []
         for s in annotation['symbols']:
-            bboxes += "{} {} {} {} {}".format(s['name'], *s['box'])
-            symbol_set.add(s['name'])
-        an.with_suffix(".txt").write_text("\n".join(bboxes))
+            try:
+                index = symbols.index(s['name'])
+            except ValueError:
+                symbols.append(s['name'])
+                index = len(symbols)-1
+            bboxes.append("{} {} {} {} {}\n".format(index, *s['box']))
+        an.with_suffix(".txt").write_text("".join(bboxes))
 
-    num_classes = len(symbol_set)
+    num_classes = len(symbols)
 
     names_file = dn_dir / 'obj.names'
-    names_file.write_text("\n".join(symbol_set))
+    names_file.write_text("\n".join(symbols)+"\n")
 
     # Write train file with the list of files to train on, that is real +
     # generated transcriptions
-    generated = list((dataset.path / 'generated').glob('*.png'))
     train_file = dn_dir / 'train.txt'
-    train_file.write_text("\n".join(str(f.with_suffix(".png").resolve()) for f in
-        annotation_files + generated))
+    train_file.write_text("\n".join(str(f.with_suffix(".png").resolve())
+        for f in annotation_files)+"\n")
 
     # In this directory, the weights of the trained network will be stored
     weight_d = dataset.path / 'weights'

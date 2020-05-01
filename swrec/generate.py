@@ -1,6 +1,7 @@
 # 2020-04-08 Antonio F. G. Sevilla <afgs@ucm.es>
 
 import click
+import json
 from PIL import Image
 from PIL.ImageOps import invert, grayscale
 import random
@@ -52,9 +53,11 @@ def put_symbol (canvas, x, y, filename, name, rotate=False):
     sim.putalpha(invert(sim.convert("L")))
 
     canvas.alpha_composite(sim, (x, y))
-    return "{} {} {} {} {}".format(name,
-        (x+w/2)/canvas_w, (y+h/2)/canvas_h,
-        w/canvas_w, h/canvas_h)
+    return {
+        'name': name,
+        'box': [ (x+w/2)/canvas_w, (y+h/2)/canvas_h,
+                w/canvas_w, h/canvas_h ]
+        }
 
 def create_transcription (path, symbols):
     '''Creates an image with randomly placed symbols'''
@@ -103,7 +106,7 @@ def create_transcription (path, symbols):
         bboxes.append(put_symbol(canvas, int(x), int(y),
             filename, name, rotate))
     canvas.save(path.with_suffix(".png"))
-    (path.with_suffix(".txt")).write_text("\n".join(bboxes))
+    path.with_suffix(".json").write_text(json.dumps({ 'symbols': bboxes }))
 
 @click.command()
 @click.pass_obj
