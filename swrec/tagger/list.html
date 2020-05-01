@@ -66,9 +66,9 @@
         {%- for t in trans %}
             <li>
                 <h2>{{t.meanings[0]}}</h2>
-                <img src="{{mount}}/img/{{t.id}}.png" />
+                <img src="{{mount}}img/{{t.id}}.png" />
                 <p>
-                    <a href="{{mount}}/edit/{{t.id}}">📝</a>
+                    <a href="{{mount}}edit/{{t.id}}">📝</a>
                     {%- if (t.annotated>0) %}✔️ ({{t.annotated}}){%- endif %}
                 </p>
             </li>

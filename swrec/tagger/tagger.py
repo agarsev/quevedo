@@ -64,5 +64,5 @@ def edit_post (idx):
     return 'OK'
 
 def run (host, port, path):
-    config['mount'] = '/'+path
+    config['mount'] = '/'+path+'/' if path != '' else '/'
     app.run(host=host, port=port)
