@@ -59,7 +59,7 @@ def configure (dataset):
 
     # Write net configuration. See the darknet.cfg file provided from upstream,
     # the template is filled in here.
-    num_max_batches = num_classes * 500 # Recommended *2000, let's see
+    num_max_batches = num_classes * 2000
     template = Template((Path(__file__).parent / 'darknet.cfg').read_text())
     net_config = template.substitute(
             num_classes=num_classes,
@@ -111,6 +111,7 @@ def test (dataset, darknetpath, image):
     if not weights.exists():
         raise SystemExit("Neural network has not been trained")
 
+    # When running mAP, use flag -letter_box
     run([darknetpath, 'detector', 'test', darknet_data, darknet_cfg,
         weights, image])
 
