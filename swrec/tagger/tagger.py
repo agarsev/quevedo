@@ -23,6 +23,7 @@ def get_transcription_info (idx):
         }
 
 def load_dataset (dataset):
+    config['dataset'] = dataset
     resolved = dataset.path.resolve();
     config['path'] = resolved;
     data_dir = resolved / 'real';
@@ -47,10 +48,8 @@ def edit_page (idx):
     anot = json.loads(anot_file.read_text())
     return render_template('edit.html', **{ 'id': idx,
         'mount': config['mount'],
-        'prev_link': '{}/edit/{}'.format(config['mount'],
-            idn-1 if idn>1 else config['last_id']),
-        'next_link': '{}/edit/{}'.format(config['mount'],
-            idn+1 if idn<config['last_id'] else 1),
+        'prev_link': 'edit/{}'.format(idn-1 if idn>1 else config['last_id']),
+        'next_link': 'edit/{}'.format(idn+1 if idn<config['last_id'] else 1),
         'info': config['info'], **anot })
 
 @app.route('/edit/<idx>', methods=["POST"])
@@ -62,6 +61,18 @@ def edit_post (idx):
     trans['annotated'] = annotated_status(new_info)
     anot_file.write_text(json.dumps(new_info))
     return 'OK'
+
+predict = None
+@app.route('/auto/<idx>')
+def get_auto_annotations (idx):
+    global predict
+    if predict is None:
+        from swrec.darknet.test import init_darknet, predict as true_predict
+        init_darknet(config['dataset'])
+        predict = true_predict
+
+    img = (config['data_dir'] / '{}.png'.format(idx)).resolve()
+    return { 'symbols': predict(img) }
 
 def run (host, port, path):
     config['mount'] = '/'+path+'/' if path != '' else '/'

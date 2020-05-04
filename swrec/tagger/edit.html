@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>SW Tagger: {{ info.title }} ({{ id }})</title>
+    <base href="{{ mount }}">
     <style>
         * {
             box-sizing: border-box;
@@ -96,6 +97,7 @@
         <a href="{{ next_link }}" tabIndex="3">➡️</a>
         <button id="save" tabIndex="2">💾</button>
         <span id="message_text"></span>
+        <button id="auto">⚙️</button>
     </h1>
 
     <div id="meanings">
@@ -185,9 +187,15 @@
         let current_box = null; // symbol being edited
 
         const symbol_list = document.getElementById("symbol_list");
-        function add_symbol () {
+        function add_symbol (sym) {
             const li = document.createElement("li");
-            li.innerHTML = "<symbol-entry />";
+            if (sym !== undefined) {
+                li.innerHTML = `<symbol-entry name="${sym.name}"
+                    x="${sym.bbox[0]}" y="${sym.bbox[1]}"
+                    w="${sym.bbox[2]}" h="${sym.bbox[3]}"/>`;
+            } else {
+                li.innerHTML = "<symbol-entry />";
+            }
             symbol_list.appendChild(li);
             mark_dirty();
             return li.firstChild;
@@ -230,11 +238,12 @@
                     current_box = rect;
                     mark_dirty();
                 };
-                del.onclick = () => {
-                    symbol_list.removeChild(this.parentElement);
-                    boxes_layer.removeChild(rect);
-                    mark_dirty();
-                };
+                del.onclick = () => this.removeSelf();
+            }
+            removeSelf () {
+                symbol_list.removeChild(this.parentElement);
+                boxes_layer.removeChild(this.rect);
+                mark_dirty();
             }
         }
         customElements.define('symbol-entry', SymbolEntry);
@@ -321,6 +330,24 @@
                     msg.innerHTML = "Saved";
                     mark_clean();
                 } else throw r.statusText;
+            })
+            .catch(e => msg.innerHTML = `Error: ${e}`);
+        }
+
+        const auto_url = (window.location+'').replace(/edit/, 'auto');
+        /* loading of automatic annotations */
+        document.getElementById('auto').onclick = function () {
+            let sl = symbol_list.querySelectorAll('symbol-entry');
+            if (sl.length>0 && !confirm("WARNING: Existing annotations will be removed"))
+                return;
+            sl.forEach(el => el.removeSelf());
+            fetch(auto_url).then(r => {
+                if (r.ok) {
+                    return r.json();
+                } else throw r.statusText;
+            }).then(({ symbols }) => {
+                console.log(symbols);
+                symbols.forEach(s => add_symbol(s));
             })
             .catch(e => msg.innerHTML = `Error: ${e}`);
         }

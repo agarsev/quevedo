@@ -10,5 +10,6 @@ import swrec.darknet.train
 @click.pass_obj
 def test (dataset, image):
     ''' Test the neural network on an image.'''
-    from swrec.darknet.test import predict
-    print(predict(dataset, image))
+    from swrec.darknet.test import init_darknet, predict
+    init_darknet(dataset)
+    print(predict(image))
