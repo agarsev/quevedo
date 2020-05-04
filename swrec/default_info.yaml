@@ -1,8 +1,20 @@
+title: $title
+
+description: |
+  $description
+
 annotation_help: |
   Write here any help for annotators, like lists of symbols or other
   instructions. For example:
 
   Make boxes slightly larger than the symbols, not too tight.
+
+# Darknet configuration
+darknet:
+  path: darknet/darknet
+  library: darknet/libdarknet.so
+  env:
+    LD_LIBRARY_PATH: /usr/lib/cuda
 
 # Configuration for the artificial transcription generation
 generate:

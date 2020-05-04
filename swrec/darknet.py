@@ -4,11 +4,11 @@ import click
 import json
 from pathlib import Path
 from string import Template
-from subprocess import run
+import re
 
 @click.command()
 @click.pass_obj
-def configure (dataset):
+def pre_train (dataset):
     ''' Creates the files needed for training darknet yolo on this dataset.
 
     The transcriptions in the `real` directory must have been tagged. Any
@@ -69,14 +69,11 @@ def configure (dataset):
             num_steps_2=int(num_max_batches*90/100))
     (dn_dir / 'darknet.cfg').write_text(net_config)
 
-    click.echo("Darknet configuration ready")
+    click.echo("Dataset ready for training")
 
 @click.command()
-@click.option('--darknetpath','-d',type=click.Path(exists=True),
-        required=True, default="darknet/darknet",
-        help="Path to the darknet executable")
 @click.pass_obj
-def train (dataset, darknetpath):
+def train (dataset):
     ''' Trains a neural network to recognize the SW in this dataset.
 
     Uses the transcriptions and configuration created, and calls the darknet
@@ -84,25 +81,22 @@ def train (dataset, darknetpath):
 
     dn_dir = dataset.path / 'darknet'
     if not dn_dir.exists():
-        raise SystemExit("Darknet not configured for this dataset, configure it first")
+        raise SystemExit("Please run pre-train command first")
 
     darknet_data = (dn_dir / 'darknet.data').resolve()
     darknet_cfg = (dn_dir / 'darknet.cfg').resolve()
-    run([darknetpath, 'detector', 'train', darknet_data, darknet_cfg])
+    dataset.run_darknet('detector', 'train', darknet_data, darknet_cfg)
 
 @click.command()
-@click.option('--darknetpath','-d',type=click.Path(exists=True),
-        required=True, default="darknet/darknet",
-        help="Path to the darknet executable")
 @click.option('--image','-i',type=click.Path(exists=True),
         required=True, help="Image to predict")
 @click.pass_obj
-def test (dataset, darknetpath, image):
+def test (dataset, image):
     ''' Test the neural network on an image.'''
 
     dn_dir = dataset.path / 'darknet'
     if not dn_dir.exists():
-        raise SystemExit("Darknet not configured for this dataset, configure it first")
+        raise SystemExit("Neural network has not been trained")
 
     darknet_data = (dn_dir / 'darknet.data').resolve()
     darknet_cfg = (dn_dir / 'darknet.cfg').resolve()
@@ -111,7 +105,27 @@ def test (dataset, darknetpath, image):
     if not weights.exists():
         raise SystemExit("Neural network has not been trained")
 
-    # When running mAP, use flag -letter_box
-    run([darknetpath, 'detector', 'test', darknet_data, darknet_cfg,
-        weights, image])
+    from swrec.pythondarknet import init, detect
+    from ctypes import c_char_p
+    from math import ceil, floor
 
+    load_net, load_meta = init(dataset.info['darknet']['library'])
+
+    def cstr (s):
+        return c_char_p(s.encode('utf8'))
+
+    net = load_net(cstr(str(darknet_cfg)), cstr(str(weights)), 0)
+    meta = load_meta(cstr(str(darknet_data)))
+    r = detect(net, meta, cstr(image))
+
+    def make_bbox(x, y, w, h):
+        return [floor(x-w/2), floor(y-h/2), ceil(w), ceil(h)]
+
+    print([{
+        'name': s.decode('utf8'),
+        'confidence': c,
+        'bbox': make_bbox(*b)
+        } for (s, c, b) in r])
+
+    # When running mAP, use flag -letter_box
+    #dataset.run_darknet('detector', 'test', darknet_data, darknet_cfg, weights, image)

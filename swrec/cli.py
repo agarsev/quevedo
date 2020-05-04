@@ -6,7 +6,7 @@ from swrec import extract_symbols, generate, darknet, dataset as ds
 @click.group(commands={
         'extract_symbols': extract_symbols.extract_symbols,
         'generate': generate.generate,
-        'configure_darknet': darknet.configure,
+        'pre_train': darknet.pre_train,
         'train': darknet.train, 'test': darknet.test,
         'info': ds.info, 'create': ds.create, 'add_images': ds.add_images,
     }, chain=True, invoke_without_command=True)

@@ -4,6 +4,8 @@ import click
 import json
 from pathlib import Path
 from shutil import copyfile
+from string import Template
+from subprocess import run
 import yaml
 
 class Dataset:
@@ -20,6 +22,12 @@ class Dataset:
             raise SystemExit("Dataset '{}' already exists".format(self._path))
         self.path = self._path
         (self.path / 'real').mkdir(parents=True) # We also create the required real directory
+
+    def run_darknet (self, *args):
+        darknet = self.info.get('darknet')
+        if darknet is None:
+            raise SystemExit("Darknet not configured for this dataset, configure it first")
+        run([darknet['path'], *args], env=darknet['env'])
 
     def __getattr__ (self, attr):
         if attr == 'path':
@@ -41,11 +49,13 @@ def create(dataset):
     title = click.prompt("Title of the dataset")
     description = click.prompt("Description of the dataset")
 
-    default_info = (Path(__file__).parent / 'default_info.yaml').read_text()
-    (path / 'info.yaml').write_text("title: {}\n\ndescription: {}\n\n{}".format(
-        title, description, default_info))
+    default_info = Template((Path(__file__).parent / 'default_info.yaml').read_text())
+    (path / 'info.yaml').write_text(default_info.substitute(
+        title=title, description=description))
 
-    click.secho("Created dataset '{}' at '{}'\n".format(title, path), bold=True)
+    click.secho(("Created dataset '{}' at '{}'\n"
+            "Please read and edit '{}'/info.yaml to adapt it for the dataset")
+            .format(title, path, path), bold=True)
 
 
 def style (condition, right, wrong=None):
@@ -108,9 +118,13 @@ def info (dataset):
     num_gen = count(gen.glob('*.png'))
     click.echo('Transcriptions generated: {}'.format(style(gen.exists(), num_gen, 'no')))
 
+    dn_binary = (dataset.info.get('darknet', {}).get('path'))
+    click.echo('Darknet {} properly configured in info.yaml'.format(
+        style(Path(dn_binary).exists(), 'is', 'is not')))
+
     darknet = path / 'darknet'
     num_txt = count(real.glob('*.txt')) + count(gen.glob('*.txt'))
-    click.echo('Darknet {} configured and ready'.format(style(
+    click.echo('Dataset {} ready for training'.format(style(
         darknet.exists() and num_txt == num_gen+num_real,
         'is', "is not")))
 
