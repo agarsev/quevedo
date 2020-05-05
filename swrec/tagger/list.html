@@ -9,6 +9,11 @@
             margin: 0;
             padding: 0;
         }
+        h2 .set {
+            font-size: 60%;
+            font-weight: normal;
+            font-style: italic;
+        }
         ul {
             text-align: center;
             width: 99vw;
@@ -65,7 +70,7 @@
     <ul>
         {%- for t in trans %}
             <li>
-                <h2>{{t.meanings[0]}}</h2>
+                <h2>{{t.meanings[0]}} <span class="set">({{t.set}})</span></h2>
                 <img src="{{mount}}img/{{t.id}}.png" />
                 <p>
                     <a href="{{mount}}edit/{{t.id}}">📝</a>

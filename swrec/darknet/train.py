@@ -20,11 +20,12 @@ def prepare (dataset):
     # Collect all symbol names/classes used while making darknet/yolo bounding
     # box files
     symbols = []
-    annotation_files = (list(real_d.glob('*.json')) +
-                        list((dataset.path / 'generated').glob('*.json')))
+    annotation_files = list((dataset.path / 'generated').glob('*.json'))
 
-    for an in annotation_files:
+    for an in real_d.glob('*.json'):
         annotation = json.loads(an.read_text())
+        if annotation['set'] != 'train':
+            continue
         bboxes = []
         for s in annotation['symbols']:
             try:
@@ -34,6 +35,7 @@ def prepare (dataset):
                 index = len(symbols)-1
             bboxes.append("{} {} {} {} {}\n".format(index, *s['box']))
         an.with_suffix(".txt").write_text("".join(bboxes))
+        annotation_files.append(an)
 
     num_classes = len(symbols)
 

@@ -19,6 +19,7 @@ def get_transcription_info (idx):
     anot = json.loads(anot_file.read_text())
     return { 'id': idx,
         'annotated': annotated_status(anot),
+        'set': anot.get('set', 'none'),
         'meanings': anot.get('meanings', [])
         }
 

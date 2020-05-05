@@ -26,10 +26,14 @@ def extract_symbols(dataset):
         symbol_d.mkdir()
     except FileExistsError:
         click.confirm('Symbol directory already exists. Overwrite?', abort=True)
+        for f in symbol_d.glob('*.png'):
+            f.unlink()
 
     for an in real_d.glob('*.json'):
-        number = an.stem
         annotation = json.loads(an.read_text())
+        if annotation['set'] != 'train':
+            continue
+        number = an.stem
         transcription = Image.open(real_d / '{}.png'.format(number))
         width, height = transcription.size
         for idx, symb in enumerate(annotation['symbols'], start=1):

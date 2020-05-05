@@ -3,6 +3,7 @@
 import click
 import json
 from pathlib import Path
+import random
 from shutil import copyfile
 from string import Template
 from subprocess import run
@@ -82,12 +83,42 @@ def add_images(dataset, image_dir):
             copyfile(img, new_name.with_suffix('.png'))
             new_name.with_suffix(".json").write_text(json.dumps({
                 "meanings": [img.stem],
-                "symbols": []
+                "symbols": [],
+                "set": "train",
                 }))
             idx = idx + 1
             count = count + 1
         click.echo("imported {}".format(style(count>0, count)))
     click.echo("\n")
+
+@click.command()
+@click.argument('train_percentage', type=click.IntRange(0,100))
+@click.option('--seed','-s', type=click.INT, help='A seed for the random split algorithm.')
+@click.pass_obj
+def train_test_split (dataset, train_percentage, seed):
+    '''Split real annotation files into two sets, one for training and one for
+    test. Test files will not be used for symbol extraction either.'''
+
+    if seed is not None:
+        random.seed(seed)
+
+    ano_files = list((dataset.path / 'real').glob('*.json'))
+    random.shuffle(ano_files)
+
+    split_point = round(len(ano_files) * train_percentage / 100)
+
+    for t in ano_files[:split_point]:
+        ano = json.loads(t.read_text())
+        ano['set'] = 'train'
+        t.write_text(json.dumps(ano))
+
+    for t in ano_files[split_point:]:
+        ano = json.loads(t.read_text())
+        ano['set'] = 'test'
+        t.write_text(json.dumps(ano))
+
+    click.echo("Dataset split into train ({} files) and test ({} files)".format(
+        split_point, len(ano_files)-split_point))
 
 def count (l):
     return sum(1 for _ in l)

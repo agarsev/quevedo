@@ -4,6 +4,7 @@ import click
 from swrec import extract_symbols, generate, darknet, dataset as ds
 
 @click.group(commands={
+        'split': ds.train_test_split,
         'extract_symbols': extract_symbols.extract_symbols,
         'generate': generate.generate,
         'pre_train': darknet.train.prepare, 'train': darknet.train.train,
