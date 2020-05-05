@@ -1,6 +1,7 @@
 # 2020-05-04 Antonio F. G. Sevilla <afgs@ucm.es>
 
 import click
+from itertools import chain
 import json
 from pathlib import Path
 from string import Template
@@ -20,11 +21,12 @@ def prepare (dataset):
     # Collect all symbol names/classes used while making darknet/yolo bounding
     # box files
     symbols = []
-    annotation_files = list((dataset.path / 'generated').glob('*.json'))
+    annotation_files = []
 
-    for an in real_d.glob('*.json'):
+    for an in chain(real_d.glob('*.json'),
+            (dataset.path / 'generated').glob('*.json')):
         annotation = json.loads(an.read_text())
-        if annotation['set'] != 'train':
+        if annotation.get('set', 'train') != 'train':
             continue
         bboxes = []
         for s in annotation['symbols']:

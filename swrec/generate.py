@@ -126,6 +126,8 @@ def generate (dataset):
         gen_d.mkdir()
     except FileExistsError:
         click.confirm('Generated directory already exists. Overwrite?', abort=True)
+        for f in gen_d.glob('*'):
+            f.unlink()
 
     config.update(dataset.info.get('generate', {}))
 

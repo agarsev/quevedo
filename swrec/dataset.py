@@ -151,7 +151,7 @@ def info (dataset):
 
     dn_binary = (dataset.info.get('darknet', {}).get('path'))
     click.echo('Darknet {} properly configured in info.yaml'.format(
-        style(Path(dn_binary).exists(), 'is', 'is not')))
+        style(dn_binary is not None and Path(dn_binary).exists(), 'is', 'is not')))
 
     darknet = path / 'darknet'
     num_txt = count(real.glob('*.txt')) + count(gen.glob('*.txt'))
