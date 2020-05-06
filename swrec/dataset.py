@@ -28,7 +28,7 @@ class Dataset:
         darknet = self.info.get('darknet')
         if darknet is None:
             raise SystemExit("Darknet not configured for this dataset, configure it first")
-        run([darknet['path'], *args], env=darknet['env'])
+        run([darknet['path'], *args])
 
     def __getattr__ (self, attr):
         if attr == 'path':

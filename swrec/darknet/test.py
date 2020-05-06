@@ -1,54 +1,93 @@
-# 2020-05-04 Antonio F. G. Sevilla <afgs@ucm.es>
+# 2020-05-06 Antonio F. G. Sevilla <afgs@ucm.es>
 
-from ctypes import c_char_p
-from math import ceil, floor
-from PIL import Image
+import click
+import json
 
-from swrec.darknet.library import init, detect
+def box (xc, yc, w, h):
+    return {
+        'l': float(xc)-float(w)/2,
+        'r': float(xc)+float(w)/2,
+        'b': float(yc)-float(h)/2,
+        't': float(yc)+float(h)/2,
+        'w': float(w),
+        'h': float(h)
+    }
 
-net = None
-meta = None
+def safe_divide (a, b):
+    if a == 0:
+        return 0
+    elif b == 0:
+        return 1
+    else:
+        return a/b
 
-def cstr (s):
-    return c_char_p(str(s).encode('utf8'))
+def iou (a, b):
+    '''Intersection over union for boxes in x, y, w, h format'''
+    a = box(*a)
+    b = box(*b)
+    # Intersection
+    il = max(a['l'], b['l'])
+    ir = min(a['r'], b['r'])
+    ix = ir-il if ir>il else 0
+    ib = max(a['b'], b['b'])
+    it = min(a['t'], b['t'])
+    iy = it-ib if it>ib else 0
+    i = ix*iy
+    # Sum (union = sum - inters)
+    s = a['w']*a['h'] + b['w']*b['h']
+    return safe_divide(i, (s - i))
 
-def clamp (val, minim, maxim):
-    return min(maxim, max(minim, val))
+def similarity (a, b):
+    '''Similarity of symbols.'''
+    return iou(a['box'], b['box']) if (a['name'] == b['name']) else 0
 
-def make_bbox(im_width, im_height, x, y, w, h):
-    x = clamp(x/im_width, 0, 1)
-    y = clamp(y/im_height, 0, 1)
-    w = clamp(w/im_width, 0, 1)
-    h = clamp(h/im_height, 0, 1)
-    return [x, y, w, h]
+def incr (dic, name):
+    dic[name] = dic.get(name, 0)+1
 
-def init_darknet (dataset):
-    '''Loads the trained neural network. Must be called before predict.'''
+@click.command()
+@click.pass_obj
+def test (dataset):
+    '''Compute evaluation metrics for the trained neural network.
 
-    global net, meta
+    The transcriptions in the test set are used (so a train/test split must have
+    been done) and precision, recall and f-score are computed for each class.'''
 
-    dn_dir = dataset.path / 'darknet'
-    if not dn_dir.exists():
-        raise SystemExit("Neural network has not been trained")
-    
-    darknet_data = (dn_dir / 'darknet.data').resolve()
-    darknet_cfg = (dn_dir / 'darknet.cfg').resolve()
-    weights = (dataset.path / 'weights' / 'darknet_final.weights').resolve()
+    from swrec.darknet.predict import init_darknet, predict
+    init_darknet(dataset)
 
-    if not weights.exists():
-        raise SystemExit("Neural network has not been trained")
+    all_symbols = set()
+    true_positives = dict()
+    false_positives = dict()
+    false_negatives = dict()
 
-    load_net, load_meta = init(dataset.info['darknet']['library'])
-    net = load_net(cstr(darknet_cfg), cstr(weights), 0)
-    meta = load_meta(cstr(darknet_data))
+    for image in (dataset.path / 'real').glob('*.png'):
+        anot = json.loads(image.with_suffix('.json').read_text())
+        if anot.get('set') != 'test':
+            continue
+        predictions = predict(image)
+        for sym in anot['symbols']:
+            if sym['name'] not in all_symbols:
+                all_symbols.add(sym['name'])
+            if len(predictions)>0:
+                similarities = sorted(((similarity(p, sym), i) for (i, p) in
+                        enumerate(predictions)), reverse=True)
+                (sim, idx) = similarities[0]
+                if sim > 0.7:
+                    match = predictions.pop(idx)
+                    incr(true_positives, sym['name'])
+                    continue
+            incr(false_negatives, sym['name'])
+        # Unassigned predictions are false positives
+        for pred in predictions:
+            incr(false_positives, pred['name'])
 
-def predict (image_path):
-    '''Get symbols in an image using the trained neural network (which must have
-    been loaded using init_darknet)'''
-
-    width, height = Image.open(image_path).size
-    return [{
-        'name': s.decode('utf8'),
-        'confidence': c,
-        'bbox': make_bbox(width, height, *b)
-    } for (s, c, b) in detect(net, meta, cstr(image_path))]
+    header = "symbol     precision accuracy f-score"
+    click.echo("{}\n{}".format(header, "-" * len(header)))
+    for name in sorted(all_symbols):
+        tp = true_positives.get(name, 0)
+        fp = false_positives.get(name, 0)
+        fn = false_negatives.get(name, 0)
+        prec = safe_divide(tp, tp+fp)
+        rec = safe_divide(tp, tp+fn)
+        f = safe_divide(2*prec*rec, prec+rec)
+        click.echo("{:10s} {:9.2f} {:8.2f} {:7.2f}".format(name, prec, rec, f))

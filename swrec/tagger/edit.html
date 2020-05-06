@@ -191,8 +191,8 @@
             const li = document.createElement("li");
             if (sym !== undefined) {
                 li.innerHTML = `<symbol-entry name="${sym.name}"
-                    x="${sym.bbox[0]}" y="${sym.bbox[1]}"
-                    w="${sym.bbox[2]}" h="${sym.bbox[3]}"/>`;
+                    x="${sym.box[0]}" y="${sym.box[1]}"
+                    w="${sym.box[2]}" h="${sym.box[3]}"/>`;
             } else {
                 li.innerHTML = "<symbol-entry />";
             }

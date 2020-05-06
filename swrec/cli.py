@@ -8,7 +8,7 @@ from swrec import extract_symbols, generate, darknet, dataset as ds
         'extract_symbols': extract_symbols.extract_symbols,
         'generate': generate.generate,
         'pre_train': darknet.train.prepare, 'train': darknet.train.train,
-        'test': darknet.test,
+        'test': darknet.test, 'predict': darknet.predict_image,
         'info': ds.info, 'create': ds.create, 'add_images': ds.add_images,
     }, chain=True, invoke_without_command=True)
 @click.argument('dataset', type=click.Path())

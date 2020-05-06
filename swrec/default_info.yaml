@@ -13,8 +13,6 @@ annotation_help: |
 darknet:
   path: darknet/darknet
   library: darknet/libdarknet.so
-  env:
-    LD_LIBRARY_PATH: /usr/lib/cuda
 
 # Configuration for the artificial transcription generation
 generate:
