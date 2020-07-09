@@ -13,6 +13,8 @@ annotation_help: |
 darknet:
   path: darknet/darknet
   library: darknet/libdarknet.so
+  options:
+    - -dont_show
 
 # Configuration for the artificial transcription generation
 generate:
