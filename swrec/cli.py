@@ -1,6 +1,7 @@
 # 2020-04-08 Antonio F. G. Sevilla <afgs@ucm.es>
 
 import click
+from os import getcwd
 from swrec import extract_symbols, generate, darknet, dataset as ds
 
 @click.group(commands={
@@ -11,7 +12,7 @@ from swrec import extract_symbols, generate, darknet, dataset as ds
         'test': darknet.test, 'predict': darknet.predict_image,
         'info': ds.info, 'create': ds.create, 'add_images': ds.add_images,
     }, chain=True, invoke_without_command=True)
-@click.argument('dataset', type=click.Path())
+@click.option('-D', '--dataset', type=click.Path(), help="Path to the dataset to use, by default use current directory", default=getcwd())
 @click.pass_context
 def cli (ctx, dataset):
     '''Command line application for managing a SW deep learning dataset.'''

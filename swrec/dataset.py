@@ -37,7 +37,10 @@ class Dataset:
             self.path = self._path
             return self.path
         if attr == 'info':
-            self.info = yaml.safe_load((self.path / 'info.yaml').read_text())
+            info_path = self.path / 'info.yaml'
+            if not info_path.exists():
+                raise SystemExit("Path '{}' is not a valid dataset".format(self._path))
+            self.info = yaml.safe_load(info_path.read_text())
             return self.info
 
 @click.command()
