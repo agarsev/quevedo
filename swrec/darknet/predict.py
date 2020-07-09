@@ -1,18 +1,14 @@
 # 2020-05-04 Antonio F. G. Sevilla <afgs@ucm.es>
-
-from ctypes import c_char_p
-from math import ceil, floor
 import os
 from PIL import Image
 import sys
 
-from swrec.darknet.library import init, detect
+from swrec.darknet.library import init
 
-net = None
-meta = None
+perform_detect = None
 
 def cstr (s):
-    return c_char_p(str(s).encode('utf8'))
+    return str(s).encode('utf8')
 
 def clamp (val, minim, maxim):
     return min(maxim, max(minim, val))
@@ -24,10 +20,30 @@ def make_bbox(im_width, im_height, x, y, w, h):
     h = clamp(h/im_height, 0, 1)
     return [x, y, w, h]
 
+# Only way to suppress usual darknet output as much as possible
+class DarknetShutup(object):
+
+    def __enter__(self):
+        self.stderr_fileno = sys.stderr.fileno()
+        self.stderr_save = os.dup(self.stderr_fileno)
+        self.stdout_fileno = sys.stdout.fileno()
+        self.stdout_save = os.dup(self.stdout_fileno)
+        self.devnull = open(os.devnull, 'w')
+        devnull_fn = self.devnull.fileno()
+        os.dup2(devnull_fn, self.stderr_fileno)
+        os.dup2(devnull_fn, self.stdout_fileno)
+
+    def __exit__(self, type, value, traceback):
+        self.devnull.close()
+        os.dup2(self.stderr_save, self.stderr_fileno)
+        os.dup2(self.stdout_save, self.stdout_fileno)
+        os.close(self.stderr_save)
+        os.close(self.stdout_save)
+
 def init_darknet (dataset):
     '''Loads the trained neural network. Must be called before predict.'''
 
-    global net, meta
+    global perform_detect
 
     dn_dir = dataset.path / 'darknet'
     if not dn_dir.exists():
@@ -40,20 +56,13 @@ def init_darknet (dataset):
     if not weights.exists():
         raise SystemExit("Neural network has not been trained")
 
-    load_net, load_meta = init(dataset.info['darknet']['library'])
+    with DarknetShutup():
+        perform_detect = init(
+            libraryPath = cstr(dataset.info['darknet']['library']),
+            configPath = cstr(darknet_cfg),
+            weightPath = cstr(weights),
+            metaPath = cstr(darknet_data))
 
-    # We suppress usual darknet output
-    stderr_fileno = sys.stderr.fileno()
-    stderr_save = os.dup(stderr_fileno)
-    devnull = open(os.devnull, 'w')
-    os.dup2(devnull.fileno(), stderr_fileno)
-
-    net = load_net(cstr(darknet_cfg), cstr(weights), 0)
-    meta = load_meta(cstr(darknet_data))
-
-    devnull.close()
-    os.dup2(stderr_save, stderr_fileno)
-    os.close(stderr_save)
 
 def predict (image_path):
     '''Get symbols in an image using the trained neural network (which must have
@@ -61,7 +70,7 @@ def predict (image_path):
 
     width, height = Image.open(image_path).size
     return [{
-        'name': s.decode('utf8'),
+        'name': s,
         'confidence': c,
         'box': make_bbox(width, height, *b)
-    } for (s, c, b) in detect(net, meta, cstr(image_path))]
+    } for (s, c, b) in perform_detect(cstr(image_path))]
