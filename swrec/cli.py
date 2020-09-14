@@ -2,7 +2,7 @@
 
 import click
 from os import getcwd
-from swrec import extract_symbols, generate, darknet, dataset as ds
+from swrec import extract_symbols, generate, darknet, migrate, dataset as ds
 
 @click.group(commands={
         'split': ds.train_test_split,
@@ -10,6 +10,7 @@ from swrec import extract_symbols, generate, darknet, dataset as ds
         'generate': generate.generate,
         'pre_train': darknet.train.prepare, 'train': darknet.train.train,
         'test': darknet.test, 'predict': darknet.predict_image,
+        'migrate': migrate.migrate,
         'info': ds.info, 'create': ds.create, 'add_images': ds.add_images,
     }, chain=True, invoke_without_command=True)
 @click.option('-D', '--dataset', type=click.Path(), help="Path to the dataset to use, by default use current directory", default=getcwd())
