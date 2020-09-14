@@ -81,7 +81,7 @@ def test (dataset):
         for pred in predictions:
             incr(false_positives, pred['name'])
 
-    header = "symbol     precision accuracy f-score"
+    header = "symbol     precision  recall f-score"
     click.echo("{}\n{}".format(header, "-" * len(header)))
     for name in sorted(all_symbols):
         tp = true_positives.get(name, 0)
@@ -90,4 +90,4 @@ def test (dataset):
         prec = safe_divide(tp, tp+fp)
         rec = safe_divide(tp, tp+fn)
         f = safe_divide(2*prec*rec, prec+rec)
-        click.echo("{:10s} {:9.2f} {:8.2f} {:7.2f}".format(name, prec, rec, f))
+        click.echo("{:10s} {:9.2f} {:7.2f} {:7.2f}".format(name, prec, rec, f))
