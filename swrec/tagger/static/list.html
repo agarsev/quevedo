@@ -2,7 +2,8 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>SW Tagger: {{ info.title }}</title>
+    <title>SW Tagger</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <style>
         * {
             box-sizing: border-box;
@@ -64,21 +65,43 @@
     </style>
 </head>
 <body>
-    <h1>{{ info.title }}</h1>
-    <pre><b>({{ path }})</b></pre>
-    <pre>{{ info.description }}</pre>
-    <ul>
-        {%- for t in trans %}
-            <li>
-                <h2>{{t.meanings[0]}} <span class="set">({{t.set}})</span></h2>
-                <img src="{{mount}}img/{{t.id}}.png" />
+    <noscript>Please enable javascript for this application</noscript>
+    <script type="module">
+        import { html, render } from 'https://unpkg.com/htm/preact/index.mjs?module';
+        let mount_path = '';
+
+        function Entry ({ id, meanings, set, annotated }) {
+            return html`<li>
+                <h2>${meanings[0]} <span class="set">(${set})</span></h2>
+                <img src="${mount_path}img/${id}.png" />
                 <p>
-                    <a href="{{mount}}edit/{{t.id}}">📝</a>
-                    {%- if (t.annotated>0) %}✔️ ({{t.annotated}}){%- endif %}
+                    <a href="${mount_path}edit/${id}">📝</a>
+                    ${annotated>0?`✔️ (${annotated})`:null}
                 </p>
-            </li>
-        {%- endfor %}
-        <li class="extra-space"></li>
-    </ul>
+            </li>`;
+        }
+
+        function List ({ trans_list }) {
+            return html`<ul>
+                ${trans_list.map(t => html`<${Entry} ...${t} />`)}
+                <li class="extra-space"></li>
+            </ul>`;
+        }
+
+        function App ({ title, path, description, trans_list }) {
+            return html`
+                <h1>${title}</h1>
+                <pre><b>(${path})</b></pre>
+                <pre>${description}</pre>
+                <${List} trans_list=${trans_list} />
+            `;
+        }
+
+        fetch('/api/list').then(r => r.json()).then(data => {
+            document.title = `${document.title}: ${data.title}`;
+            mount_path = data.mount_path;
+            render(html`<${App} ...${data} />`, document.body);
+        });
+    </script>
 </body>
 </html>

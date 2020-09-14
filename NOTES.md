@@ -1,5 +1,9 @@
 - Remember: images need to be 3 channel
 
+# Right now
+Migrate tagger web app to preact instead of SSR flask html + spaguetti JS, in
+order to be ablo to do annotation tables in a sane way.
+
 # TODO
 
 - Annotation tables
