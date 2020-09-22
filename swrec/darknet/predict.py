@@ -1,24 +1,29 @@
 # 2020-05-04 Antonio F. G. Sevilla <afgs@ucm.es>
+
 import os
 from PIL import Image
 import sys
 
 from swrec.darknet.library import init
 
-perform_detect = None
+perform_detect = None  # Function that performs the actual detection after loading the neural net
 
-def cstr (s):
+
+def cstr(s):
     return str(s).encode('utf8')
 
-def clamp (val, minim, maxim):
+
+def clamp(val, minim, maxim):
     return min(maxim, max(minim, val))
 
+
 def make_bbox(im_width, im_height, x, y, w, h):
-    x = clamp(x/im_width, 0, 1)
-    y = clamp(y/im_height, 0, 1)
-    w = clamp(w/im_width, 0, 1)
-    h = clamp(h/im_height, 0, 1)
+    x = clamp(x / im_width, 0, 1)
+    y = clamp(y / im_height, 0, 1)
+    w = clamp(w / im_width, 0, 1)
+    h = clamp(h / im_height, 0, 1)
     return [x, y, w, h]
+
 
 # Only way to suppress usual darknet output as much as possible
 class DarknetShutup(object):
@@ -40,7 +45,8 @@ class DarknetShutup(object):
         os.close(self.stderr_save)
         os.close(self.stdout_save)
 
-def init_darknet (dataset):
+
+def init_darknet(dataset):
     '''Loads the trained neural network. Must be called before predict.'''
 
     global perform_detect
@@ -48,7 +54,7 @@ def init_darknet (dataset):
     dn_dir = dataset.path / 'darknet'
     if not dn_dir.exists():
         raise SystemExit("Neural network has not been trained")
-    
+
     darknet_data = (dn_dir / 'darknet.data').resolve()
     darknet_cfg = (dn_dir / 'darknet.cfg').resolve()
     weights = (dataset.path / 'weights' / 'darknet_final.weights').resolve()
@@ -58,13 +64,13 @@ def init_darknet (dataset):
 
     with DarknetShutup():
         perform_detect = init(
-            libraryPath = cstr(dataset.info['darknet']['library']),
-            configPath = cstr(darknet_cfg),
-            weightPath = cstr(weights),
-            metaPath = cstr(darknet_data))
+            libraryPath=cstr(dataset.info['darknet']['library']),
+            configPath=cstr(darknet_cfg),
+            weightPath=cstr(weights),
+            metaPath=cstr(darknet_data))
 
 
-def predict (image_path):
+def predict(image_path):
     '''Get symbols in an image using the trained neural network (which must have
     been loaded using init_darknet)'''
 

@@ -3,7 +3,7 @@
 import click
 import json
 from PIL import Image
-from PIL.ImageOps import invert, grayscale
+from PIL.ImageOps import invert
 import random
 import re
 
@@ -21,12 +21,13 @@ except ImportError:
 config = {
     'count': 500,  # Number of files to generate
     'seed': None,  # Random seed for generation
-    'use_force': True, # Use a force layout algorithm to distribute symbols
-    'width_range': [300, 500], # A range of possible widths
-    'height_range': [300, 500], # A range of possible heights
+    'use_force': True,  # Use a force layout algorithm to distribute symbols
+    'width_range': [300, 500],  # A range of possible widths
+    'height_range': [300, 500],  # A range of possible heights
 }
 
-def put_symbol (canvas, x, y, filename, name, rotate=False):
+
+def put_symbol(canvas, x, y, filename, name, rotate=False):
     '''Put a symbol into a transcription, and write the resulting darknet
     bounding box annotation.'''
 
@@ -37,17 +38,17 @@ def put_symbol (canvas, x, y, filename, name, rotate=False):
     w = sim.width
     h = sim.height
     if rotate:
-        if (random.random()>0.5):
+        if random.random() > 0.5:
             sim = sim.transpose(Image.FLIP_LEFT_RIGHT)
-        turns = random.randint(0,4)
-        sim = sim.rotate(turns*90,resample=Image.BILINEAR,expand=True)
+        turns = random.randint(0, 4)
+        sim = sim.rotate(turns * 90, resample=Image.BILINEAR, expand=True)
         if turns % 2 > 0:
             w, h = h, w
 
-    if x+w > canvas_w:
-        x-=x+w-canvas_w+2
-    if y+h > canvas_h:
-        y-=y+h-canvas_h+2
+    if x + w > canvas_w:
+        x -= x + w - canvas_w + 2
+    if y + h > canvas_h:
+        y -= y + h - canvas_h + 2
 
     # Convert white pixels to transparent
     sim.putalpha(invert(sim.convert("L")))
@@ -55,11 +56,12 @@ def put_symbol (canvas, x, y, filename, name, rotate=False):
     canvas.alpha_composite(sim, (x, y))
     return {
         'name': name,
-        'box': [ (x+w/2)/canvas_w, (y+h/2)/canvas_h,
-                w/canvas_w, h/canvas_h ]
-        }
+        'box': [(x + w / 2) / canvas_w, (y + h / 2) / canvas_h,
+                w / canvas_w, h / canvas_h]
+    }
 
-def create_transcription (path, symbols):
+
+def create_transcription(path, symbols):
     '''Creates an image with randomly placed symbols'''
     canvas_w = random.randint(*config['width_range'])
     canvas_h = random.randint(*config['height_range'])
@@ -69,7 +71,7 @@ def create_transcription (path, symbols):
     rotate = []         # list of whether to rotate each symbol
     positions = []      # list of the positions
 
-    def add_symbol (name, params):
+    def add_symbol(name, params):
         class_names.append(name)
         files.append(random.choice(params['files']))
         rotate.append(params['rotate'])
@@ -77,40 +79,41 @@ def create_transcription (path, symbols):
 
     # Iterate over the list of symbols to find how many to place of each
     for name, params in symbols.items():
-        if params['mode'] == 'one' and random.random()<params['freq']:
+        if params['mode'] == 'one' and random.random() < params['freq']:
             add_symbol(name, params)
         elif params['mode'] == 'many':
             for _ in range(random.randint(0, params['max'])):
-                if random.random()<params['prob']:
+                if random.random() < params['prob']:
                     add_symbol(name, params)
 
     #  Use force layout to spread symbols
-    if can_use_force and config['use_force'] and len(positions)>1:
+    if can_use_force and config['use_force'] and len(positions) > 1:
         layout = fl.draw_spring_layout(dataset=np.array(positions), algorithm=fl.SpringForce)
         positions = layout.spring_layout()
 
-        xs = positions[:,0]
+        xs = positions[:, 0]
         max_x, min_x = max(xs), min(xs)
-        scale_x = (canvas_w*.8)/(max_x - min_x)
-        positions[:,0] = (xs-min_x)*scale_x+canvas_w*.1
+        scale_x = (canvas_w * .8) / (max_x - min_x)
+        positions[:, 0] = (xs - min_x) * scale_x + canvas_w * .1
 
-        ys = positions[:,1]
+        ys = positions[:, 1]
         max_y, min_y = max(ys), min(ys)
-        scale_y = (canvas_h*.8)/(max_y - min_y)
-        positions[:,1] = (ys-min_y)*scale_y+canvas_h*.1
+        scale_y = (canvas_h * .8) / (max_y - min_y)
+        positions[:, 1] = (ys - min_y) * scale_y + canvas_h * .1
 
     # Create the actual transcription
-    canvas = Image.new("RGBA", (canvas_w,canvas_h), "white")
-    bboxes = [];
+    canvas = Image.new("RGBA", (canvas_w, canvas_h), "white")
+    bboxes = []
     for [x, y], name, filename, rotate in zip(positions, class_names, files, rotate):
         bboxes.append(put_symbol(canvas, int(x), int(y),
-            filename, name, rotate))
+                      filename, name, rotate))
     canvas.save(path.with_suffix(".png"))
-    path.with_suffix(".json").write_text(json.dumps({ 'symbols': bboxes }))
+    path.with_suffix(".json").write_text(json.dumps({'symbols': bboxes}))
+
 
 @click.command()
 @click.pass_obj
-def generate (dataset):
+def generate(dataset):
     ''' Generates artificial "transcriptions" for training.
 
     It uses the symbols in the `symbols` directory of the dataset (so these must
@@ -132,7 +135,7 @@ def generate (dataset):
     config.update(dataset.info.get('generate', {}))
 
     if config['seed'] is not None:
-        random.seed(seed)
+        random.seed(config['seed'])
 
     for param in config['params']:
         param['match'] = re.compile(param['match'])
@@ -156,4 +159,4 @@ def generate (dataset):
 
     # Generate as many transcriptions as requested, numbering them incrementally
     for i in range(config['count']):
-        create_transcription(gen_d / str(i+1), symbols)
+        create_transcription(gen_d / str(i + 1), symbols)

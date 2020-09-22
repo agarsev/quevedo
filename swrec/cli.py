@@ -4,30 +4,33 @@ import click
 from os import getcwd
 from swrec import extract_symbols, generate, darknet, migrate, dataset as ds
 
+
 @click.group(commands={
-        'split': ds.train_test_split,
-        'extract_symbols': extract_symbols.extract_symbols,
-        'generate': generate.generate,
-        'pre_train': darknet.train.prepare, 'train': darknet.train.train,
-        'test': darknet.test, 'predict': darknet.predict_image,
-        'migrate': migrate.migrate,
-        'info': ds.info, 'create': ds.create, 'add_images': ds.add_images,
-    }, chain=True, invoke_without_command=True)
-@click.option('-D', '--dataset', type=click.Path(), help="Path to the dataset to use, by default use current directory", default=getcwd())
+    'split': ds.train_test_split,
+    'extract_symbols': extract_symbols.extract_symbols,
+    'generate': generate.generate,
+    'pre_train': darknet.train.prepare, 'train': darknet.train.train,
+    'test': darknet.test, 'predict': darknet.predict_image,
+    'migrate': migrate.migrate,
+    'info': ds.info, 'create': ds.create, 'add_images': ds.add_images,
+}, chain=True, invoke_without_command=True)
+@click.option('-D', '--dataset', type=click.Path(), default=getcwd(),
+              help="Path to the dataset to use, by default use current directory")
 @click.pass_context
-def cli (ctx, dataset):
+def cli(ctx, dataset):
     '''Command line application for managing a SW deep learning dataset.'''
     ctx.obj = ds.Dataset(dataset)
     if ctx.invoked_subcommand is None:
         ctx.invoke(ds.info)
         click.echo(cli.get_help(ctx))
 
+
 @cli.command()
 @click.pass_obj
-@click.option('-h','--host', default='localhost')
-@click.option('-p','--port', default='5000')
-@click.option('-m','--mount-path', default='', help="Mount path for the tagger application")
-@click.option('--browser/--no-browser',default=True, help="Launch browser at the tagger location")
+@click.option('-h', '--host', default='localhost')
+@click.option('-p', '--port', default='5000')
+@click.option('-m', '--mount-path', default='', help="Mount path for the tagger application")
+@click.option('--browser/--no-browser', default=True, help="Launch browser at the tagger location")
 def tagger(dataset, host, port, browser, mount_path):
     ''' Run a web application for annotating the transcriptions in the dataset.
 
@@ -42,8 +45,8 @@ def tagger(dataset, host, port, browser, mount_path):
     tagger.load_dataset(dataset)
     url = "http://{}:{}".format(host, port)
 
-    click.echo("Starting tagger at {}".format(url));
+    click.echo("Starting tagger at {}".format(url))
     if browser:
-        click.launch(url);
+        click.launch(url)
 
     tagger.run(host, port, mount_path)

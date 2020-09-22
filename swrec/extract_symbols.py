@@ -4,6 +4,7 @@ import click
 import json
 from PIL import Image
 
+
 @click.command()
 @click.pass_obj
 def extract_symbols(dataset):
@@ -37,10 +38,10 @@ def extract_symbols(dataset):
         transcription = Image.open(real_d / '{}.png'.format(number))
         width, height = transcription.size
         for idx, symb in enumerate(annotation['symbols'], start=1):
-            name = symb['name'] 
+            name = symb['name']
             w = float(symb['box'][2]) * width
             h = float(symb['box'][3]) * height
-            l = float(symb['box'][0])*width - w/2
-            u = float(symb['box'][1])*height - h/2
-            region = transcription.crop((l, u, l+w, u+h))
+            l = float(symb['box'][0]) * width - (w / 2)
+            u = float(symb['box'][1]) * height - (h / 2)
+            region = transcription.crop((l, u, l + w, u + h))
             region.save(symbol_d / '{}.{}.{}.png'.format(name, number, idx))

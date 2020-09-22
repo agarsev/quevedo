@@ -11,19 +11,23 @@ logging.getLogger('werkzeug').disabled = True
 
 app_data = {}
 
-def annotated_status (anot):
+
+def annotated_status(anot):
     return len(anot.get('symbols', {}))
 
-def get_transcription_info (idx):
+
+def get_transcription_info(idx):
     anot_file = app_data['data_dir'] / '{}.json'.format(idx)
     anot = json.loads(anot_file.read_text())
-    return { 'id': idx,
+    return {
+        'id': idx,
         'annotated': annotated_status(anot),
         'set': anot.get('set', 'none'),
         'meanings': anot.get('meanings', [])
-        }
+    }
 
-def load_dataset (dataset):
+
+def load_dataset(dataset):
     app_data['dataset'] = dataset
     resolved = dataset.path.resolve()
     app_data['path'] = resolved
@@ -33,12 +37,14 @@ def load_dataset (dataset):
     app_data['last_id'] = ids[-1]
     app_data['trans_list'] = list(map(get_transcription_info, ids))
 
+
 @app.route('/')
-def index ():
+def index():
     return app.send_static_file('list.html')
 
+
 @app.route('/api/list')
-def list_page ():
+def list_page():
     ds = app_data['dataset']
     return {
         'title': ds.info['title'],
@@ -48,34 +54,43 @@ def list_page ():
         'mount_path': app_data['mount_path']
     }
 
+
 @app.route('/img/<filename>')
-def send_image (filename):
+def send_image(filename):
     return send_from_directory(app_data['data_dir'], filename)
 
+
 @app.route('/edit/<idx>')
-def edit_page (idx):
+def edit_page(idx):
     idn = int(idx)
     anot_file = app_data['data_dir'] / '{}.json'.format(idx)
     anot = json.loads(anot_file.read_text())
-    return render_template('edit.html', **{ 'id': idx,
+    return render_template('edit.html', **{
+        'id': idx,
         'mount': app_data['mount'],
-        'prev_link': 'edit/{}'.format(idn-1 if idn>1 else app_data['last_id']),
-        'next_link': 'edit/{}'.format(idn+1 if idn<app_data['last_id'] else 1),
-        'info': app_data['info'], **anot })
+        'prev_link': 'edit/{}'.format(idn - 1 if idn > 1 else app_data['last_id']),
+        'next_link': 'edit/{}'.format(idn + 1 if idn < app_data['last_id'] else 1),
+        'info': app_data['info'],
+        **anot
+    })
+
 
 @app.route('/edit/<idx>', methods=["POST"])
-def edit_post (idx):
+def edit_post(idx):
     anot_file = app_data['data_dir'] / '{}.json'.format(idx)
     anot = json.loads(anot_file.read_text())
-    new_info = { **anot, **request.get_json() }
+    new_info = {**anot, **request.get_json()}
     trans = next(t for t in app_data['trans'] if t['id'] == int(idx))
     trans['annotated'] = annotated_status(new_info)
     anot_file.write_text(json.dumps(new_info))
     return 'OK'
 
-predict = None
+
+predict = None  # Do not load neural network until requested
+
+
 @app.route('/auto/<idx>')
-def get_auto_annotations (idx):
+def get_auto_annotations(idx):
     global predict
     if predict is None:
         from swrec.darknet.test import init_darknet, predict as true_predict
@@ -83,8 +98,9 @@ def get_auto_annotations (idx):
         predict = true_predict
 
     img = (app_data['data_dir'] / '{}.png'.format(idx)).resolve()
-    return { 'symbols': predict(img) }
+    return {'symbols': predict(img)}
 
-def run (host, port, path):
-    app_data['mount_path'] = '/'+path+'/' if path != '' else '/'
+
+def run(host, port, path):
+    app_data['mount_path'] = '/' + path + '/' if path != '' else '/'
     app.run(host=host, port=port)

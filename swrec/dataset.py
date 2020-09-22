@@ -9,28 +9,29 @@ from string import Template
 from subprocess import run
 import yaml
 
+
 class Dataset:
     ''' Class representing a SW dataset'''
 
-    def __init__ (self, path):
+    def __init__(self, path):
         '''We lazy load the dataset path to allow the "create" command to create the
         directory but other commands to fail if it doesn't exist. This is due to how
         click works, and unlikely to be fixed. '''
         self._path = Path(path)
 
-    def mkdir (self):
+    def mkdir(self):
         if self._path.exists():
             raise SystemExit("Dataset '{}' already exists".format(self._path))
         self.path = self._path
-        (self.path / 'real').mkdir(parents=True) # We also create the required real directory
+        (self.path / 'real').mkdir(parents=True)  # We also create the required real directory
 
-    def run_darknet (self, *args):
+    def run_darknet(self, *args):
         darknet = self.info.get('darknet')
         if darknet is None:
             raise SystemExit("Darknet not configured for this dataset, configure it first")
         run([darknet['path'], *args, *darknet['options']])
 
-    def __getattr__ (self, attr):
+    def __getattr__(self, attr):
         if attr == 'path':
             if not self._path.exists():
                 raise SystemExit("Dataset '{}' does not exist".format(self._path))
@@ -42,6 +43,7 @@ class Dataset:
                 raise SystemExit("Path '{}' is not a valid dataset".format(self._path))
             self.info = yaml.safe_load(info_path.read_text())
             return self.info
+
 
 @click.command()
 @click.pass_obj
@@ -58,11 +60,11 @@ def create(dataset):
         title=title, description=description))
 
     click.secho(("Created dataset '{}' at '{}'\n"
-            "Please read and edit '{}'/info.yaml to adapt it for the dataset")
-            .format(title, path, path), bold=True)
+                "Please read and edit '{}'/info.yaml to adapt it for the dataset")
+                .format(title, path, path), bold=True)
 
 
-def style (condition, right, wrong=None):
+def style(condition, right, wrong=None):
     color = "green" if condition else "red"
     text = right if (condition or (wrong is None)) else wrong
     return click.style(str(text), fg=color)
@@ -70,8 +72,8 @@ def style (condition, right, wrong=None):
 
 @click.command()
 @click.pass_obj
-@click.option('--image_dir','-i', multiple=True, type=click.Path(exists=True),
-        required=True, help="Directory from which to import images")
+@click.option('--image_dir', '-i', multiple=True, type=click.Path(exists=True),
+              required=True, help="Directory from which to import images")
 def add_images(dataset, image_dir):
     ''' Import images from directories to a dataset.'''
 
@@ -88,17 +90,18 @@ def add_images(dataset, image_dir):
                 "meanings": [img.stem],
                 "symbols": [],
                 "set": "train",
-                }))
+            }))
             idx = idx + 1
             count = count + 1
-        click.echo("imported {}".format(style(count>0, count)))
+        click.echo("imported {}".format(style(count > 0, count)))
     click.echo("\n")
 
+
 @click.command()
-@click.argument('train_percentage', type=click.IntRange(0,100))
-@click.option('--seed','-s', type=click.INT, help='A seed for the random split algorithm.')
+@click.argument('train_percentage', type=click.IntRange(0, 100))
+@click.option('--seed', '-s', type=click.INT, help='A seed for the random split algorithm.')
 @click.pass_obj
-def train_test_split (dataset, train_percentage, seed):
+def train_test_split(dataset, train_percentage, seed):
     '''Split real annotation files into two sets, one for training and one for
     test. Test files will not be used for symbol extraction either.'''
 
@@ -121,28 +124,30 @@ def train_test_split (dataset, train_percentage, seed):
         t.write_text(json.dumps(ano))
 
     click.echo("Dataset split into train ({} files) and test ({} files)".format(
-        split_point, len(ano_files)-split_point))
+               split_point, len(ano_files) - split_point))
 
-def count (l):
+
+def count(l):
     return sum(1 for _ in l)
+
 
 @click.command()
 @click.pass_obj
-def info (dataset):
+def info(dataset):
     ''' Returns status information about a dataset.'''
 
     path = dataset.path
     info = dataset.info
-    click.secho('{}\n{}\n'.format(info["title"], '='*len(info['title'])), bold=True)
+    click.secho('{}\n{}\n'.format(info["title"], '=' * len(info['title'])), bold=True)
     click.echo(info["description"])
 
     real = path / 'real'
     num_real = count(real.glob('*.png'))
-    click.echo('Real transcriptions: {}'.format(style(num_real>0, num_real)))
-    num_annot = sum(len(json.loads(annot.read_text())['symbols'])>0
-            for annot in real.glob('*.json'))
-    click.echo('Annotated: {}/{}\n'.format(style(num_annot==num_real, num_annot),
-        num_real))
+    click.echo('Real transcriptions: {}'.format(style(num_real > 0, num_real)))
+    num_annot = sum(len(json.loads(annot.read_text())['symbols']) > 0
+                    for annot in real.glob('*.json'))
+    click.echo('Annotated: {}/{}\n'.format(style(num_annot == num_real, num_annot),
+                                           num_real))
 
     symbols = path / 'symbols'
     num_sym = count(symbols.glob('*.png'))
@@ -159,11 +164,11 @@ def info (dataset):
     darknet = path / 'darknet'
     num_txt = count(real.glob('*.txt')) + count(gen.glob('*.txt'))
     click.echo('Dataset {} ready for training'.format(style(
-        darknet.exists() and num_txt == num_gen+num_real,
+        darknet.exists() and num_txt == num_gen + num_real,
         'is', "is not")))
 
     weights = path / 'weights' / 'darknet_final.weights'
     click.echo('Neural network {}'.format(style(weights.exists(),
-        'has been trained', "hasn't been trained")))
+               'has been trained', "hasn't been trained")))
 
     click.echo('')
