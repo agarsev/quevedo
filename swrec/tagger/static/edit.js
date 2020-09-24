@@ -1,134 +1,69 @@
-<!doctype html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>SW Tagger: {{ info.title }} ({{ id }})</title>
-    <base href="{{ mount }}">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body { padding: 2vw; }
-        h1 {
-            margin-bottom: 1ex;
-            padding: 0 0 0.5vw 1vw;
-            border-bottom: 1px solid gray;
-            display: flex;
-            align-items: center;
-        }
-        h2 {
-            display: inline-flex;
-            align-items: center;
-            margin-bottom: 1ex;
-        }
-        h1 > *, h2 > * {
-            flex: 0;
-            margin: 0 1vw;
-        }
-        a, a:visited {
-            text-decoration: none;
-            color: #00A;
-        }
-        a:hover { color: #00F; }
-        h1 button { margin-left: 3em; }
-        #message_text {
-            flex: 1;
-            padding-top: 0.5em;
-            font-weight: normal;
-            font-size: 50%;
-        }
-        li {
-            list-style-type: none;
-            margin-bottom: 0.5ex;
-        }
-        li > * {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-        }
-        li > * > * { margin: 0 0.5ex; }
-        input[type="text"] { flex: 1; }
-        #meanings {
-            align-items: start;
-            display: flex;
-        }
-        #meaning_list {
-            flex: 1;
-            display: inline-block;
-        }
-        #symbols {
-            display: flex;
-            justify-content: space-around;
-        }
-		#boxes {
-			display: inline-block;
-			position: relative;
-            border: 1px solid black;
-		}
-        #transcr {
-            max-width: 50vw;
-            max-height: 40vw;
-        }
-        .anot {
-			display: block;
-			position: absolute;
-			pointer-events: none;
-			border: 2px solid black;
-        }
-        #symbol_list {
-            padding-left: 2vw;
-            flex: 1;
-        }
-        pre {
-            margin: 2em 0;
-            padding: 1ex 0;
-            border-top: 1px solid gray;
-            color: gray;
-        }
-    </style>
-</head>
-<body>
-    <h1>
-        <a href="{{ prev_link }}">⬅️</a>
-        <a href="{{ mount }}">⬆️</a>
-        {{ id }}
-        <a href="{{ next_link }}" tabIndex="3">➡️</a>
-        <button id="save" tabIndex="2">💾</button>
-        <span id="message_text"></span>
-        <button id="auto">⚙️</button>
-    </h1>
+import { html, render } from 'https://unpkg.com/htm/preact/index.mjs?module'
 
-    <div id="meanings">
-        <h2>Meanings <button id="add_meaning">➕</button></h2>
+let mount_path = '';
 
-        <ul id="meaning_list">
-            {%- for m in meanings %}
-                <li><meaning-entry value="{{m}}" /></li>
-            {%- endfor %}
-        </ul>
-    </div>
-
-    <h2>Symbols (drag to draw)</h2>
-
-	<div id="symbols">
-        <div>
-            <div id="boxes">
-                <img id="transcr" src="{{mount}}img/{{id}}.png"/>
-            </div>
+function App ({ title, path, description, trans_list }) {
+    return html`
+        <${Header} />
+        <${MeaningList} />
+        <h2>Symbols (drag to draw)</h2>
+        <div id="symbols">
+            <${BoxesArea} />
+            <${SymbolList} />
         </div>
-        <ul id="symbol_list">
-            {%- for s in symbols %}
-                <li><symbol-entry name="{{s.name}}" x="{{s.box[0]}}" y="{{s.box[1]}}"
-                         w="{{s.box[2]}}" h="{{s.box[3]}}" />
-            {%- endfor %}
+        <pre>${info.annotation_help}</pre>
+    `;
+}
+
+function Header ({ id, prev_link, next_link }) {
+    return html`<h1>
+        <a href=${prev_link}>⬅️</a>
+        <a href=${mount_path}>⬆️</a>
+        ${id}
+        <a href=${next_link} tabIndex=3 >➡️</a>
+        <button id=save tabIndex=2 >💾</button>
+        <span id=message_text ></span>
+        <button id=auto >⚙️</button>
+    </h1>`;
+}
+
+function MeaningList ({ meanings }) {
+    return html`<div id="meanings">
+        <h2>Meanings <button id="add_meaning">➕</button></h2>
+        <ul id="meaning_list">
+            ${meanings.map(m => html`<li>
+                <${MeaningEntry} value="${m}" />
+            </li>`)}
         </ul>
-	</div>
+    </div>`;
+}
 
-    <pre>{{ info.annotation_help }}</pre>
+function BoxesArea ({ id }) {
+    return html`<div>
+        <div id="boxes">
+            <img id="transcr" src="${mount_path}img/${id}.png"/>
+        </div>
+    </div>`;
+}
 
-    <script>window.onload = function () {
+function SymbolList ({ symbols }) {
+    return html`<ul id="symbol_list">
+        ${symbols.map(s => html`<li>
+            <${SymbolEntry} name="${s.name}" x="${s.box[0]}" y="${s.box[1]}"
+                     w="${s.box[2]}" h="${s.box[3]}" />
+        </li>`)}
+    </ul>`;
+}
+
+// TODO: get transcription number from url
+
+fetch('/api/transcription/${id}').then(r => r.json()).then(data => {
+    document.title = `${document.title}: ${data.title} (${id})`;
+    mount_path = data.mount_path;
+    render(html`<${App} ...${data} />`, document.body);
+});
+
+window.onload = function () {
         let dirty = false;
         const save_button = document.getElementById("save");
         save_button.style.visibility = 'hidden';
@@ -351,6 +286,4 @@
             })
             .catch(e => msg.innerHTML = `Error: ${e}`);
         }
-    }</script>
-</body>
-</html>
+    }
