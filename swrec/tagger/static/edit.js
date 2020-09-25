@@ -1,41 +1,68 @@
-import { html, render } from 'https://unpkg.com/htm/preact/index.mjs?module'
+const html = htm.bind(preact.h);
+const useState = preactHooks.useState;
+
 
 let mount_path = '';
+let t_id  = (new URL(document.location)).searchParams.get("id");
 
-function App ({ title, path, description, trans_list }) {
+
+fetch(`/api/transcriptions/${t_id}`).then(r => r.json()).then(data => {
+    document.title = `${document.title}: ${data.title} (${t_id})`;
+    mount_path = data.mount_path;
+    preact.render(html`<${App} ...${data} />`, document.body);
+});
+
+function App ({ annotation_help, mount_path, links, anot }) {
+
+    const [ meanings, setMeanings ] = useState(anot.meanings);
+    const removeMeaning = i => {
+        meanings.splice(i, 1);
+        setMeanings(meanings.slice());
+    };
+
     return html`
-        <${Header} />
-        <${MeaningList} />
+        <${Header} mount_path=${mount_path} links=${links} />
+        <${MeaningList} meanings=${meanings} remove=${removeMeaning} />
         <h2>Symbols (drag to draw)</h2>
+        <pre>${annotation_help}</pre>
+    `;
+    /*
         <div id="symbols">
             <${BoxesArea} />
             <${SymbolList} />
         </div>
-        <pre>${info.annotation_help}</pre>
     `;
+    */
 }
 
-function Header ({ id, prev_link, next_link }) {
+function Header ({ mount_path, links }) {
     return html`<h1>
-        <a href=${prev_link}>⬅️</a>
+        <a href="edit.html?id=${links.prev}">⬅️</a>
         <a href=${mount_path}>⬆️</a>
-        ${id}
-        <a href=${next_link} tabIndex=3 >➡️</a>
+        ${t_id}
+        <a href="edit.html?id=${links.next}" tabIndex=3 >➡️</a>
         <button id=save tabIndex=2 >💾</button>
         <span id=message_text ></span>
         <button id=auto >⚙️</button>
     </h1>`;
 }
 
-function MeaningList ({ meanings }) {
+function MeaningList ({ meanings, remove }) {
     return html`<div id="meanings">
         <h2>Meanings <button id="add_meaning">➕</button></h2>
         <ul id="meaning_list">
-            ${meanings.map(m => html`<li>
-                <${MeaningEntry} value="${m}" />
+            ${meanings.map((m, i) => html`<li>
+                <${MeaningEntry} value=${m} remove=${() => remove(i)} />
             </li>`)}
         </ul>
     </div>`;
+}
+
+function MeaningEntry ({ value, remove }) {
+    return html`
+        <input type="text" value=${value} />
+        <button onclick=${remove}>🗑️</button>
+    `;
 }
 
 function BoxesArea ({ id }) {
@@ -55,14 +82,7 @@ function SymbolList ({ symbols }) {
     </ul>`;
 }
 
-// TODO: get transcription number from url
-
-fetch('/api/transcription/${id}').then(r => r.json()).then(data => {
-    document.title = `${document.title}: ${data.title} (${id})`;
-    mount_path = data.mount_path;
-    render(html`<${App} ...${data} />`, document.body);
-});
-
+/*
 window.onload = function () {
         let dirty = false;
         const save_button = document.getElementById("save");
@@ -79,18 +99,7 @@ window.onload = function () {
             }
         });
 
-        /* Helper for creating DOM elements */
-        function create (parent, tag, attrs, inner) {
-            const el = document.createElement(tag);
-            for (key in attrs) {
-                el.setAttribute(key, attrs[key]);
-            }
-            if (inner) el.innerHTML = inner;
-            parent.appendChild(el);
-            return el;
-        }
-
-        /* List of meanings for the transcribed sign */
+        // List of meanings for the transcribed sign
 
         const meaning_list = document.getElementById("meaning_list");
         const meaning_list_button = document.getElementById("add_meaning");
@@ -106,7 +115,7 @@ window.onload = function () {
                 this.text = create(this, 'input', { type: 'text',
                     value: this.getAttribute('value') || '' });
                 this.text.oninput = mark_dirty;
-                const del = create(this, 'button', {}, '🗑️');
+                const del = create(this, 'button', {}, '');
                 del.onclick = () => {
                     mark_dirty();
                     meaning_list.removeChild(this.parentElement);
@@ -115,7 +124,7 @@ window.onload = function () {
         }
         customElements.define('meaning-entry', MeaningEntry);
 
-        /* List of symbols */
+        // List of symbols
         
         const trans = document.getElementById("transcr");
         const boxes_layer = document.getElementById("boxes");
@@ -183,7 +192,7 @@ window.onload = function () {
         }
         customElements.define('symbol-entry', SymbolEntry);
 
-        /* Bounding boxes of symbols */
+        // Bounding boxes of symbols
 
         let draw = null;
         trans.addEventListener('mousedown', e => {
@@ -227,7 +236,7 @@ window.onload = function () {
 
 		current_box = null;
 
-        /* saving */
+        // saving
 
         const msg = document.getElementById("message_text");
         save_button.onclick = function () {
@@ -270,7 +279,7 @@ window.onload = function () {
         }
 
         const auto_url = (window.location+'').replace(/edit/, 'auto');
-        /* loading of automatic annotations */
+        // loading of automatic annotations
         document.getElementById('auto').onclick = function () {
             let sl = symbol_list.querySelectorAll('symbol-entry');
             if (sl.length>0 && !confirm("WARNING: Existing annotations will be removed"))
@@ -287,3 +296,4 @@ window.onload = function () {
             .catch(e => msg.innerHTML = `Error: ${e}`);
         }
     }
+*/

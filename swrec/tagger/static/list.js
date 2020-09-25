@@ -1,4 +1,4 @@
-import { html, render } from 'https://unpkg.com/htm/preact/index.mjs?module'
+const html = htm.bind(preact.h);
 
 let mount_path = '';
 
@@ -7,7 +7,7 @@ function Entry ({ id, meanings, set, annotated }) {
         <h2>${meanings[0]} <span class="set">(${set})</span></h2>
         <img src="${mount_path}img/${id}.png" />
         <p>
-            <a href="${mount_path}edit/${id}">📝</a>
+            <a href="${mount_path}edit.html?id=${id}">📝</a>
             ${annotated>0?`✔️ (${annotated})`:null}
         </p>
     </li>`;
@@ -29,8 +29,8 @@ function App ({ title, path, description, trans_list }) {
     `;
 }
 
-fetch('/api/list').then(r => r.json()).then(data => {
+fetch('/api/transcriptions').then(r => r.json()).then(data => {
     document.title = `${document.title}: ${data.title}`;
     mount_path = data.mount_path;
-    render(html`<${App} ...${data} />`, document.body);
+    preact.render(html`<${App} ...${data} />`, document.body);
 });

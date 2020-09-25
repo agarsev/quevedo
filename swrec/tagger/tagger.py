@@ -38,41 +38,41 @@ def load_dataset(dataset):
     app_data['trans_list'] = list(map(get_transcription_info, ids))
 
 
-@app.route('/')
-def index():
-    return app.send_static_file('list.html')
+def run(host, port, path):
+    app_data['mount_path'] = '/' + path + '/' if path != '' else '/'
+    app.run(host=host, port=port)
 
 
-@app.route('/api/list')
-def list_page():
+# ------------ API ------------------
+
+@app.route('/api/transcriptions')
+def all_transcriptions():
     ds = app_data['dataset']
     return {
         'title': ds.info['title'],
+        'mount_path': app_data['mount_path'],
         'path': str(app_data['path']),
         'description': ds.info['description'],
         'trans_list': app_data['trans_list'],
-        'mount_path': app_data['mount_path']
     }
 
 
-@app.route('/img/<filename>')
-def send_image(filename):
-    return send_from_directory(app_data['data_dir'], filename)
-
-
-@app.route('/edit/<idx>')
-def edit_page(idx):
+@app.route('/api/transcriptions/<idx>')
+def one_transcription(idx):
     idn = int(idx)
     anot_file = app_data['data_dir'] / '{}.json'.format(idx)
     anot = json.loads(anot_file.read_text())
-    return render_template('edit.html', **{
-        'id': idx,
-        'mount': app_data['mount'],
-        'prev_link': 'edit/{}'.format(idn - 1 if idn > 1 else app_data['last_id']),
-        'next_link': 'edit/{}'.format(idn + 1 if idn < app_data['last_id'] else 1),
-        'info': app_data['info'],
-        **anot
-    })
+    ds = app_data['dataset']
+    return {
+        'title': ds.info['title'],
+        'annotation_help': ds.info['annotation_help'],
+        'mount_path': app_data['mount_path'],
+        'links': {
+            'prev': idn - 1 if idn > 1 else app_data['last_id'],
+            'next': idn + 1 if idn < app_data['last_id'] else 1,
+        },
+        'anot': anot,
+    }
 
 
 @app.route('/edit/<idx>', methods=["POST"])
@@ -101,6 +101,13 @@ def get_auto_annotations(idx):
     return {'symbols': predict(img)}
 
 
-def run(host, port, path):
-    app_data['mount_path'] = '/' + path + '/' if path != '' else '/'
-    app.run(host=host, port=port)
+# ----------------- WEB APP ----------------
+
+@app.route('/')
+def index():
+    return app.send_static_file('list.html')
+
+
+@app.route('/img/<filename>')
+def send_image(filename):
+    return send_from_directory(app_data['data_dir'], filename)
