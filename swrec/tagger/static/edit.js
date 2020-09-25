@@ -1,5 +1,6 @@
 const html = htm.bind(preact.h);
 const useState = preactHooks.useState;
+const useEffect = preactHooks.useEffect;
 
 
 let mount_path = '';
@@ -14,15 +15,22 @@ fetch(`/api/transcriptions/${t_id}`).then(r => r.json()).then(data => {
 
 function App ({ annotation_help, mount_path, links, anot }) {
 
+    /* Prevent loss of changes by unintentional page unloading */
+    const [ dirty, setDirty ] = useState(false);
+    useEffect(() => {
+        window.addEventListener('beforeunload', e => {
+            if (dirty) {
+                e.preventDefault();
+                e.returnValue = "Warning: unsaved changes will be lost";
+            }
+        });
+    });
+
     const [ meanings, setMeanings ] = useState(anot.meanings);
-    const removeMeaning = i => {
-        meanings.splice(i, 1);
-        setMeanings(meanings.slice());
-    };
 
     return html`
-        <${Header} mount_path=${mount_path} links=${links} />
-        <${MeaningList} meanings=${meanings} remove=${removeMeaning} />
+        <${Header} ...${{mount_path, links, dirty}} />
+        <${MeaningList} ...${{meanings, setMeanings, setDirty}} />
         <h2>Symbols (drag to draw)</h2>
         <pre>${annotation_help}</pre>
     `;
@@ -35,32 +43,50 @@ function App ({ annotation_help, mount_path, links, anot }) {
     */
 }
 
-function Header ({ mount_path, links }) {
+function Header ({ mount_path, links, dirty }) {
     return html`<h1>
         <a href="edit.html?id=${links.prev}">⬅️</a>
         <a href=${mount_path}>⬆️</a>
         ${t_id}
         <a href="edit.html?id=${links.next}" tabIndex=3 >➡️</a>
-        <button id=save tabIndex=2 >💾</button>
+        ${dirty?html`<button id=save tabIndex=2 >💾</button>`:null}
         <span id=message_text ></span>
         <button id=auto >⚙️</button>
     </h1>`;
 }
 
-function MeaningList ({ meanings, remove }) {
+function MeaningList ({ meanings, setMeanings, setDirty }) {
+
+    const removeMeaning = i => {
+        meanings.splice(i, 1);
+        setMeanings(meanings.slice());
+        setDirty(true);
+    };
+    const addMeaning = () => setMeanings(meanings.concat(['']));
+    const changeMeaning = (i, value) => {
+        meanings[i] = value;
+        setMeanings(meanings.slice());
+        setDirty(true);
+    };
+
     return html`<div id="meanings">
-        <h2>Meanings <button id="add_meaning">➕</button></h2>
+        <h2>Meanings
+            <button id="add_meaning" onclick=${addMeaning}>➕</button>
+        </h2>
         <ul id="meaning_list">
             ${meanings.map((m, i) => html`<li>
-                <${MeaningEntry} value=${m} remove=${() => remove(i)} />
+                <${MeaningEntry} value=${m}
+                    change=${val => changeMeaning(i, val)}
+                    remove=${() => removeMeaning(i)} />
             </li>`)}
         </ul>
     </div>`;
 }
 
-function MeaningEntry ({ value, remove }) {
+function MeaningEntry ({ value, remove, change }) {
     return html`
-        <input type="text" value=${value} />
+        <input type="text" value=${value}
+            oninput=${e => change(e.target.value)} />
         <button onclick=${remove}>🗑️</button>
     `;
 }
@@ -84,45 +110,6 @@ function SymbolList ({ symbols }) {
 
 /*
 window.onload = function () {
-        let dirty = false;
-        const save_button = document.getElementById("save");
-        save_button.style.visibility = 'hidden';
-        function mark_dirty () {
-            save_button.style.visibility = '';
-            dirty = true;
-        }
-        function mark_clean () { dirty = false; }
-        window.addEventListener('beforeunload', e => {
-            if (dirty) {
-                e.preventDefault();
-                e.returnValue = "Warning: unsaved changes will be lost";
-            }
-        });
-
-        // List of meanings for the transcribed sign
-
-        const meaning_list = document.getElementById("meaning_list");
-        const meaning_list_button = document.getElementById("add_meaning");
-        meaning_list_button.addEventListener("click", function () {
-            const li = document.createElement("li");
-            li.innerHTML = "<meaning-entry />";
-            meaning_list.appendChild(li);
-            mark_dirty();
-        });
-        class MeaningEntry extends HTMLElement {
-            constructor () {
-                super();
-                this.text = create(this, 'input', { type: 'text',
-                    value: this.getAttribute('value') || '' });
-                this.text.oninput = mark_dirty;
-                const del = create(this, 'button', {}, '');
-                del.onclick = () => {
-                    mark_dirty();
-                    meaning_list.removeChild(this.parentElement);
-                };
-            }
-        }
-        customElements.define('meaning-entry', MeaningEntry);
 
         // List of symbols
         

@@ -35,13 +35,11 @@ h1 button { margin-left: 3em; }
 li {
     list-style-type: none;
     margin-bottom: 0.5ex;
-}
-li > * {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
 }
-li > * > * { margin: 0 0.5ex; }
+li > * { margin: 0 0.5ex; }
 input[type="text"] { flex: 1; }
 #meanings {
     align-items: start;
