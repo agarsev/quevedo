@@ -1,6 +1,5 @@
 const html = htm.bind(preact.h);
-const useState = preactHooks.useState;
-const useEffect = preactHooks.useEffect;
+const { useState, useEffect, useRef } = preactHooks;
 
 
 let mount_path = '';
@@ -115,9 +114,16 @@ function SymbolList ({ symbols, setSymbols }) {
         setColors(colors.slice());
     };
 
+    const transcr = useRef(null);
+
     return html`
         <div id="boxes">
-            <img id="transcr" src="${mount_path}img/${t_id}.png"/>
+            <img ref=${transcr} id="transcr" src="${mount_path}img/${t_id}.png"/>
+            ${symbols.map((s, i) => html`<${BBox}
+                    x=${s.box[0]} y=${s.box[1]}
+                    w=${s.box[2]} h=${s.box[3]}
+                    color=${colors[i]} image_rect=${transcr}
+            />`)}
         </div>
         <ul id="symbol_list">${symbols.map((s, i) => html`<li>
             <${SymbolEntry}
@@ -127,11 +133,6 @@ function SymbolList ({ symbols, setSymbols }) {
             /></li>`)}
         </ul>
     `;
-    /*
-     * in boxes div, after id, box for each symbol
-                    x=${s.box[0]} y=${s.box[1]}
-                    w=${s.box[2]} h=${s.box[3]}
-                    */
 }
 
 function SymbolEntry ({ name, remove, changeName, color, changeColor }) {
@@ -143,6 +144,31 @@ function SymbolEntry ({ name, remove, changeName, color, changeColor }) {
         <button>📐</button>
         <button onclick=${remove}>🗑️</button>
     `;
+}
+
+function BBox ({ x, y, w, h, color, image_rect }) {
+    const rect = useRef(null);
+    const [left, setLeft] = useState(-10);
+    const [top, setTop] = useState(-10);
+    const [width, setWidth] = useState(0);
+    const [height, setHeight] = useState(0);
+
+    if (x === undefined) return null;
+
+    const reflow = () => {
+        const { width, height } = image_rect.current.getBoundingClientRect();
+        if (width > 10) {
+            setLeft(Math.round((x-w/2.0)*width)+'px');
+            setTop(Math.round((y-h/2.0)*height)+'px');
+            setWidth(Math.round(w*1.0*width)+'px');
+            setHeight(Math.round(h*1.0*height)+'px');
+        } else { setTimeout(reflow, 50); }
+    };
+    useEffect(() => setTimeout(reflow, 100), []); // I don't know a better way to ensure image is rendered...
+
+    return html`<span ref=${rect} class=anot
+        style="left: ${left}; top: ${top}; width: ${width}; height: ${height}; border-color: ${color};"
+    />`;
 }
 
 /*
@@ -170,7 +196,6 @@ window.onload = function () {
         class SymbolEntry extends HTMLElement {
             constructor () {
                 super();
-                this.text = text;
 				const rect = create(boxes_layer, 'span', { class: 'anot' });
                 this.rect = rect;
                 const x = this.getAttribute('x');
@@ -178,15 +203,8 @@ window.onload = function () {
                     const y = this.getAttribute('y');
                     const w = this.getAttribute('w');
                     const h = this.getAttribute('h');
-                    const { width, height } = trans.getBoundingClientRect();
-                    rect.style.left = Math.round((x-w/2.0)*width)+'px';
-                    rect.style.top = Math.round((y-h/2.0)*height)+'px';
-                    rect.style.width = Math.round(w*1.0*width)+'px';
-                    rect.style.height = Math.round(h*1.0*height)+'px';
                 }
-				rect.style.borderColor = color_val;
 				rect.dirty_box = false;
-                boxes_layer.appendChild(rect);
                 current_box = rect;
                 edit.onclick = () => {
                     rect.style.width = 0;
