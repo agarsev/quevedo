@@ -7,7 +7,7 @@ function Entry ({ id, meanings, set, annotated }) {
         <h2>${meanings[0]} <span class="set">(${set})</span></h2>
         <img src="${mount_path}img/${id}.png" />
         <p>
-            <a href="${mount_path}edit.html?id=${id}">📝</a>
+            <a href="${mount_path}edit.html#${id}">📝</a>
             ${annotated>0?`✔️ (${annotated})`:null}
         </p>
     </li>`;

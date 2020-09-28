@@ -4,7 +4,8 @@ const useEffect = preactHooks.useEffect;
 
 
 let mount_path = '';
-let t_id  = (new URL(document.location)).searchParams.get("id");
+let t_id  = (new URL(document.location)).hash.substring(1);
+window.onhashchange = () => window.location.reload();
 
 
 fetch(`/api/transcriptions/${t_id}`).then(r => r.json()).then(data => {
@@ -26,47 +27,46 @@ function App ({ annotation_help, mount_path, links, anot }) {
         });
     });
 
-    const [ meanings, setMeanings ] = useState(anot.meanings);
+    const [ meanings, trueSetMeanings ] = useState(anot.meanings);
+    const setMeanings = ms => { trueSetMeanings(ms); setDirty(true); }
+
+    const [ symbols, trueSetSymbols ] = useState(anot.symbols);
+    const setSymbols = ss => { trueSetSymbols(ss); setDirty(true); }
+
 
     return html`
         <${Header} ...${{mount_path, links, dirty}} />
-        <${MeaningList} ...${{meanings, setMeanings, setDirty}} />
+        <${MeaningList} ...${{meanings, setMeanings}} />
         <h2>Symbols (drag to draw)</h2>
+        <div id="symbols">
+            <${SymbolList} ...${{symbols, setSymbols}} />
+        </div>
         <pre>${annotation_help}</pre>
     `;
-    /*
-        <div id="symbols">
-            <${BoxesArea} />
-            <${SymbolList} />
-        </div>
-    `;
-    */
 }
 
 function Header ({ mount_path, links, dirty }) {
     return html`<h1>
-        <a href="edit.html?id=${links.prev}">⬅️</a>
+        <a href="edit.html#${links.prev}">⬅️</a>
         <a href=${mount_path}>⬆️</a>
         ${t_id}
-        <a href="edit.html?id=${links.next}" tabIndex=3 >➡️</a>
+        <a href="edit.html#${links.next}" tabIndex=3 >➡️</a>
         ${dirty?html`<button id=save tabIndex=2 >💾</button>`:null}
         <span id=message_text ></span>
         <button id=auto >⚙️</button>
     </h1>`;
 }
 
-function MeaningList ({ meanings, setMeanings, setDirty }) {
+function MeaningList ({ meanings, setMeanings }) {
 
     const removeMeaning = i => {
         meanings.splice(i, 1);
         setMeanings(meanings.slice());
-        setDirty(true);
     };
     const addMeaning = () => setMeanings(meanings.concat(['']));
     const changeMeaning = (i, value) => {
         meanings[i] = value;
         setMeanings(meanings.slice());
-        setDirty(true);
     };
 
     return html`<div id="meanings">
@@ -91,21 +91,58 @@ function MeaningEntry ({ value, remove, change }) {
     `;
 }
 
-function BoxesArea ({ id }) {
-    return html`<div>
+const color_list = [ '#FF0000', '#00FF00', '#0000FF', '#FF00FF',
+    '#00FFFF', '#880000', '#008800', '#000088', '#888800', '#008888' ];
+
+function SymbolList ({ symbols, setSymbols }) {
+
+    //let [ current_box, setCurrentBox ] = useState(null); // symbol being edited
+    const changeSymbol = (i, value) => {
+        symbols[i] = value;
+        setSymbols(symbols.slice());
+    };
+    const [ colors, setColors ] = useState(symbols.map((_,i) =>
+        color_list[i%color_list.length]))
+    const changeColor = (i, value) => {
+        colors[i] = value;
+        setColors(colors.slice());
+    }
+
+    const removeSymbol = i => {
+        symbols.splice(i, 1);
+        setSymbols(symbols.slice());
+        colors.splice(i, 1);
+        setColors(colors.slice());
+    };
+
+    return html`
         <div id="boxes">
-            <img id="transcr" src="${mount_path}img/${id}.png"/>
+            <img id="transcr" src="${mount_path}img/${t_id}.png"/>
         </div>
-    </div>`;
+        <ul id="symbol_list">${symbols.map((s, i) => html`<li>
+            <${SymbolEntry}
+                name=${s.name || ''} changeName=${name => changeSymbol(i, { ...s, name})}
+                color=${colors[i]} changeColor=${c => changeColor(i, c)}
+                remove=${() => removeSymbol(i)}
+            /></li>`)}
+        </ul>
+    `;
+    /*
+     * in boxes div, after id, box for each symbol
+                    x=${s.box[0]} y=${s.box[1]}
+                    w=${s.box[2]} h=${s.box[3]}
+                    */
 }
 
-function SymbolList ({ symbols }) {
-    return html`<ul id="symbol_list">
-        ${symbols.map(s => html`<li>
-            <${SymbolEntry} name="${s.name}" x="${s.box[0]}" y="${s.box[1]}"
-                     w="${s.box[2]}" h="${s.box[3]}" />
-        </li>`)}
-    </ul>`;
+function SymbolEntry ({ name, remove, changeName, color, changeColor }) {
+    return html`
+        <input type=color value=${color}
+            oninput=${e => changeColor(e.target.value)} />
+        <input type=text tabIndex=1 value=${name}
+            oninput=${e => changeName(e.target.value)}/>
+        <button>📐</button>
+        <button onclick=${remove}>🗑️</button>
+    `;
 }
 
 /*
@@ -115,7 +152,6 @@ window.onload = function () {
         
         const trans = document.getElementById("transcr");
         const boxes_layer = document.getElementById("boxes");
-        let current_box = null; // symbol being edited
 
         const symbol_list = document.getElementById("symbol_list");
         function add_symbol (sym) {
@@ -131,19 +167,10 @@ window.onload = function () {
             mark_dirty();
             return li.firstChild;
         }
-        const color_list = [ '#FF0000', '#00FF00', '#0000FF', '#FF00FF',
-            '#00FFFF', '#880000', '#008800', '#000088', '#888800', '#008888' ];
-        let i = 0;
         class SymbolEntry extends HTMLElement {
             constructor () {
                 super();
-                const color_val = color_list[(i++)%color_list.length];
-                const col = create(this, 'input', { type: 'color', value: color_val });
-                const text = create(this, 'input', { type: 'text', tabIndex: 1,
-					value: this.getAttribute('name') || '' });
                 this.text = text;
-                const edit = create(this, 'button', {}, '📐');
-                const del = create(this, 'button', {}, '🗑️');
 				const rect = create(boxes_layer, 'span', { class: 'anot' });
                 this.rect = rect;
                 const x = this.getAttribute('x');
@@ -160,8 +187,6 @@ window.onload = function () {
 				rect.style.borderColor = color_val;
 				rect.dirty_box = false;
                 boxes_layer.appendChild(rect);
-                text.oninput = mark_dirty;
-                col.oninput = () => rect.style.borderColor = col.value;
                 current_box = rect;
                 edit.onclick = () => {
                     rect.style.width = 0;
@@ -169,15 +194,8 @@ window.onload = function () {
                     current_box = rect;
                     mark_dirty();
                 };
-                del.onclick = () => this.removeSelf();
-            }
-            removeSelf () {
-                symbol_list.removeChild(this.parentElement);
-                boxes_layer.removeChild(this.rect);
-                mark_dirty();
             }
         }
-        customElements.define('symbol-entry', SymbolEntry);
 
         // Bounding boxes of symbols
 
