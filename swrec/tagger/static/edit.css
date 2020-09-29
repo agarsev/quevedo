@@ -3,35 +3,76 @@
     margin: 0;
     padding: 0;
 }
-body { padding: 2vw; }
-h1 {
+
+body {
+    padding: 2vw;
+}
+
+header {
+    font-size: 2.4em;
+    font-weight: bold;
     margin-bottom: 1ex;
     padding: 0 0 0.5vw 1vw;
     border-bottom: 1px solid gray;
     display: flex;
     align-items: center;
 }
-h2 {
-    display: inline-flex;
-    align-items: center;
-    margin-bottom: 1ex;
-}
-h1 > *, h2 > * {
+
+header > * {
     flex: 0;
     margin: 0 1vw;
 }
+
+header button {
+    margin-left: 3em;
+}
+
 a, a:visited {
     text-decoration: none;
     color: #00A;
 }
-a:hover { color: #00F; }
-h1 button { margin-left: 3em; }
-#message_text {
+
+a:hover {
+    color: #00F;
+}
+
+.message_text {
     flex: 1;
     padding-top: 0.5em;
     font-weight: normal;
     font-size: 50%;
 }
+
+h2 {
+    display: inline-flex;
+    margin-bottom: 1ex;
+    align-items: center;
+}
+
+h2 > * {
+    flex: 0;
+    margin: 0 1vw;
+}
+
+.MeaningList, .SymbolList {
+    display: flex;
+    align-items: start;
+    justify-content: space-around;
+}
+
+.MeaningList ul, .SymbolList ul {
+    flex: 1;
+    display: inline-block;
+}
+
+.SymbolEntry {
+    padding-left: 2vw;
+}
+
+.SymbolEntry.editing {
+    background-color: #aaf;
+}
+
 li {
     list-style-type: none;
     margin-bottom: 0.5ex;
@@ -39,44 +80,32 @@ li {
     align-items: baseline;
     justify-content: space-between;
 }
-li.editing { background-color: #ccc; }
+
 li > * { margin: 0 0.5ex; }
-input[type="text"] { flex: 1; }
-#meanings {
-    align-items: start;
-    display: flex;
-}
-#meaning_list {
-    flex: 1;
-    display: inline-block;
-}
-#symbols {
-    display: flex;
-    justify-content: space-around;
-}
-#boxes {
+
+li input[type="text"] { flex: 1; }
+
+.Annotation {
     display: inline-block;
     position: relative;
     border: 1px solid black;
 }
-#transcr {
+
+.Annotation img {
     max-width: 50vw;
     max-height: 40vw;
 }
-.anot {
+
+.BBox {
     display: block;
     position: absolute;
     pointer-events: none;
     border: 2px solid black;
 }
-#symbol_list {
-    padding-left: 2vw;
-    flex: 1;
-}
+
 pre {
     margin: 2em 0;
     padding: 1ex 0;
     border-top: 1px solid gray;
     color: gray;
 }
-

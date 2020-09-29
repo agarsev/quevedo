@@ -84,33 +84,31 @@ function App ({ annotation_help, mount_path, links, anot }) {
             message, show_save: dirty>0 }} />
         <${MeaningList} ...${{meanings}} />
         <h2>Symbols (drag to draw)</h2>
-        <div id="symbols">
-            <${SymbolList} ...${{symbols}} />
-        </div>
+        <${SymbolList} ...${{symbols}} />
         <pre>${annotation_help}</pre>
     `;
 }
 
 function Header ({ mount_path, links, saveChanges, message, show_save }) {
 
-    return html`<h1>
+    return html`<header>
         <a href="edit.html#${links.prev}">⬅️</a>
         <a href=${mount_path}>⬆️</a>
         ${t_id}
         <a href="edit.html#${links.next}" tabIndex=3 >➡️</a>
-        ${show_save?html`<button id=save tabIndex=2
+        ${show_save?html`<button tabIndex=2
             onclick=${saveChanges} >💾</button>`:null}
-        <span id=message_text >${message}</span>
-        <button id=auto >⚙️</button>
-    </h1>`;
+        <span class="message_text">${message}</span>
+        <button>⚙️</button>
+    </header>`;
 }
 
 function MeaningList ({ meanings }) {
-    return html`<div id="meanings">
+    return html`<div class="MeaningList">
         <h2>Meanings
-            <button id="add_meaning" onclick=${() => meanings.add()}>➕</button>
+            <button onclick=${() => meanings.add()}>➕</button>
         </h2>
-        <ul id="meaning_list">
+        <ul>
             ${meanings.list.map((m, i) => html`<li>
                 <${MeaningEntry} value=${m}
                     change=${val => meanings.update(i, val)}
@@ -150,31 +148,29 @@ function SymbolList ({ symbols }) {
     // start_y of rectangle being drawn
     const [ editing_symbol, setEditing ] = useState(null);
 
-    return html`
+    return html`<div class="SymbolList">
         <${Annotation} ...${{symbols, colors, editing_symbol, setEditing}} />
-        <ul id="symbol_list">${symbols.list.map((s, i) => html`
-            <li class=${editing_symbol !== null &&
-                    editing_symbol.idx === i?'editing':''}>
-                <${SymbolEntry} name=${s.name || ''}
-                    changeName=${name => symbols.update(i, { ...s, name})}
-                    color=${colors.list[i]} changeColor=${c => colors.update(i, c)}
-                    remove=${() => removeSymbol(i)}
-                    editBox=${() => setEditing({ idx: i })}
-                />
-            </li>`)}
+        <ul>${symbols.list.map((s, i) => html`
+            <${SymbolEntry} name=${s.name || ''}
+                changeName=${name => symbols.update(i, { ...s, name})}
+                color=${colors.list[i]} changeColor=${c => colors.update(i, c)}
+                remove=${() => removeSymbol(i)}
+                editBox=${() => setEditing({ idx: i })}
+                editing=${editing_symbol !== null && editing_symbol.idx === i}
+            />`)}
         </ul>
-    `;
+    </div>`;
 }
 
-function SymbolEntry ({ name, remove, changeName, color, changeColor, editBox }) {
-    return html`
+function SymbolEntry ({ name, remove, changeName, color, changeColor, editBox, editing }) {
+    return html`<li class="SymbolEntry ${editing?'editing':''}">
         <input type=color value=${color}
             oninput=${e => changeColor(e.target.value)} />
         <input type=text tabIndex=1 value=${name}
             oninput=${e => changeName(e.target.value)}/>
         <button onclick=${editBox}>📐</button>
         <button onclick=${remove}>🗑️</button>
-    `;
+    </li>`;
 }
 
 function Annotation ({ symbols, colors, editing_symbol, setEditing }) {
@@ -230,9 +226,9 @@ function Annotation ({ symbols, colors, editing_symbol, setEditing }) {
         document.addEventListener('mouseup', () => setEditing(null))
     }, []);
 
-    return html`<div id="boxes">
+    return html`<div class="Annotation">
         <img src="${mount_path}img/${t_id}.png"
-            ref=${image_rect} id="transcr" 
+            ref=${image_rect}
             onmousedown=${mouse_down}
             onmousemove=${mouse_move}
         />
@@ -254,7 +250,7 @@ function BBox ({ x, y, w, h, color, image_width, image_height }) {
     const width = Math.round(w*1.0*image_width)+'px';
     const height = Math.round(h*1.0*image_height)+'px';
 
-    return html`<span class=anot style=${`
+    return html`<span class="BBox" style=${`
         left: ${left}; top: ${top};
         width: ${width}; height: ${height};
         border-color: ${color};`} />`;
