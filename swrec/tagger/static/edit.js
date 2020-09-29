@@ -7,6 +7,26 @@ let t_id  = (new URL(document.location)).hash.substring(1);
 window.onhashchange = () => window.location.reload();
 
 
+function useList (initial_value, cb = () => null) {
+    const [ list, setList ] = useState(initial_value);
+    return { list,
+        add: v => {
+            setList(list.concat([v]));
+            cb();
+        },
+        remove: i => {
+            let nl = list.slice(); nl.splice(i, 1);
+            setList(nl);
+            cb();
+        },
+        update: (i, v) => {
+            let nl = list.slice(); nl[i] = v;
+            setList(nl);
+            cb();
+        },
+    };
+}
+
 fetch(`/api/transcriptions/${t_id}`).then(r => r.json()).then(data => {
     document.title = `${document.title}: ${data.title} (${t_id})`;
     mount_path = data.mount_path;
@@ -17,6 +37,7 @@ function App ({ annotation_help, mount_path, links, anot }) {
 
     /* Prevent loss of changes by unintentional page unloading */
     const [ dirty, setDirty ] = useState(false);
+    const markDirty = () => setDirty(true);
     useEffect(() => {
         window.addEventListener('beforeunload', e => {
             if (dirty) {
@@ -26,19 +47,15 @@ function App ({ annotation_help, mount_path, links, anot }) {
         });
     });
 
-    const [ meanings, trueSetMeanings ] = useState(anot.meanings);
-    const setMeanings = ms => { trueSetMeanings(ms); setDirty(true); }
-
-    const [ symbols, trueSetSymbols ] = useState(anot.symbols);
-    const setSymbols = ss => { trueSetSymbols(ss); setDirty(true); }
-
+    const meanings = useList(anot.meanings, markDirty)
+    const symbols = useList(anot.symbols, markDirty)
 
     return html`
         <${Header} ...${{mount_path, links, dirty}} />
-        <${MeaningList} ...${{meanings, setMeanings}} />
+        <${MeaningList} ...${{meanings}} />
         <h2>Symbols (drag to draw)</h2>
         <div id="symbols">
-            <${SymbolList} ...${{symbols, setSymbols}} />
+            <${SymbolList} ...${{symbols}} />
         </div>
         <pre>${annotation_help}</pre>
     `;
@@ -56,27 +73,17 @@ function Header ({ mount_path, links, dirty }) {
     </h1>`;
 }
 
-function MeaningList ({ meanings, setMeanings }) {
-
-    const removeMeaning = i => {
-        meanings.splice(i, 1);
-        setMeanings(meanings.slice());
-    };
-    const addMeaning = () => setMeanings(meanings.concat(['']));
-    const changeMeaning = (i, value) => {
-        meanings[i] = value;
-        setMeanings(meanings.slice());
-    };
+function MeaningList ({ meanings }) {
 
     return html`<div id="meanings">
         <h2>Meanings
-            <button id="add_meaning" onclick=${addMeaning}>➕</button>
+            <button id="add_meaning" onclick=${() => meanings.add()}>➕</button>
         </h2>
         <ul id="meaning_list">
-            ${meanings.map((m, i) => html`<li>
+            ${meanings.list.map((m, i) => html`<li>
                 <${MeaningEntry} value=${m}
-                    change=${val => changeMeaning(i, val)}
-                    remove=${() => removeMeaning(i)} />
+                    change=${val => meanings.update(i, val)}
+                    remove=${() => meanings.remove(i)} />
             </li>`)}
         </ul>
     </div>`;
@@ -93,25 +100,15 @@ function MeaningEntry ({ value, remove, change }) {
 const color_list = [ '#FF0000', '#00FF00', '#0000FF', '#FF00FF',
     '#00FFFF', '#880000', '#008800', '#000088', '#888800', '#008888' ];
 
-function SymbolList ({ symbols, setSymbols }) {
+function SymbolList ({ symbols }) {
 
     //let [ current_box, setCurrentBox ] = useState(null); // symbol being edited
-    const changeSymbol = (i, value) => {
-        symbols[i] = value;
-        setSymbols(symbols.slice());
-    };
-    const [ colors, setColors ] = useState(symbols.map((_,i) =>
+    const colors = useList(symbols.list.map((_,i) =>
         color_list[i%color_list.length]))
-    const changeColor = (i, value) => {
-        colors[i] = value;
-        setColors(colors.slice());
-    }
 
     const removeSymbol = i => {
-        symbols.splice(i, 1);
-        setSymbols(symbols.slice());
-        colors.splice(i, 1);
-        setColors(colors.slice());
+        symbols.remove(i);
+        colors.remove(i);
     };
 
     const transcr = useRef(null);
@@ -119,16 +116,16 @@ function SymbolList ({ symbols, setSymbols }) {
     return html`
         <div id="boxes">
             <img ref=${transcr} id="transcr" src="${mount_path}img/${t_id}.png"/>
-            ${symbols.map((s, i) => html`<${BBox}
+            ${symbols.list.map((s, i) => html`<${BBox}
                     x=${s.box[0]} y=${s.box[1]}
                     w=${s.box[2]} h=${s.box[3]}
-                    color=${colors[i]} image_rect=${transcr}
+                    color=${colors.list[i]} image_rect=${transcr}
             />`)}
         </div>
-        <ul id="symbol_list">${symbols.map((s, i) => html`<li>
-            <${SymbolEntry}
-                name=${s.name || ''} changeName=${name => changeSymbol(i, { ...s, name})}
-                color=${colors[i]} changeColor=${c => changeColor(i, c)}
+        <ul id="symbol_list">${symbols.list.map((s, i) => html`<li>
+            <${SymbolEntry} name=${s.name || ''}
+                changeName=${name => symbols.update(i, { ...s, name})}
+                color=${colors.list[i]} changeColor=${c => colors.update(i, c)}
                 remove=${() => removeSymbol(i)}
             /></li>`)}
         </ul>
