@@ -16,14 +16,16 @@ function useList (initial_value, cb = () => null) {
         },
         remove: i => {
             let nl = list.slice(); nl.splice(i, 1);
-            setList(nl);
-            cb();
+            setList(nl); cb();
         },
         update: (i, v) => {
             let nl = list.slice(); nl[i] = v;
-            setList(nl);
-            cb();
+            setList(nl); cb();
         },
+        update_fn: (i, fn) => {
+            let nl = list.slice(); nl[i] = fn(list[i]);
+            setList(nl); cb();
+        }
     };
 }
 
@@ -74,7 +76,6 @@ function Header ({ mount_path, links, dirty }) {
 }
 
 function MeaningList ({ meanings }) {
-
     return html`<div id="meanings">
         <h2>Meanings
             <button id="add_meaning" onclick=${() => meanings.add()}>➕</button>
@@ -99,29 +100,24 @@ function MeaningEntry ({ value, remove, change }) {
 
 const color_list = [ '#FF0000', '#00FF00', '#0000FF', '#FF00FF',
     '#00FFFF', '#880000', '#008800', '#000088', '#888800', '#008888' ];
+let next_color = 0;
+function getNextColor () {
+    const r = color_list[next_color];
+    next_color = (next_color + 1) % color_list.length;
+    return r;
+}
 
 function SymbolList ({ symbols }) {
 
-    //let [ current_box, setCurrentBox ] = useState(null); // symbol being edited
-    const colors = useList(symbols.list.map((_,i) =>
-        color_list[i%color_list.length]))
+    const colors = useList(() => symbols.list.map(getNextColor));
 
     const removeSymbol = i => {
         symbols.remove(i);
         colors.remove(i);
     };
 
-    const transcr = useRef(null);
-
     return html`
-        <div id="boxes">
-            <img ref=${transcr} id="transcr" src="${mount_path}img/${t_id}.png"/>
-            ${symbols.list.map((s, i) => html`<${BBox}
-                    x=${s.box[0]} y=${s.box[1]}
-                    w=${s.box[2]} h=${s.box[3]}
-                    color=${colors.list[i]} image_rect=${transcr}
-            />`)}
-        </div>
+        <${Annotation} symbols=${symbols} colors=${colors} />
         <ul id="symbol_list">${symbols.list.map((s, i) => html`<li>
             <${SymbolEntry} name=${s.name || ''}
                 changeName=${name => symbols.update(i, { ...s, name})}
@@ -143,29 +139,88 @@ function SymbolEntry ({ name, remove, changeName, color, changeColor }) {
     `;
 }
 
-function BBox ({ x, y, w, h, color, image_rect }) {
-    const rect = useRef(null);
-    const [left, setLeft] = useState(-10);
-    const [top, setTop] = useState(-10);
-    const [width, setWidth] = useState(0);
-    const [height, setHeight] = useState(0);
+function Annotation ({ symbols, colors }) {
 
-    if (x === undefined) return null;
-
+    // Image bounding rectangle 
+    const image_rect = useRef(null);
+    const [ image_width, setImageW ] = useState(0);
+    const [ image_height, setImageH ] = useState(0);
     const reflow = () => {
         const { width, height } = image_rect.current.getBoundingClientRect();
         if (width > 10) {
-            setLeft(Math.round((x-w/2.0)*width)+'px');
-            setTop(Math.round((y-h/2.0)*height)+'px');
-            setWidth(Math.round(w*1.0*width)+'px');
-            setHeight(Math.round(h*1.0*height)+'px');
+            setImageW(width);
+            setImageH(height);
         } else { setTimeout(reflow, 50); }
     };
-    useEffect(() => setTimeout(reflow, 100), []); // I don't know a better way to ensure image is rendered...
+    // I don't know a better way to wait for the image to be rendered
+    useEffect(() => setTimeout(reflow, 100), []);
 
-    return html`<span ref=${rect} class=anot
-        style="left: ${left}; top: ${top}; width: ${width}; height: ${height}; border-color: ${color};"
-    />`;
+    // Symbol being currently edited
+    const editing_symbol = useRef(null);
+    const mouse_down = e => {
+        if (editing_symbol.current === null) {
+            symbols.add({ box: [0,0,0,0] });
+            colors.add(getNextColor());
+            editing_symbol.current = { idx: symbols.list.length };
+        }
+        const draw = editing_symbol.current;
+        const { left, top } = image_rect.current.getBoundingClientRect();
+        draw.start_x = e.clientX - left;
+        draw.start_y = e.clientY - top;
+        symbols.update_fn(draw.idx, s => ({ ...s, box: [
+            draw.start_x/image_width, draw.start_y/image_height,
+            0,0] }));
+        e.preventDefault();
+    };
+    const mouse_move = e => {
+        if (editing_symbol.current === null) return;
+        const { left, top } = image_rect.current.getBoundingClientRect();
+        const draw = editing_symbol.current;
+        const mx = e.clientX - left;
+        const my = e.clientY - top;
+        const bw = mx-draw.start_x;
+        const bh = my-draw.start_y;
+        symbols.update_fn(draw.idx, s => ({ ...s, box: [
+            (draw.start_x + bw/2)/image_width, // x
+            (draw.start_y + bh/2)/image_height, // y
+            (bw>=0?bw:-bw)/image_width, // w
+            (bh>=0?bh:-bh)/image_height, // h
+        ] }));
+        e.preventDefault();
+    }
+    useEffect(() => {
+        document.addEventListener('mouseup', () =>
+            editing_symbol.current = null);
+    }, []);
+
+    return html`<div id="boxes">
+        <img src="${mount_path}img/${t_id}.png"
+            ref=${image_rect} id="transcr" 
+            onmousedown=${mouse_down}
+            onmousemove=${mouse_move}
+        />
+        ${symbols.list.map((s, i) => html`<${BBox}
+                x=${s.box[0]} y=${s.box[1]}
+                w=${s.box[2]} h=${s.box[3]}
+                color=${colors.list[i]}
+                image_width=${image_width}
+                image_height=${image_height}
+        />`)}
+    </div>`;
+}
+
+function BBox ({ x, y, w, h, color, image_width, image_height }) {
+
+    if (x === undefined) return null;
+    const left = Math.round((x-w/2.0)*image_width)+'px';
+    const top = Math.round((y-h/2.0)*image_height)+'px';
+    const width = Math.round(w*1.0*image_width)+'px';
+    const height = Math.round(h*1.0*image_height)+'px';
+
+    return html`<span class=anot style=${`
+        left: ${left}; top: ${top};
+        width: ${width}; height: ${height};
+        border-color: ${color};`} />`;
 }
 
 /*
@@ -177,19 +232,7 @@ window.onload = function () {
         const boxes_layer = document.getElementById("boxes");
 
         const symbol_list = document.getElementById("symbol_list");
-        function add_symbol (sym) {
-            const li = document.createElement("li");
-            if (sym !== undefined) {
-                li.innerHTML = `<symbol-entry name="${sym.name}"
-                    x="${sym.box[0]}" y="${sym.box[1]}"
-                    w="${sym.box[2]}" h="${sym.box[3]}"/>`;
-            } else {
-                li.innerHTML = "<symbol-entry />";
-            }
-            symbol_list.appendChild(li);
-            mark_dirty();
-            return li.firstChild;
-        }
+
         class SymbolEntry extends HTMLElement {
             constructor () {
                 super();
@@ -217,16 +260,6 @@ window.onload = function () {
         let draw = null;
         trans.addEventListener('mousedown', e => {
             if (!current_box) add_symbol();
-			current_box.dirty_box = true;
-            const { left, top } = trans.getBoundingClientRect();
-            const x = e.clientX - left;
-            const y = e.clientY - top;
-            draw = { x, y };
-            current_box.style.left = x+'px';
-            current_box.style.top = y+'px';
-            current_box.style.width = 0;
-            current_box.style.height = 0;
-            e.preventDefault();
         });
         trans.addEventListener('mousemove', e => {
             if (draw !== null) {
