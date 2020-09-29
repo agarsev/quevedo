@@ -35,25 +35,53 @@ fetch(`/api/transcriptions/${t_id}`).then(r => r.json()).then(data => {
     preact.render(html`<${App} ...${data} />`, document.body);
 });
 
+function preventLostChanges (e) {
+    e.preventDefault();
+    e.returnValue = "Warning: unsaved changes will be lost";
+}
+
 function App ({ annotation_help, mount_path, links, anot }) {
 
-    /* Prevent loss of changes by unintentional page unloading */
-    const [ dirty, setDirty ] = useState(false);
-    const markDirty = () => setDirty(true);
+    /* Prevent loss of changes by unintentional page unloading:
+     * 0: no changes/all changes saved
+     * 1: changes done
+     * 2: changes submitted to server
+     */
+    const [ dirty, setDirty ] = useState(0);
+    const markDirty = () => setDirty(1);
     useEffect(() => {
-        window.addEventListener('beforeunload', e => {
-            if (dirty) {
-                e.preventDefault();
-                e.returnValue = "Warning: unsaved changes will be lost";
-            }
-        });
-    });
+        if (dirty>0) {
+            window.addEventListener('beforeunload', preventLostChanges);
+            return () => window.removeEventListener('beforeunload', preventLostChanges);
+        }
+    }, [dirty]);
 
     const meanings = useList(anot.meanings, markDirty)
     const symbols = useList(anot.symbols, markDirty)
 
+    const [ message, setMessage ] = useState('');
+    const saveChanges = () => {
+        setDirty(2);
+        setMessage("Saving...");
+        fetch(`/api/transcriptions/${t_id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                meanings: meanings.list,
+                symbols: symbols.list
+            })
+        }).then(r => {
+            if (r.ok) {
+                setDirty(0);
+                setMessage("Saved");
+            } else throw r.statusText;
+        })
+        .catch(e => setMessage(`Error: ${e}`));
+    };
+
     return html`
-        <${Header} ...${{mount_path, links, dirty}} />
+        <${Header} ...${{mount_path, links, saveChanges,
+            message, show_save: dirty>0 }} />
         <${MeaningList} ...${{meanings}} />
         <h2>Symbols (drag to draw)</h2>
         <div id="symbols">
@@ -63,14 +91,16 @@ function App ({ annotation_help, mount_path, links, anot }) {
     `;
 }
 
-function Header ({ mount_path, links, dirty }) {
+function Header ({ mount_path, links, saveChanges, message, show_save }) {
+
     return html`<h1>
         <a href="edit.html#${links.prev}">⬅️</a>
         <a href=${mount_path}>⬆️</a>
         ${t_id}
         <a href="edit.html#${links.next}" tabIndex=3 >➡️</a>
-        ${dirty?html`<button id=save tabIndex=2 >💾</button>`:null}
-        <span id=message_text ></span>
+        ${show_save?html`<button id=save tabIndex=2
+            onclick=${saveChanges} >💾</button>`:null}
+        <span id=message_text >${message}</span>
         <button id=auto >⚙️</button>
     </h1>`;
 }
@@ -232,48 +262,6 @@ function BBox ({ x, y, w, h, color, image_width, image_height }) {
 
 /*
 window.onload = function () {
-
-        // saving
-
-        const msg = document.getElementById("message_text");
-        save_button.onclick = function () {
-            msg.innerHTML = "Saving...";
-            const data = {
-                meanings: [],
-                symbols: []
-            };
-            meaning_list.querySelectorAll("meaning-entry").forEach(m => {
-                data.meanings.push(m.text.value);
-            });
-			const { left: off_x, top: off_y } = trans.getBoundingClientRect();
-			const { clientWidth: off_w, clientHeight: off_h } = trans;
-            symbol_list.querySelectorAll("symbol-entry").forEach(s => {
-				let box;
-				if (s.rect.dirty_box) {
-                	const r = s.rect.getBoundingClientRect();
-					const { clientWidth: w, clientHeight: h } = s.rect;
-                    box = [ (r.left+w/2.0-off_x)/off_w,
-                        (r.top+h/2.0-off_y)/off_h,
-                        w*1.0/off_w, h*1.0/off_h ];
-				} else {
-					box = [ s.getAttribute('x'), s.getAttribute('y'),
-							s.getAttribute('w'), s.getAttribute('h') ];
-				}
-                data.symbols.push({ name: s.text.value, box });
-            });
-            fetch(window.location, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-            .then(r => {
-                if (r.ok) {
-                    msg.innerHTML = "Saved";
-                    mark_clean();
-                } else throw r.statusText;
-            })
-            .catch(e => msg.innerHTML = `Error: ${e}`);
-        }
 
         const auto_url = (window.location+'').replace(/edit/, 'auto');
         // loading of automatic annotations

@@ -1,6 +1,6 @@
 # 2020-04-07 Antonio F. G. Sevilla <afgs@ucm.es>
 
-from flask import Flask, render_template, send_from_directory, request
+from flask import Flask, send_from_directory, request
 import json
 import logging
 import os
@@ -57,7 +57,7 @@ def all_transcriptions():
     }
 
 
-@app.route('/api/transcriptions/<idx>')
+@app.route('/api/transcriptions/<idx>', methods=["GET"])
 def one_transcription(idx):
     idn = int(idx)
     anot_file = app_data['data_dir'] / '{}.json'.format(idx)
@@ -75,12 +75,12 @@ def one_transcription(idx):
     }
 
 
-@app.route('/edit/<idx>', methods=["POST"])
+@app.route('/api/transcriptions/<idx>', methods=["POST"])
 def edit_post(idx):
     anot_file = app_data['data_dir'] / '{}.json'.format(idx)
     anot = json.loads(anot_file.read_text())
     new_info = {**anot, **request.get_json()}
-    trans = next(t for t in app_data['trans'] if t['id'] == int(idx))
+    trans = next(t for t in app_data['trans_list'] if t['id'] == int(idx))
     trans['annotated'] = annotated_status(new_info)
     anot_file.write_text(json.dumps(new_info))
     return 'OK'
