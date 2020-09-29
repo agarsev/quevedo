@@ -5,12 +5,12 @@
 Migrate tagger web app to preact instead of SSR flask html + spaguetti JS, in
 order to be ablo to do annotation tables in a sane way.
 
-- url of edit: /edit?id=blabla (thus edit.{html,js,css} cached, just API call to
-    get data of particular transcription)
+Should rewrite edit.css too.
 
 # TODO
 
 - Annotation tables
+- Tagger Undo/Redo (use reducer for state in webapp?)
 - Document dataset/annotation format !IMPORTANT
 - Add option to change detection threshold in test and compare
 - Upload transcriptions from the tagger list interface (maybe some image

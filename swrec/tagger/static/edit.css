@@ -39,6 +39,7 @@ li {
     align-items: baseline;
     justify-content: space-between;
 }
+li.editing { background-color: #ccc; }
 li > * { margin: 0 0.5ex; }
 input[type="text"] { flex: 1; }
 #meanings {

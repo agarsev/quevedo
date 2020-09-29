@@ -116,30 +116,38 @@ function SymbolList ({ symbols }) {
         colors.remove(i);
     };
 
+    // Symbol being currently edited (object with idx (array index), start_x and
+    // start_y of rectangle being drawn
+    const [ editing_symbol, setEditing ] = useState(null);
+
     return html`
-        <${Annotation} symbols=${symbols} colors=${colors} />
-        <ul id="symbol_list">${symbols.list.map((s, i) => html`<li>
-            <${SymbolEntry} name=${s.name || ''}
-                changeName=${name => symbols.update(i, { ...s, name})}
-                color=${colors.list[i]} changeColor=${c => colors.update(i, c)}
-                remove=${() => removeSymbol(i)}
-            /></li>`)}
+        <${Annotation} ...${{symbols, colors, editing_symbol, setEditing}} />
+        <ul id="symbol_list">${symbols.list.map((s, i) => html`
+            <li class=${editing_symbol !== null &&
+                    editing_symbol.idx === i?'editing':''}>
+                <${SymbolEntry} name=${s.name || ''}
+                    changeName=${name => symbols.update(i, { ...s, name})}
+                    color=${colors.list[i]} changeColor=${c => colors.update(i, c)}
+                    remove=${() => removeSymbol(i)}
+                    editBox=${() => setEditing({ idx: i })}
+                />
+            </li>`)}
         </ul>
     `;
 }
 
-function SymbolEntry ({ name, remove, changeName, color, changeColor }) {
+function SymbolEntry ({ name, remove, changeName, color, changeColor, editBox }) {
     return html`
         <input type=color value=${color}
             oninput=${e => changeColor(e.target.value)} />
         <input type=text tabIndex=1 value=${name}
             oninput=${e => changeName(e.target.value)}/>
-        <button>📐</button>
+        <button onclick=${editBox}>📐</button>
         <button onclick=${remove}>🗑️</button>
     `;
 }
 
-function Annotation ({ symbols, colors }) {
+function Annotation ({ symbols, colors, editing_symbol, setEditing }) {
 
     // Image bounding rectangle 
     const image_rect = useRef(null);
@@ -155,42 +163,41 @@ function Annotation ({ symbols, colors }) {
     // I don't know a better way to wait for the image to be rendered
     useEffect(() => setTimeout(reflow, 100), []);
 
-    // Symbol being currently edited
-    const editing_symbol = useRef(null);
     const mouse_down = e => {
-        if (editing_symbol.current === null) {
+        if (editing_symbol === null) {
             symbols.add({ box: [0,0,0,0] });
             colors.add(getNextColor());
-            editing_symbol.current = { idx: symbols.list.length };
+            editing_symbol = { idx: symbols.list.length };
+        } else {
+            editing_symbol = { ...editing_symbol }; // should be cloned
         }
-        const draw = editing_symbol.current;
         const { left, top } = image_rect.current.getBoundingClientRect();
-        draw.start_x = e.clientX - left;
-        draw.start_y = e.clientY - top;
-        symbols.update_fn(draw.idx, s => ({ ...s, box: [
-            draw.start_x/image_width, draw.start_y/image_height,
+        editing_symbol.start_x = e.clientX - left;
+        editing_symbol.start_y = e.clientY - top;
+        symbols.update_fn(editing_symbol.idx, s => ({ ...s, box: [
+            editing_symbol.start_x/image_width, editing_symbol.start_y/image_height,
             0,0] }));
+        setEditing(editing_symbol);
         e.preventDefault();
     };
     const mouse_move = e => {
-        if (editing_symbol.current === null) return;
+        if (editing_symbol === null) return;
+        if (editing_symbol.start_x === undefined) return;
         const { left, top } = image_rect.current.getBoundingClientRect();
-        const draw = editing_symbol.current;
         const mx = e.clientX - left;
         const my = e.clientY - top;
-        const bw = mx-draw.start_x;
-        const bh = my-draw.start_y;
-        symbols.update_fn(draw.idx, s => ({ ...s, box: [
-            (draw.start_x + bw/2)/image_width, // x
-            (draw.start_y + bh/2)/image_height, // y
+        const bw = mx - editing_symbol.start_x;
+        const bh = my - editing_symbol.start_y;
+        symbols.update_fn(editing_symbol.idx, s => ({ ...s, box: [
+            (editing_symbol.start_x + bw/2)/image_width, // x
+            (editing_symbol.start_y + bh/2)/image_height, // y
             (bw>=0?bw:-bw)/image_width, // w
             (bh>=0?bh:-bh)/image_height, // h
         ] }));
         e.preventDefault();
     }
     useEffect(() => {
-        document.addEventListener('mouseup', () =>
-            editing_symbol.current = null);
+        document.addEventListener('mouseup', () => setEditing(null))
     }, []);
 
     return html`<div id="boxes">
@@ -225,69 +232,6 @@ function BBox ({ x, y, w, h, color, image_width, image_height }) {
 
 /*
 window.onload = function () {
-
-        // List of symbols
-        
-        const trans = document.getElementById("transcr");
-        const boxes_layer = document.getElementById("boxes");
-
-        const symbol_list = document.getElementById("symbol_list");
-
-        class SymbolEntry extends HTMLElement {
-            constructor () {
-                super();
-				const rect = create(boxes_layer, 'span', { class: 'anot' });
-                this.rect = rect;
-                const x = this.getAttribute('x');
-                if (x !== undefined) {
-                    const y = this.getAttribute('y');
-                    const w = this.getAttribute('w');
-                    const h = this.getAttribute('h');
-                }
-				rect.dirty_box = false;
-                current_box = rect;
-                edit.onclick = () => {
-                    rect.style.width = 0;
-                    rect.style.height = 0;
-                    current_box = rect;
-                    mark_dirty();
-                };
-            }
-        }
-
-        // Bounding boxes of symbols
-
-        let draw = null;
-        trans.addEventListener('mousedown', e => {
-            if (!current_box) add_symbol();
-        });
-        trans.addEventListener('mousemove', e => {
-            if (draw !== null) {
-                const { left, top } = trans.getBoundingClientRect();
-                const x = e.clientX - left;
-                const y = e.clientY - top;
-                if (x >= draw.x) {
-                    current_box.style.left = draw.x+'px';
-                    current_box.style.width = x-draw.x+'px';
-                } else {
-                    current_box.style.left = x+'px';
-                    current_box.style.width = draw.x-x+'px';
-                }
-                if (y >= draw.y) {
-                    current_box.style.top = draw.y+'px';
-                    current_box.style.height = y-draw.y+'px';
-                } else {
-                    current_box.style.top = y+'px';
-                    current_box.style.height = draw.y-y+'px';
-                }
-            }
-        });
-        document.addEventListener('mouseup', () => {
-            current_box = null;
-            draw = null;
-        });
-
-		current_box = null;
 
         // saving
 
