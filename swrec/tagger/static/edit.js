@@ -147,23 +147,32 @@ function SymbolList ({ symbols }) {
     // Symbol being currently edited (object with idx (array index), start_x and
     // start_y of rectangle being drawn
     const [ editing_symbol, setEditing ] = useState(null);
+    useEffect(() => {
+        // on mouse up, we stop drawing but keep selected box
+        document.addEventListener('mouseup', () =>
+            setEditing(es => es!=null?({ idx: es.idx }):null))
+        // on mouse down outside the annotation, we stop drawing
+        document.addEventListener('mousedown', () => setEditing(null));
+    }, []);
 
     return html`<div class="SymbolList">
         <${Annotation} ...${{symbols, colors, editing_symbol, setEditing}} />
-        <ul>${symbols.list.map((s, i) => html`
-            <${SymbolEntry} name=${s.name || ''}
+        <ul>${symbols.list.map((s, i) => {
+            const current = editing_symbol !== null && editing_symbol.idx === i;
+            return html`<${SymbolEntry} name=${s.name || ''}
                 changeName=${name => symbols.update(i, { ...s, name})}
                 color=${colors.list[i]} changeColor=${c => colors.update(i, c)}
                 remove=${() => removeSymbol(i)}
-                editBox=${() => setEditing({ idx: i })}
-                editing=${editing_symbol !== null && editing_symbol.idx === i}
-            />`)}
-        </ul>
+                editBox=${() => setEditing(current?null:{ idx: i })}
+                editing=${current}
+            />`;
+        })}</ul>
     </div>`;
 }
 
 function SymbolEntry ({ name, remove, changeName, color, changeColor, editBox, editing }) {
-    return html`<li class="SymbolEntry ${editing?'editing':''}">
+    return html`<li class="SymbolEntry ${editing?'editing':''}"
+        onmousedown=${e => e.stopPropagation()} >
         <input type=color value=${color}
             oninput=${e => changeColor(e.target.value)} />
         <input type=text tabIndex=1 value=${name}
@@ -205,6 +214,7 @@ function Annotation ({ symbols, colors, editing_symbol, setEditing }) {
             0,0] }));
         setEditing(editing_symbol);
         e.preventDefault();
+        e.stopPropagation();
     };
     const mouse_move = e => {
         if (editing_symbol === null) return;
@@ -222,9 +232,6 @@ function Annotation ({ symbols, colors, editing_symbol, setEditing }) {
         ] }));
         e.preventDefault();
     }
-    useEffect(() => {
-        document.addEventListener('mouseup', () => setEditing(null))
-    }, []);
 
     return html`<div class="Annotation">
         <img src="${mount_path}img/${t_id}.png"
