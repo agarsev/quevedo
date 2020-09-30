@@ -66,23 +66,28 @@ def test(dataset):
     false_positives = dict()
     false_negatives = dict()
 
+    def get_tag(sym):
+        return sym['tags'][0]
+
     for image in (dataset.path / 'real').glob('*.png'):
         anot = json.loads(image.with_suffix('.json').read_text())
         if anot.get('set') != 'test':
             continue
         predictions = predict(image)
         for sym in anot['symbols']:
-            if sym['name'] not in all_symbols:
-                all_symbols.add(sym['name'])
+            tag = get_tag(sym)
+            real = {'box': sym['box'], 'name': tag}
+            if tag not in all_symbols:
+                all_symbols.add(tag)
             if len(predictions) > 0:
-                similarities = sorted(((similarity(p, sym), i) for (i, p) in
+                similarities = sorted(((similarity(p, real), i) for (i, p) in
                                       enumerate(predictions)), reverse=True)
                 (sim, idx) = similarities[0]
                 if sim > 0.7:
                     predictions.pop(idx)
-                    incr(true_positives, sym['name'])
+                    incr(true_positives, tag)
                     continue
-            incr(false_negatives, sym['name'])
+            incr(false_negatives, tag)
         # Unassigned predictions are false positives
         for pred in predictions:
             incr(false_positives, pred['name'])

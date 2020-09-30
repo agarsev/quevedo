@@ -24,6 +24,9 @@ def prepare(dataset):
     symbols = []
     annotation_files = []
 
+    def get_tag(sym):
+        return sym['tags'][0]
+
     for an in chain(real_d.glob('*.json'),
                     (dataset.path / 'generated').glob('*.json')):
         annotation = json.loads(an.read_text())
@@ -31,10 +34,11 @@ def prepare(dataset):
             continue
         bboxes = []
         for s in annotation['symbols']:
+            tag = get_tag(s)
             try:
-                index = symbols.index(s['name'])
+                index = symbols.index(tag)
             except ValueError:
-                symbols.append(s['name'])
+                symbols.append(tag)
                 index = len(symbols) - 1
             bboxes.append("{} {} {} {} {}\n".format(index, *s['box']))
         an.with_suffix(".txt").write_text("".join(bboxes))

@@ -2,12 +2,16 @@
 
 # Right now
 
-Migrate tagger web app to preact instead of SSR flask html + spaguetti JS, in
-order to be ablo to do annotation tables in a sane way.
+- In the tagger, implement/migrate auto annotation retrieval to tabular
+    annotations.
+- Annotation tables: in train.py and test.py there is "get_tag". It should be
+    made more general/configurable to use other tags than the first column
+- Must adapt symbol generation to tabular annotation too
 
 # TODO
 
-- Annotation tables
+- When moving a dataset, `prepare` has to be called too before testing (so
+    rearchitecture that, and don't call it `pre_train`) 
 - Tagger Undo/Redo (use reducer for state in webapp?)
 - Document dataset/annotation format !IMPORTANT
 - Add option to change detection threshold in test and compare
