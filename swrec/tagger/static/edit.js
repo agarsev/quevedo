@@ -9,22 +9,20 @@ window.onhashchange = () => window.location.reload();
 
 function useList (initial_value, cb = () => null) {
     const [ list, setList ] = useState(initial_value);
-    return { list,
-        add: v => {
-            setList(list.concat([v]));
-            cb();
-        },
+    const set = l => { setList(l); cb(); }
+    return { list, set,
+        add: v => set(list.concat([v])),
         remove: i => {
             let nl = list.slice(); nl.splice(i, 1);
-            setList(nl); cb();
+            set(nl);
         },
         update: (i, v) => {
             let nl = list.slice(); nl[i] = v;
-            setList(nl); cb();
+            set(nl);
         },
         update_fn: (i, fn) => {
             let nl = list.slice(); nl[i] = fn(list[i]);
-            setList(nl); cb();
+            set(nl);
         }
     };
 }
@@ -60,6 +58,8 @@ function App ({ annotation_help, mount_path, links, anot, columns }) {
     const symbols = useList(anot.symbols, markDirty)
 
     const [ message, setMessage ] = useState('');
+    const setError = e => setMessage(`Error: ${e}`);
+
     const saveChanges = () => {
         setDirty(2);
         setMessage("Saving...");
@@ -75,13 +75,28 @@ function App ({ annotation_help, mount_path, links, anot, columns }) {
                 setDirty(0);
                 setMessage("Saved");
             } else throw r.statusText;
-        })
-        .catch(e => setMessage(`Error: ${e}`));
+        }).catch(setError);
+    };
+
+    const autoAnnotate = () => {
+        if (symbols.list.length > 0 && 
+            !confirm("WARNING: Existing annotations will be removed")) {
+            return;
+        }
+        fetch(`/api/auto_annotate/${t_id}`).then(r => {
+            if (r.ok) {
+                return r.json();
+            } else throw r.statusText;
+        }).then(data => {
+            console.log(data);
+            symbols.set(data.symbols.map(({ box, name }) =>
+                ({ box, tags: [ name ] })));
+        }).catch(setError);
     };
 
     return html`
         <${Header} ...${{mount_path, links, saveChanges,
-            message, show_save: dirty>0 }} />
+            message, show_save: dirty>0, autoAnnotate }} />
         <${MeaningList} ...${{meanings}} />
         <h2>Symbols (drag to draw)</h2>
         <${SymbolList} ...${{symbols, columns}} />
@@ -89,7 +104,7 @@ function App ({ annotation_help, mount_path, links, anot, columns }) {
     `;
 }
 
-function Header ({ mount_path, links, saveChanges, message, show_save }) {
+function Header ({ mount_path, links, saveChanges, message, show_save, autoAnnotate }) {
 
     return html`<header>
         <a href="edit.html#${links.prev}">⬅️</a>
@@ -99,7 +114,7 @@ function Header ({ mount_path, links, saveChanges, message, show_save }) {
         ${show_save?html`<button tabIndex=2
             onclick=${saveChanges} >💾</button>`:null}
         <span class="message_text">${message}</span>
-        <button>⚙️</button>
+        <button onclick=${autoAnnotate}>⚙️</button>
     </header>`;
 }
 
@@ -137,7 +152,11 @@ function getNextColor () {
 
 function SymbolList ({ symbols, columns }) {
 
-    const colors = useList(() => symbols.list.map(getNextColor));
+    const colors = useList([]);
+    if (colors.list.length < symbols.list.length) {
+        next_color = 0;
+        colors.set(symbols.list.map(getNextColor));
+    }
 
     const removeSymbol = i => {
         symbols.remove(i);
@@ -275,26 +294,3 @@ function BBox ({ x, y, w, h, color, image_width, image_height }) {
         width: ${width}; height: ${height};
         border-color: ${color};`} />`;
 }
-
-/*
-window.onload = function () {
-
-        const auto_url = (window.location+'').replace(/edit/, 'auto');
-        // loading of automatic annotations
-        document.getElementById('auto').onclick = function () {
-            let sl = symbol_list.querySelectorAll('symbol-entry');
-            if (sl.length>0 && !confirm("WARNING: Existing annotations will be removed"))
-                return;
-            sl.forEach(el => el.removeSelf());
-            fetch(auto_url).then(r => {
-                if (r.ok) {
-                    return r.json();
-                } else throw r.statusText;
-            }).then(({ symbols }) => {
-                console.log(symbols);
-                symbols.forEach(s => add_symbol(s));
-            })
-            .catch(e => msg.innerHTML = `Error: ${e}`);
-        }
-    }
-*/

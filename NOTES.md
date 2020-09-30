@@ -2,16 +2,18 @@
 
 # Right now
 
-- In the tagger, implement/migrate auto annotation retrieval to tabular
-    annotations.
 - Annotation tables: in train.py and test.py there is "get_tag". It should be
-    made more general/configurable to use other tags than the first column
+    made more general/configurable to use other tags than the first column. This
+    should also be reflected somehow in the tagger when getting the "auto"
+    annotations.
 - Must adapt symbol generation to tabular annotation too
 
 # TODO
 
 - When moving a dataset, `prepare` has to be called too before testing (so
-    rearchitecture that, and don't call it `pre_train`) 
+    rearchitecture that, and don't call it `pre_train`). Also be careful about
+    order of `obj.names` file. probably should sort tags beforehand to be
+    deterministic.
 - Tagger Undo/Redo (use reducer for state in webapp?)
 - Document dataset/annotation format !IMPORTANT
 - Add option to change detection threshold in test and compare

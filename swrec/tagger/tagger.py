@@ -91,11 +91,11 @@ def edit_post(idx):
 predict = None  # Do not load neural network until requested
 
 
-@app.route('/auto/<idx>')
+@app.route('/api/auto_annotate/<idx>')
 def get_auto_annotations(idx):
     global predict
     if predict is None:
-        from swrec.darknet.test import init_darknet, predict as true_predict
+        from swrec.darknet.predict import init_darknet, predict as true_predict
         init_darknet(app_data['dataset'])
         predict = true_predict
 
