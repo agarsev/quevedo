@@ -40,7 +40,7 @@ function preventLostChanges (e) {
     e.returnValue = "Warning: unsaved changes will be lost";
 }
 
-function App ({ annotation_help, mount_path, links, anot }) {
+function App ({ annotation_help, mount_path, links, anot, columns }) {
 
     /* Prevent loss of changes by unintentional page unloading:
      * 0: no changes/all changes saved
@@ -84,7 +84,7 @@ function App ({ annotation_help, mount_path, links, anot }) {
             message, show_save: dirty>0 }} />
         <${MeaningList} ...${{meanings}} />
         <h2>Symbols (drag to draw)</h2>
-        <${SymbolList} ...${{symbols}} />
+        <${SymbolList} ...${{symbols, columns}} />
         <pre>${annotation_help}</pre>
     `;
 }
@@ -135,7 +135,7 @@ function getNextColor () {
     return r;
 }
 
-function SymbolList ({ symbols }) {
+function SymbolList ({ symbols, columns }) {
 
     const colors = useList(() => symbols.list.map(getNextColor));
 
@@ -157,29 +157,42 @@ function SymbolList ({ symbols }) {
 
     return html`<div class="SymbolList">
         <${Annotation} ...${{symbols, colors, editing_symbol, setEditing}} />
-        <ul>${symbols.list.map((s, i) => {
-            const current = editing_symbol !== null && editing_symbol.idx === i;
-            return html`<${SymbolEntry} name=${s.name || ''}
-                changeName=${name => symbols.update(i, { ...s, name})}
-                color=${colors.list[i]} changeColor=${c => colors.update(i, c)}
-                remove=${() => removeSymbol(i)}
-                editBox=${() => setEditing(current?null:{ idx: i })}
-                editing=${current}
-            />`;
-        })}</ul>
+        <div><table>
+            <thead><tr><th /><th />
+                ${columns.map(c => html`<th>${c}</th>`)}
+                <th />
+            </tr></thead>
+            <tbody>${symbols.list.map((s, i) => {
+                const current = editing_symbol !== null && editing_symbol.idx === i;
+                return html`<${SymbolEntry} tags=${s.tags || []}
+                    changeTag=${(t_id, t_val) => {
+                        let ntags = s.tags?s.tags.slice():[];
+                        ntags[t_id] = t_val;
+                        symbols.update_fn(i, s => ({ ...s, tags: ntags }));
+                    }}
+                    columns=${columns}
+                    color=${colors.list[i]} changeColor=${c => colors.update(i, c)}
+                    remove=${() => removeSymbol(i)}
+                    editBox=${() => setEditing(current?null:{ idx: i })}
+                    editing=${current}
+                />`;
+            })}</tbody>
+        </table></div>
     </div>`;
 }
 
-function SymbolEntry ({ name, remove, changeName, color, changeColor, editBox, editing }) {
-    return html`<li class="SymbolEntry ${editing?'editing':''}"
-        onmousedown=${e => e.stopPropagation()} >
-        <input type=color value=${color}
-            oninput=${e => changeColor(e.target.value)} />
-        <input type=text tabIndex=1 value=${name}
-            oninput=${e => changeName(e.target.value)}/>
-        <button onclick=${editBox}>📐</button>
-        <button onclick=${remove}>🗑️</button>
-    </li>`;
+function SymbolEntry ({ tags, changeTag, columns, remove,
+        color, changeColor, editBox, editing }) {
+    return html`<tr class=${`SymbolEntry ${editing?'editing':''}`}
+        onmousedown=${editing?(e => e.stopPropagation()):null}>
+        <td><input type=color value=${color}
+            oninput=${e => changeColor(e.target.value)} /></td>
+        <td><button onclick=${editBox}>📐</button></td>
+        ${columns.map((c, i) => html`<td><input type=text
+            placeholder=${c} tabIndex=1 value=${tags[i]}
+            oninput=${e => changeTag(i, e.target.value)}/></td>`)}
+        <td><button onclick=${remove}>🗑️</button></td>
+    </tr>`;
 }
 
 function Annotation ({ symbols, colors, editing_symbol, setEditing }) {
@@ -200,7 +213,7 @@ function Annotation ({ symbols, colors, editing_symbol, setEditing }) {
 
     const mouse_down = e => {
         if (editing_symbol === null) {
-            symbols.add({ box: [0,0,0,0] });
+            symbols.add({ box: [0,0,0,0], tags: [] });
             colors.add(getNextColor());
             editing_symbol = { idx: symbols.list.length };
         } else {

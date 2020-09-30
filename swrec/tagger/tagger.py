@@ -53,6 +53,7 @@ def all_transcriptions():
         'mount_path': app_data['mount_path'],
         'path': str(app_data['path']),
         'description': ds.info['description'],
+        'columns': ds.info['columns'],
         'trans_list': app_data['trans_list'],
     }
 
@@ -67,6 +68,7 @@ def one_transcription(idx):
         'title': ds.info['title'],
         'annotation_help': ds.info['annotation_help'],
         'mount_path': app_data['mount_path'],
+        'columns': ds.info['columns'],
         'links': {
             'prev': idn - 1 if idn > 1 else app_data['last_id'],
             'next': idn + 1 if idn < app_data['last_id'] else 1,

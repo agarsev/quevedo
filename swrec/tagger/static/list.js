@@ -20,10 +20,11 @@ function List ({ trans_list }) {
     </ul>`;
 }
 
-function App ({ title, path, description, trans_list }) {
+function App ({ title, path, description, trans_list, columns }) {
     return html`
         <h1>${title}</h1>
         <pre><b>(${path})</b></pre>
+        <pre><b>Columns: ${columns.join(', ')}</b></pre>
         <pre>${description}</pre>
         <${List} trans_list=${trans_list} />
     `;

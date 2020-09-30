@@ -60,20 +60,12 @@ h2 > * {
     justify-content: space-around;
 }
 
-.MeaningList ul, .SymbolList ul {
+.MeaningList ul {
     flex: 1;
     display: inline-block;
 }
 
-.SymbolEntry {
-    padding-left: 2vw;
-}
-
-.SymbolEntry.editing {
-    background-color: #aaf;
-}
-
-li {
+.MeaningList li {
     list-style-type: none;
     margin-bottom: 0.5ex;
     display: flex;
@@ -81,9 +73,34 @@ li {
     justify-content: space-between;
 }
 
-li > * { margin: 0 0.5ex; }
+.MeaningList li > * { margin: 0 0.5ex; }
 
-li input[type="text"] { flex: 1; }
+.MeaningList input[type="text"] { flex: 1; }
+
+.SymbolList div:nth-child(2) {
+    flex: 1;
+    display: inline-block;
+}
+
+.SymbolList table {
+    width: 100%;
+}
+
+.SymbolEntry.editing {
+    background-color: #aaf;
+}
+
+.SymbolEntry td:nth-child(1),
+.SymbolEntry td:nth-child(2),
+.SymbolEntry td:nth-last-child(1) {
+    width: 0;
+}
+
+.SymbolEntry td:first-child{
+    padding-left: 2vw;
+}
+
+.SymbolEntry input[type="text"] { width: 100%; }
 
 .Annotation {
     display: inline-block;
