@@ -140,6 +140,7 @@ def info(dataset):
     info = dataset.info
     click.secho('{}\n{}\n'.format(info["title"], '=' * len(info['title'])), bold=True)
     click.echo(info["description"])
+    click.secho('Tag schema: {}\n'.format(', '.join(info["tag_schema"])), bold=True)
 
     real = path / 'real'
     num_real = count(real.glob('*.png'))

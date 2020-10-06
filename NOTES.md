@@ -15,7 +15,8 @@
     order of `obj.names` file. probably should sort tags beforehand to be
     deterministic.
 - Tagger Undo/Redo (use reducer for state in webapp?)
-- Document dataset/annotation format !IMPORTANT
+- Documentation for dataset/annotation format !IMPORTANT
+- Internationalization (ES and EN)
 - Add option to change detection threshold in test and compare
 - Upload transcriptions from the tagger list interface (maybe some image
     normalization there?)

@@ -3,6 +3,10 @@ title: $title
 description: |
   $description
 
+tag_schema: [ tag ]
+# For a multi-tag schema, use:
+# tag_schema: [ tag1, tag2 ]
+
 annotation_help: |
   Write here any help for annotators, like lists of symbols or other
   instructions. For example:
