@@ -2,11 +2,16 @@
 
 # Right now
 
-- Annotation tables: in train.py and test.py there is "get_tag". It should be
-    made more general/configurable to use other tags than the first column. This
-    should also be reflected somehow in the tagger when getting the "auto"
-    annotations.
-- Must adapt symbol generation to tabular annotation too
+- Move to multi experiment arch. In each dataset, there is a directory
+    "experiments". There are, for each experiment, a yaml file with
+    configuration, and a directory with results. Most previous things should now
+    take this into account, a new cli option "experiment" which to use.
+- TO ADAPT:
+    * dataset (info of particular experiment)
+    * extract_symbols
+    * generate
+    * darknet use
+    * tagger auto annotate
 
 # TODO
 
@@ -17,6 +22,7 @@
 - Tagger Undo/Redo (use reducer for state in webapp?)
 - Documentation for dataset/annotation format !IMPORTANT
 - Internationalization (ES and EN)
+- Experiments with mixed tags
 - Add option to change detection threshold in test and compare
 - Upload transcriptions from the tagger list interface (maybe some image
     normalization there?)

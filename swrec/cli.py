@@ -16,10 +16,15 @@ from swrec import extract_symbols, generate, darknet, migrate, dataset as ds
 }, chain=True, invoke_without_command=True)
 @click.option('-D', '--dataset', type=click.Path(), default=getcwd(),
               help="Path to the dataset to use, by default use current directory")
+@click.option('-E', '--experiment', help="Experimental configuration to use")
 @click.pass_context
-def cli(ctx, dataset):
+def cli(ctx, dataset, experiment):
     '''Command line application for managing a SW deep learning dataset.'''
-    ctx.obj = ds.Dataset(dataset)
+    dataset = ds.Dataset(dataset)
+    ctx.obj = {
+        'dataset': dataset,
+        'experiment': experiment
+    }
     if ctx.invoked_subcommand is None:
         ctx.invoke(ds.info)
         click.echo(cli.get_help(ctx))
@@ -31,7 +36,7 @@ def cli(ctx, dataset):
 @click.option('-p', '--port', default='5000')
 @click.option('-m', '--mount-path', default='', help="Mount path for the tagger application")
 @click.option('--browser/--no-browser', default=True, help="Launch browser at the tagger location")
-def tagger(dataset, host, port, browser, mount_path):
+def tagger(obj, host, port, browser, mount_path):
     ''' Run a web application for annotating the transcriptions in the dataset.
 
     The files in the `real` directory will be listed. For each, bounding boxes
@@ -42,7 +47,7 @@ def tagger(dataset, host, port, browser, mount_path):
     from swrec.tagger import tagger
 
     click.echo("Loading dataset...")
-    tagger.load_dataset(dataset)
+    tagger.load_dataset(obj['dataset'])
     url = "http://{}:{}".format(host, port)
 
     click.echo("Starting tagger at {}".format(url))
