@@ -36,10 +36,15 @@ class Dataset:
         return [e.stem for e in self.path.glob('experiments/*.yaml')]
 
     def get_experiment(self, name):
-        exp_path = (self.path / 'experiments' / name).with_suffix('.yaml')
-        if not exp_path.exists():
+        exp_path = self.path / 'experiments' / name
+        exp_conf = exp_path.with_suffix('.yaml')
+        if not exp_conf.exists():
             raise SystemExit("No such experiment: {}".format(name))
-        return yaml.safe_load(exp_path.read_text())
+        exp_path.mkdir(exist_ok=True)
+        return {
+            **yaml.safe_load(exp_conf.read_text()),
+            'path': exp_path
+        }
 
     def __getattr__(self, attr):
         if attr == 'path':
@@ -157,7 +162,7 @@ def info(obj):
 
     path = dataset.path
     info = dataset.info
-    click.secho('{}\n{}\n'.format(info["title"], '=' * len(info['title'])), bold=True)
+    click.secho('{}\n{}'.format(info["title"], '▔' * len(info['title'])), bold=True)
     click.echo(info["description"])
     click.secho('Tag schema: {}\n'.format(', '.join(info["tag_schema"])), bold=True)
 
@@ -166,42 +171,43 @@ def info(obj):
     click.echo('Real transcriptions: {}'.format(style(num_real > 0, num_real)))
     num_annot = sum(len(json.loads(annot.read_text())['symbols']) > 0
                     for annot in real.glob('*.json'))
-    click.echo('Annotated: {}/{}\n'.format(style(num_annot == num_real, num_annot),
+    click.echo('Annotated: {}/{}'.format(style(num_annot == num_real, num_annot),
                                            num_real))
+
+    dn_binary = (dataset.info.get('darknet', {}).get('path'))
+    click.echo('Darknet {} properly configured in info.yaml'.format(
+        style(dn_binary is not None and Path(dn_binary).exists(), 'is', 'is not')))
 
     exps = dataset.list_experiments()
     if len(exps) > 1:
-        click.echo('Experiments:')
+        click.echo('\nExperiments:')
         for e in dataset.list_experiments():
             exp = dataset.get_experiment(e)
             click.echo('- {}: {}'.format(e, exp['subject']))
 
-    return
-
-    # TODO
     experiment = obj['experiment']
-
     if experiment is not None:
+        header = "Experiment: '{}'".format(experiment)
+        click.secho("\n{}\n{}".format(header, '▔' * len(header)), bold=True)
 
-        symbols = path / 'symbols'
+        experiment = dataset.get_experiment(experiment)
+        epath = experiment['path']
+
+        symbols = epath / 'symbols'
         num_sym = count(symbols.glob('*.png'))
         click.echo('Symbols extracted: {}'.format(style(symbols.exists(), num_sym, 'no')))
 
-        gen = path / 'generated'
+        gen = epath / 'generated'
         num_gen = count(gen.glob('*.png'))
         click.echo('Transcriptions generated: {}'.format(style(gen.exists(), num_gen, 'no')))
 
-        dn_binary = (dataset.info.get('darknet', {}).get('path'))
-        click.echo('Darknet {} properly configured in info.yaml'.format(
-            style(dn_binary is not None and Path(dn_binary).exists(), 'is', 'is not')))
-
-        darknet = path / 'darknet'
+        darknet = epath / 'darknet'
         num_txt = count(real.glob('*.txt')) + count(gen.glob('*.txt'))
         click.echo('Dataset {} ready for training'.format(style(
             darknet.exists() and num_txt == num_gen + num_real,
             'is', "is not")))
 
-        weights = path / 'weights' / 'darknet_final.weights'
+        weights = epath / 'weights' / 'darknet_final.weights'
         click.echo('Neural network {}'.format(style(weights.exists(),
                    'has been trained', "hasn't been trained")))
 

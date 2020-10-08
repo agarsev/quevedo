@@ -7,7 +7,6 @@
     configuration, and a directory with results. Most previous things should now
     take this into account, a new cli option "experiment" which to use.
 - TO ADAPT:
-    * dataset (info of particular experiment)
     * extract_symbols
     * generate
     * darknet use
