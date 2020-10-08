@@ -9,6 +9,8 @@ from string import Template
 from subprocess import run
 import yaml
 
+from swrec.experiment import Experiment
+
 
 class Dataset:
     ''' Class representing a SW dataset'''
@@ -36,15 +38,10 @@ class Dataset:
         return [e.stem for e in self.path.glob('experiments/*.yaml')]
 
     def get_experiment(self, name):
-        exp_path = self.path / 'experiments' / name
-        exp_conf = exp_path.with_suffix('.yaml')
-        if not exp_conf.exists():
-            raise SystemExit("No such experiment: {}".format(name))
-        exp_path.mkdir(exist_ok=True)
-        return {
-            **yaml.safe_load(exp_conf.read_text()),
-            'path': exp_path
-        }
+        if name is None:
+            return Experiment(self, self.info['default_experiment'])
+        else:
+            return Experiment(self, name)
 
     def __getattr__(self, attr):
         if attr == 'path':
@@ -183,32 +180,29 @@ def info(obj):
         click.echo('\nExperiments:')
         for e in dataset.list_experiments():
             exp = dataset.get_experiment(e)
-            click.echo('- {}: {}'.format(e, exp['subject']))
+            click.echo('- {}: {}'.format(e, exp.info['subject']))
 
-    experiment = obj['experiment']
-    if experiment is not None:
-        header = "Experiment: '{}'".format(experiment)
-        click.secho("\n{}\n{}".format(header, '▔' * len(header)), bold=True)
+    experiment = dataset.get_experiment(obj['experiment'])
 
-        experiment = dataset.get_experiment(experiment)
-        epath = experiment['path']
+    header = "Experiment: '{}'".format(experiment.name)
+    click.secho("\n{}\n{}".format(header, '▔' * len(header)), bold=True)
 
-        symbols = epath / 'symbols'
-        num_sym = count(symbols.glob('*.png'))
-        click.echo('Symbols extracted: {}'.format(style(symbols.exists(), num_sym, 'no')))
+    symbols = experiment.path / 'symbols'
+    num_sym = count(symbols.glob('*.png'))
+    click.echo('Symbols extracted: {}'.format(style(symbols.exists(), num_sym, 'no')))
 
-        gen = epath / 'generated'
-        num_gen = count(gen.glob('*.png'))
-        click.echo('Transcriptions generated: {}'.format(style(gen.exists(), num_gen, 'no')))
+    gen = experiment.path / 'generated'
+    num_gen = count(gen.glob('*.png'))
+    click.echo('Transcriptions generated: {}'.format(style(gen.exists(), num_gen, 'no')))
 
-        darknet = epath / 'darknet'
-        num_txt = count(real.glob('*.txt')) + count(gen.glob('*.txt'))
-        click.echo('Dataset {} ready for training'.format(style(
-            darknet.exists() and num_txt == num_gen + num_real,
-            'is', "is not")))
+    darknet = experiment.path / 'darknet'
+    num_txt = count(real.glob('*.txt')) + count(gen.glob('*.txt'))
+    click.echo('Dataset {} ready for training'.format(style(
+        darknet.exists() and num_txt == num_gen + num_real,
+        'is', "is not")))
 
-        weights = epath / 'weights' / 'darknet_final.weights'
-        click.echo('Neural network {}'.format(style(weights.exists(),
-                   'has been trained', "hasn't been trained")))
+    weights = experiment.path / 'weights' / 'darknet_final.weights'
+    click.echo('Neural network {}'.format(style(weights.exists(),
+               'has been trained', "hasn't been trained")))
 
     click.echo('')

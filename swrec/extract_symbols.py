@@ -7,22 +7,25 @@ from PIL import Image
 
 @click.command()
 @click.pass_obj
-def extract_symbols(dataset):
+def extract_symbols(obj):
     ''' Extracts the symbols from the *real* transcriptions into their own files.
 
     - Real transcriptions must be in the `real` directory of the dataset, and they
     must be annotated.
 
-    - Symbols will be placed in the `symbols` directory. The filenames will
-    consist of the symbol name/class from the annotation, followed by the number
-    of the real transcription from which they were extracted, and their index
-    within. So:
+    - Symbols will be placed in the `symbols` directory of the experiment. The
+      filenames will consist of the symbol name/class from the annotation,
+      followed by the number of the real transcription from which they were
+      extracted, and their index within. So:
 
     `symbol_name.trans_id.symbol_index.png`
     '''
 
+    dataset = obj['dataset']
+    experiment = dataset.get_experiment(obj['experiment'])
     real_d = dataset.path / 'real'
-    symbol_d = dataset.path / 'symbols'
+    symbol_d = experiment.path / 'symbols'
+
     try:
         symbol_d.mkdir()
     except FileExistsError:
@@ -38,7 +41,9 @@ def extract_symbols(dataset):
         transcription = Image.open(real_d / '{}.png'.format(number))
         width, height = transcription.size
         for idx, symb in enumerate(annotation['symbols'], start=1):
-            name = symb['name']
+            name = experiment.get_tag(symb['tags'])
+            if name is None:
+                continue
             w = float(symb['box'][2]) * width
             h = float(symb['box'][3]) * height
             l = float(symb['box'][0]) * width - (w / 2)

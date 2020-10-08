@@ -7,7 +7,6 @@
     configuration, and a directory with results. Most previous things should now
     take this into account, a new cli option "experiment" which to use.
 - TO ADAPT:
-    * extract_symbols
     * generate
     * darknet use
     * tagger auto annotate
