@@ -158,11 +158,6 @@ function SymbolList ({ symbols, columns }) {
         colors.set(symbols.list.map(getNextColor));
     }
 
-    const removeSymbol = i => {
-        symbols.remove(i);
-        colors.remove(i);
-    };
-
     // Symbol being currently edited (object with idx (array index), start_x and
     // start_y of rectangle being drawn
     const [ editing_symbol, setEditing ] = useState(null);
@@ -173,6 +168,12 @@ function SymbolList ({ symbols, columns }) {
         // on mouse down outside the annotation, we stop drawing
         document.addEventListener('mousedown', () => setEditing(null));
     }, []);
+
+    const removeSymbol = i => {
+        setEditing(null);
+        symbols.remove(i);
+        colors.remove(i);
+    };
 
     return html`<div class="SymbolList">
         <${Annotation} ...${{symbols, colors, editing_symbol, setEditing}} />
