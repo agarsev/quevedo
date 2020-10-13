@@ -52,14 +52,21 @@ def incr(dic, name):
 
 @click.command()
 @click.pass_obj
-def test(dataset):
+@click.option('--print/--no-print', '-p', 'do_print', default=True,
+              help='Show results in the command line')
+@click.option('--csv/--no-csv', default=True,
+              help='Print results into a `results.csv` file in the experiment directory')
+def test(obj, do_print, csv):
     '''Compute evaluation metrics for the trained neural network.
 
     The transcriptions in the test set are used (so a train/test split must have
     been done) and precision, recall and f-score are computed for each class.'''
 
     from swrec.darknet.predict import init_darknet, predict
-    init_darknet(dataset)
+
+    dataset = obj['dataset']
+    experiment = dataset.get_experiment(obj['experiment'])
+    init_darknet(dataset, experiment)
 
     all_symbols = set()
     true_positives = dict()
@@ -92,13 +99,33 @@ def test(dataset):
         for pred in predictions:
             incr(false_positives, pred['name'])
 
-    header = "symbol     precision  recall f-score"
-    click.echo("{}\n{}".format(header, "-" * len(header)))
+    results = {}
     for name in sorted(all_symbols):
         tp = true_positives.get(name, 0)
         fp = false_positives.get(name, 0)
         fn = false_negatives.get(name, 0)
         prec = safe_divide(tp, tp + fp)
         rec = safe_divide(tp, tp + fn)
-        f = safe_divide(2 * prec * rec, prec + rec)
-        click.echo("{:10s} {:9.2f} {:7.2f} {:7.2f}".format(name, prec, rec, f))
+        results[name] = {
+            'prec': prec,
+            'rec': rec,
+            'f': safe_divide(2 * prec * rec, prec + rec),
+        }
+
+    if do_print:
+        header = "class      precision  recall f-score"
+        click.echo("{}\n{}".format(header, "-" * len(header)))
+        for name in sorted(all_symbols):
+            r = results[name]
+            click.echo("{:10s} {:9.2f} {:7.2f} {:7.2f}".format(name,
+                    r['prec'], r['rec'], r['f']))
+
+    if csv:
+        file_path = experiment.path / 'results.csv'
+        with open(file_path, 'w') as f:
+            print("class;precision;recall;f-score", file=f)
+            for name in sorted(all_symbols):
+                r = results[name]
+                print("{};{};{};{}".format(name, r['prec'], r['rec'],
+                       r['f']), file=f)
+        click.echo("\nPrinted results to '{}'".format(file_path.resolve()))

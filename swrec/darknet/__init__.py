@@ -9,8 +9,10 @@ from swrec.darknet.test import test
 @click.option('--image', '-i', type=click.Path(exists=True),
               required=True, help="Image to predict")
 @click.pass_obj
-def predict_image(dataset, image):
+def predict_image(obj, image):
     '''Get predicted symbols for an image using the trained neural network.'''
     from swrec.darknet.predict import init_darknet, predict
-    init_darknet(dataset)
+    dataset = obj['dataset']
+    experiment = dataset.get_experiment(obj['experiment'])
+    init_darknet(dataset, experiment)
     print(predict(image))

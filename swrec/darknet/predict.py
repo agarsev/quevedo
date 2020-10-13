@@ -46,18 +46,17 @@ class DarknetShutup(object):
         os.close(self.stdout_save)
 
 
-def init_darknet(dataset):
+def init_darknet(dataset, experiment):
     '''Loads the trained neural network. Must be called before predict.'''
 
     global perform_detect
 
-    dn_dir = dataset.path / 'darknet'
-    if not dn_dir.exists():
+    if not (experiment.path / 'darknet.cfg').exists():
         raise SystemExit("Neural network has not been trained")
 
-    darknet_data = (dn_dir / 'darknet.data').resolve()
-    darknet_cfg = (dn_dir / 'darknet.cfg').resolve()
-    weights = (dataset.path / 'weights' / 'darknet_final.weights').resolve()
+    darknet_data = (experiment.path / 'darknet.data').resolve()
+    darknet_cfg = (experiment.path / 'darknet.cfg').resolve()
+    weights = (experiment.path / 'darknet_final.weights').resolve()
 
     if not weights.exists():
         raise SystemExit("Neural network has not been trained")

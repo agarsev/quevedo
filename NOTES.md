@@ -7,8 +7,6 @@
     configuration, and a directory with results. Most previous things should now
     take this into account, a new cli option "experiment" which to use.
 - TO ADAPT:
-    * darknet test (place results.txt in experiment dir)
-    * darknet predict
     * tagger auto annotate
 
 # TODO
@@ -21,6 +19,8 @@
     rearchitecture that, and don't call it `pre_train`). Also be careful about
     order of `obj.names` file. probably should sort tags beforehand to be
     deterministic.
+- Ship different yolo config files and allow user to select for each experiment
+    (either in config or in prepare or something)
 - Tagger Undo/Redo (use reducer for state in webapp?)
 - Documentation for dataset/annotation format !IMPORTANT
 - Internationalization (ES and EN)
