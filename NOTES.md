@@ -7,12 +7,13 @@
     configuration, and a directory with results. Most previous things should now
     take this into account, a new cli option "experiment" which to use.
 - TO ADAPT:
-    * generate
     * darknet use
     * tagger auto annotate
-
 # TODO
 
+- Move experiment configuration to info.yaml. Review and remake "create" and
+    dataset.py
+- Create `run` command that runs all commands for an experiment
 - When moving a dataset, `prepare` has to be called too before testing (so
     rearchitecture that, and don't call it `pre_train`). Also be careful about
     order of `obj.names` file. probably should sort tags beforehand to be

@@ -27,14 +27,14 @@ config = {
 }
 
 
-def put_symbol(canvas, x, y, filename, name, rotate=False):
+def put_symbol(canvas, x, y, file_info, name, rotate=False):
     '''Put a symbol into a transcription, and write the resulting darknet
     bounding box annotation.'''
 
     canvas_w = canvas.width
     canvas_h = canvas.height
 
-    sim = Image.open(filename).convert("RGBA")
+    sim = Image.open(file_info['filename']).convert("RGBA")
     w = sim.width
     h = sim.height
     if rotate:
@@ -55,7 +55,7 @@ def put_symbol(canvas, x, y, filename, name, rotate=False):
 
     canvas.alpha_composite(sim, (x, y))
     return {
-        'name': name,
+        'tags': file_info['tags'],
         'box': [(x + w / 2) / canvas_w, (y + h / 2) / canvas_h,
                 w / canvas_w, h / canvas_h]
     }
@@ -104,16 +104,16 @@ def create_transcription(path, symbols):
     # Create the actual transcription
     canvas = Image.new("RGBA", (canvas_w, canvas_h), "white")
     bboxes = []
-    for [x, y], name, filename, rotate in zip(positions, class_names, files, rotate):
+    for [x, y], name, file_info, rotate in zip(positions, class_names, files, rotate):
         bboxes.append(put_symbol(canvas, int(x), int(y),
-                      filename, name, rotate))
+                      file_info, name, rotate))
     canvas.save(path.with_suffix(".png"))
     path.with_suffix(".json").write_text(json.dumps({'symbols': bboxes}))
 
 
 @click.command()
 @click.pass_obj
-def generate(dataset):
+def generate(obj):
     ''' Generates artificial "transcriptions" for training.
 
     It uses the symbols in the `symbols` directory of the dataset (so these must
@@ -122,6 +122,7 @@ def generate(dataset):
     placed in the `generated` directory.
     '''
 
+    dataset = obj['dataset']
     symbol_d = dataset.path / 'symbols'
 
     gen_d = dataset.path / 'generated'
@@ -137,15 +138,21 @@ def generate(dataset):
     if config['seed'] is not None:
         random.seed(config['seed'])
 
+    tag_index = dataset.info['tag_schema'].index(config['tag'])
+
     for param in config['params']:
         param['match'] = re.compile(param['match'])
 
     # Find the different symbols to use
     symbols = {}
     for symbol_file in symbol_d.glob('*.png'):
-        name = symbol_file.name.split('.')[0]
+        annotation = json.loads(symbol_file.with_suffix('.json').read_text())
+        name = annotation['tags'][tag_index]
         if name in symbols:
-            symbols[name]['files'].append(symbol_file.resolve())
+            symbols[name]['files'].append({
+                'filename': symbol_file.resolve(),
+                'tags': annotation['tags'],
+            })
         else:
             s = {}
             for param in config['params']:
@@ -154,7 +161,10 @@ def generate(dataset):
                     break
             else:
                 raise SystemExit("Configuration not found for symbol {}".format(name))
-            s['files'] = [symbol_file.resolve()]
+            s['files'] = [{
+                'filename': symbol_file.resolve(),
+                'tags': annotation['tags'],
+            }]
             symbols[name] = s
 
     # Generate as many transcriptions as requested, numbering them incrementally
