@@ -171,6 +171,14 @@ def info(obj):
     click.echo('Annotated: {}/{}'.format(style(num_annot == num_real, num_annot),
                                            num_real))
 
+    symbols = path / 'symbols'
+    num_sym = count(symbols.glob('*.png'))
+    click.echo('Symbols extracted: {}'.format(style(symbols.exists(), num_sym, 'no')))
+
+    gen = path / 'generated'
+    num_gen = count(gen.glob('*.png'))
+    click.echo('Transcriptions generated: {}'.format(style(gen.exists(), num_gen, 'no')))
+
     dn_binary = (dataset.info.get('darknet', {}).get('path'))
     click.echo('Darknet {} properly configured in info.yaml'.format(
         style(dn_binary is not None and Path(dn_binary).exists(), 'is', 'is not')))
@@ -186,14 +194,7 @@ def info(obj):
 
     header = "Experiment: '{}'".format(experiment.name)
     click.secho("\n{}\n{}".format(header, '▔' * len(header)), bold=True)
-
-    symbols = experiment.path / 'symbols'
-    num_sym = count(symbols.glob('*.png'))
-    click.echo('Symbols extracted: {}'.format(style(symbols.exists(), num_sym, 'no')))
-
-    gen = experiment.path / 'generated'
-    num_gen = count(gen.glob('*.png'))
-    click.echo('Transcriptions generated: {}'.format(style(gen.exists(), num_gen, 'no')))
+    click.echo("{}\n".format(experiment.info['subject']))
 
     darknet = experiment.path / 'darknet'
     num_txt = count(real.glob('*.txt')) + count(gen.glob('*.txt'))

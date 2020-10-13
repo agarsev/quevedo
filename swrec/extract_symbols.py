@@ -13,18 +13,17 @@ def extract_symbols(obj):
     - Real transcriptions must be in the `real` directory of the dataset, and they
     must be annotated.
 
-    - Symbols will be placed in the `symbols` directory of the experiment. The
-      filenames will consist of the symbol name/class from the annotation,
-      followed by the number of the real transcription from which they were
-      extracted, and their index within. So:
+    - Symbols will be placed in the `symbols` directory. The filenames will
+      consist of the number of the real transcription from which they were
+      extracted, and their index within: `trans_id.symbol_index.png`
 
-    `symbol_name.trans_id.symbol_index.png`
+    - The particular annotations for that symbol will be placed alongside in
+      json format.
     '''
 
     dataset = obj['dataset']
-    experiment = dataset.get_experiment(obj['experiment'])
     real_d = dataset.path / 'real'
-    symbol_d = experiment.path / 'symbols'
+    symbol_d = dataset.path / 'symbols'
 
     try:
         symbol_d.mkdir()
@@ -41,12 +40,11 @@ def extract_symbols(obj):
         transcription = Image.open(real_d / '{}.png'.format(number))
         width, height = transcription.size
         for idx, symb in enumerate(annotation['symbols'], start=1):
-            name = experiment.get_tag(symb['tags'])
-            if name is None:
-                continue
             w = float(symb['box'][2]) * width
             h = float(symb['box'][3]) * height
             l = float(symb['box'][0]) * width - (w / 2)
             u = float(symb['box'][1]) * height - (h / 2)
             region = transcription.crop((l, u, l + w, u + h))
-            region.save(symbol_d / '{}.{}.{}.png'.format(name, number, idx))
+            filename = symbol_d / ('{}.{}'.format(number, idx))
+            region.save(filename.with_suffix('.png'))
+            filename.with_suffix('.json').write_text(json.dumps({'tags': symb['tags']}))
