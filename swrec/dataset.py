@@ -196,13 +196,13 @@ def info(obj):
     click.secho("\n{}\n{}".format(header, '▔' * len(header)), bold=True)
     click.echo("{}\n".format(experiment.info['subject']))
 
-    darknet = experiment.path / 'darknet'
+    darknet = experiment.path / 'darknet.cfg'
     num_txt = count(real.glob('*.txt')) + count(gen.glob('*.txt'))
     click.echo('Dataset {} ready for training'.format(style(
         darknet.exists() and num_txt == num_gen + num_real,
         'is', "is not")))
 
-    weights = experiment.path / 'weights' / 'darknet_final.weights'
+    weights = experiment.path / 'darknet_final.weights'
     click.echo('Neural network {}'.format(style(weights.exists(),
                'has been trained', "hasn't been trained")))
 
