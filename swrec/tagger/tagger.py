@@ -36,6 +36,7 @@ def load_dataset(dataset):
     ids = sorted(int(trans.stem) for trans in data_dir.glob("*.png"))
     app_data['last_id'] = ids[-1]
     app_data['trans_list'] = list(map(get_transcription_info, ids))
+    app_data['exp_list'] = dataset.list_experiments()
 
 
 def run(host, port, path):
@@ -67,6 +68,7 @@ def one_transcription(idx):
     return {
         'title': ds.info['title'],
         'annotation_help': ds.info['annotation_help'],
+        'exp_list': app_data['exp_list'],
         'mount_path': app_data['mount_path'],
         'columns': ds.info['tag_schema'],
         'links': {
@@ -89,18 +91,29 @@ def edit_post(idx):
 
 
 predict = None  # Do not load neural network until requested
+last_experiment = None
 
 
 @app.route('/api/auto_annotate/<idx>')
 def get_auto_annotations(idx):
-    global predict
-    if predict is None:
+    ds = app_data['dataset']
+    experiment = ds.get_experiment(request.args.get('exp', None))
+
+    global predict, last_experiment
+    if predict is None or last_experiment.name != experiment.name:
         from swrec.darknet.predict import init_darknet, predict as true_predict
-        init_darknet(app_data['dataset'])
-        predict = true_predict
+        try:
+            init_darknet(ds, experiment)
+            predict = true_predict
+            last_experiment = experiment
+        except SystemExit as e:
+            return str(e), 400
 
     img = (app_data['data_dir'] / '{}.png'.format(idx)).resolve()
-    return {'symbols': predict(img)}
+    return {
+        'symbols': predict(img),
+        'tag_index': experiment._tag_index
+    }
 
 
 # ----------------- WEB APP ----------------

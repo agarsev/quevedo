@@ -38,7 +38,7 @@ function preventLostChanges (e) {
     e.returnValue = "Warning: unsaved changes will be lost";
 }
 
-function App ({ annotation_help, mount_path, links, anot, columns }) {
+function App ({ annotation_help, mount_path, links, anot, columns, exp_list }) {
 
     /* Prevent loss of changes by unintentional page unloading:
      * 0: no changes/all changes saved
@@ -58,7 +58,13 @@ function App ({ annotation_help, mount_path, links, anot, columns }) {
     const symbols = useList(anot.symbols, markDirty)
 
     const [ message, setMessage ] = useState('');
-    const setError = e => setMessage(`Error: ${e}`);
+    const setError = resp => {
+        if (resp.status < 500) {
+            resp.text().then(e => setMessage(`Error: ${e}`));
+        } else {
+            setMessage(`Error: ${resp.statusText}`);
+        }
+    }
 
     const saveChanges = () => {
         setDirty(2);
@@ -74,29 +80,33 @@ function App ({ annotation_help, mount_path, links, anot, columns }) {
             if (r.ok) {
                 setDirty(0);
                 setMessage("Saved");
-            } else throw r.statusText;
+            } else throw r;
         }).catch(setError);
     };
 
-    const autoAnnotate = () => {
+    const autoAnnotate = experiment => {
         if (symbols.list.length > 0 && 
             !confirm("WARNING: Existing annotations will be removed")) {
             return;
         }
-        fetch(`/api/auto_annotate/${t_id}`).then(r => {
+        fetch(`/api/auto_annotate/${t_id}?exp=${experiment}`).then(r => {
             if (r.ok) {
                 return r.json();
-            } else throw r.statusText;
+            } else throw r;
         }).then(data => {
             console.log(data);
-            symbols.set(data.symbols.map(({ box, name }) =>
-                ({ box, tags: [ name ] })));
+            symbols.set(data.symbols.map(({ box, name }) => {
+                let tags = [];
+                tags[data.tag_index] = name;
+                return { box, tags };
+            }));
         }).catch(setError);
     };
 
     return html`
         <${Header} ...${{mount_path, links, saveChanges,
-            message, show_save: dirty>0, autoAnnotate }} />
+            message, show_save: dirty>0, autoAnnotate,
+            exp_list }} />
         <${MeaningList} ...${{meanings}} />
         <h2>Symbols (drag to draw)</h2>
         <${SymbolList} ...${{symbols, columns}} />
@@ -104,7 +114,10 @@ function App ({ annotation_help, mount_path, links, anot, columns }) {
     `;
 }
 
-function Header ({ mount_path, links, saveChanges, message, show_save, autoAnnotate }) {
+function Header ({ mount_path, links, saveChanges, message, show_save,
+    exp_list, autoAnnotate }) {
+
+    const exp_select = useRef({ value: false });
 
     return html`<header>
         <a href="edit.html#${links.prev}">⬅️</a>
@@ -114,7 +127,10 @@ function Header ({ mount_path, links, saveChanges, message, show_save, autoAnnot
         ${show_save?html`<button tabIndex=2
             onclick=${saveChanges} >💾</button>`:null}
         <span class="message_text">${message}</span>
-        <button onclick=${autoAnnotate}>⚙️</button>
+        ${exp_list.length<2?null:html`<select ref=${exp_select}>
+            ${exp_list.map(e=>html`<option value=${e}>${e}</option>`)}
+        </select>`}
+        <button onclick=${() => autoAnnotate(exp_select.current.value)}>⚙️</button>
     </header>`;
 }
 

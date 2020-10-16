@@ -1,14 +1,5 @@
 - Remember: images need to be 3 channel
 
-# Right now
-
-- Move to multi experiment arch. In each dataset, there is a directory
-    "experiments". There are, for each experiment, a yaml file with
-    configuration, and a directory with results. Most previous things should now
-    take this into account, a new cli option "experiment" which to use.
-- TO ADAPT:
-    * tagger auto annotate
-
 # TODO
 
 - Move experiment configuration to info.yaml. Review and remake "create" and

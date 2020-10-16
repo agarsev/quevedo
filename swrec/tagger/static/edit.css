@@ -23,7 +23,8 @@ header > * {
     margin: 0 1vw;
 }
 
-header button {
+header select {
+    margin-right: -0.5vw;
     margin-left: 3em;
 }
 
