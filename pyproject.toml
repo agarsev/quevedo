@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "swrec"
+name = "quevedo"
 version = "0.1.0"
 description = ""
 authors = ["Antonio F. G. Sevilla <afgs@ucm.es>"]
@@ -17,7 +17,7 @@ tagger = [ "flask" ]
 force_layout = [ "forcelayout" ]
 
 [tool.poetry.scripts]
-swrec = "swrec.cli:cli"
+quevedo = "quevedo.cli:cli"
 
 [build-system]
 requires = ["poetry>=0.12"]

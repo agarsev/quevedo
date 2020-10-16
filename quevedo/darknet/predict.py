@@ -4,7 +4,7 @@ import os
 from PIL import Image
 import sys
 
-from swrec.darknet.library import init
+from quevedo.darknet.library import init
 
 perform_detect = None  # Function that performs the actual detection after loading the neural net
 

@@ -1,6 +1,6 @@
-# SWREC
+# Quevedo
 
-SignWriting RECognition tool.
+SignWriting recognition tool, part of VISSE project.
 
 ## Features
 
@@ -11,11 +11,17 @@ SignWriting RECognition tool.
 
 Base requirements: [python 3], [poetry], [darknet].
 
-Install: `poetry install`.
+Install:
+- Development: `poetry install` after clone.
+- With wheel: TODO
 
-Usage: `poetry run swrec <PATH_TO_THE_DATASET> command`.
+Usage:
 
-For more information, and the list of commands, run `poetry run swrec --help`.
+- Development: `poetry run quevedo -D <PATH_TO_THE_DATASET> command`.
+- In the dataset directory: `quevedo command`.
+- In other directory: `quevedo -D <PATH_TO_THE_DATASET> command`.
+
+For more information, and the list of commands, run `poetry run quevedo --help`.
 
 ## About the dataset
 
@@ -29,6 +35,8 @@ Datasets are plain directories with a specified structure inside:
 - `symbols`: directory with the symbols extracted from the real transcriptions.
 - `generated`: directory with generated images that look like SW trascriptions
   and can be used to augment the training data.
+- `experiments`: directory with configuration for different train/test
+  experiments.
 
 ## Author
 

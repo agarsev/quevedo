@@ -9,7 +9,7 @@ from string import Template
 from subprocess import run
 import yaml
 
-from swrec.experiment import Experiment
+from quevedo.experiment import Experiment
 
 
 class Dataset:

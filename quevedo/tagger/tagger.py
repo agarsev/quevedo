@@ -101,7 +101,7 @@ def get_auto_annotations(idx):
 
     global predict, last_experiment
     if predict is None or last_experiment.name != experiment.name:
-        from swrec.darknet.predict import init_darknet, predict as true_predict
+        from quevedo.darknet.predict import init_darknet, predict as true_predict
         try:
             init_darknet(ds, experiment)
             predict = true_predict

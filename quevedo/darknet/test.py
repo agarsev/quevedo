@@ -62,7 +62,7 @@ def test(obj, do_print, csv):
     The transcriptions in the test set are used (so a train/test split must have
     been done) and precision, recall and f-score are computed for each class.'''
 
-    from swrec.darknet.predict import init_darknet, predict
+    from quevedo.darknet.predict import init_darknet, predict
 
     dataset = obj['dataset']
     experiment = dataset.get_experiment(obj['experiment'])

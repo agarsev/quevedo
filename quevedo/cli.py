@@ -2,7 +2,7 @@
 
 import click
 from os import getcwd
-from swrec import extract_symbols, generate, darknet, migrate, dataset as ds
+from quevedo import extract_symbols, generate, darknet, migrate, dataset as ds
 
 
 @click.group(commands={
@@ -44,7 +44,7 @@ def tagger(obj, host, port, browser, mount_path):
     whole transcription. The information will be saved along the real
     transcription with a `json` extension.
     '''
-    from swrec.tagger import tagger
+    from quevedo.tagger import tagger
 
     click.echo("Loading dataset...")
     tagger.load_dataset(obj['dataset'])
