@@ -2,14 +2,15 @@
 
 # TODO
 
+- IMPORTANT: sort obj.names file, otherwise datasets not portable (at all, see
+    item below about prepare)
+- Rename tagger to "web" (simpler)
 - Move experiment configuration to info.yaml. Review and remake "create" and
     dataset.py
 - Use latest weight to restart training if weights directory exists. 
 - Create `run` command that runs all commands for an experiment
 - When moving a dataset, `prepare` has to be called too before testing (so
-    rearchitecture that, and don't call it `pre_train`). Also be careful about
-    order of `obj.names` file. probably should sort tags beforehand to be
-    deterministic.
+    rearchitecture that, and don't call it `pre_train`).
 - Ship different yolo config files and allow user to select for each experiment
     (either in config or in prepare or something)
 - Tagger Undo/Redo (use reducer for state in webapp?)

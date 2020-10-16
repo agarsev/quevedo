@@ -27,7 +27,7 @@ function useList (initial_value, cb = () => null) {
     };
 }
 
-fetch(`/api/transcriptions/${t_id}`).then(r => r.json()).then(data => {
+fetch(`api/transcriptions/${t_id}`).then(r => r.json()).then(data => {
     document.title = `${document.title}: ${data.title} (${t_id})`;
     mount_path = data.mount_path;
     preact.render(html`<${App} ...${data} />`, document.body);
@@ -69,7 +69,7 @@ function App ({ annotation_help, mount_path, links, anot, columns, exp_list }) {
     const saveChanges = () => {
         setDirty(2);
         setMessage("Saving...");
-        fetch(`/api/transcriptions/${t_id}`, {
+        fetch(`api/transcriptions/${t_id}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -89,7 +89,8 @@ function App ({ annotation_help, mount_path, links, anot, columns, exp_list }) {
             !confirm("WARNING: Existing annotations will be removed")) {
             return;
         }
-        fetch(`/api/auto_annotate/${t_id}?exp=${experiment}`).then(r => {
+        fetch(`api/auto_annotate/${t_id}${experiment?`?exp=${experiment}`:''}`)
+        .then(r => {
             if (r.ok) {
                 return r.json();
             } else throw r;
@@ -117,7 +118,7 @@ function App ({ annotation_help, mount_path, links, anot, columns, exp_list }) {
 function Header ({ mount_path, links, saveChanges, message, show_save,
     exp_list, autoAnnotate }) {
 
-    const exp_select = useRef({ value: false });
+    const exp_select = useRef({ value: null });
 
     return html`<header>
         <a href="edit.html#${links.prev}">⬅️</a>

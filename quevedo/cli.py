@@ -46,8 +46,9 @@ def tagger(obj, host, port, browser, mount_path):
     '''
     from quevedo.tagger import tagger
 
-    click.echo("Loading dataset...")
-    tagger.load_dataset(obj['dataset'])
+    dataset = obj['dataset']
+    click.echo("Loading dataset '{}'...".format(dataset.info['title']))
+    tagger.load_dataset(dataset)
     url = "http://{}:{}".format(host, port)
 
     click.echo("Starting tagger at {}".format(url))

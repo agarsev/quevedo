@@ -30,7 +30,7 @@ function App ({ title, path, description, trans_list, columns }) {
     `;
 }
 
-fetch('/api/transcriptions').then(r => r.json()).then(data => {
+fetch('api/transcriptions').then(r => r.json()).then(data => {
     document.title = `${document.title}: ${data.title}`;
     mount_path = data.mount_path;
     preact.render(html`<${App} ...${data} />`, document.body);
