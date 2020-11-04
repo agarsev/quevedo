@@ -34,25 +34,21 @@ def cli(ctx, dataset, experiment):
 @click.pass_obj
 @click.option('-h', '--host', default='localhost')
 @click.option('-p', '--port', default='5000')
-@click.option('-m', '--mount-path', default='', help="Mount path for the tagger application")
-@click.option('--browser/--no-browser', default=True, help="Launch browser at the tagger location")
-def tagger(obj, host, port, browser, mount_path):
-    ''' Run a web application for annotating the transcriptions in the dataset.
-
-    The files in the `real` directory will be listed. For each, bounding boxes
-    of symbols can be added, along with their class/name, and meanings for the
-    whole transcription. The information will be saved along the real
-    transcription with a `json` extension.
+@click.option('-m', '--mount-path', default='', help="Mount path for the web application")
+@click.option('--browser/--no-browser', default=True, help="Launch browser with the web app")
+def web(obj, host, port, browser, mount_path):
+    ''' Run a web application for managing and annotating the transcriptions in
+    the dataset.
     '''
-    from quevedo.tagger import tagger
+    from quevedo.web import app
 
     dataset = obj['dataset']
     click.echo("Loading dataset '{}'...".format(dataset.info['title']))
-    tagger.load_dataset(dataset)
+    app.load_dataset(dataset)
     url = "http://{}:{}".format(host, port)
 
-    click.echo("Starting tagger at {}".format(url))
+    click.echo("Starting app at {}".format(url))
     if browser:
         click.launch(url)
 
-    tagger.run(host, port, mount_path)
+    app.run(host, port, mount_path)
