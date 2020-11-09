@@ -85,6 +85,11 @@ h2 > * {
 
 .SymbolList table {
     width: 100%;
+    border-collapse: collapse;
+}
+
+.SymbolList td {
+    padding: 2px;
 }
 
 .SymbolEntry.editing {
@@ -92,7 +97,6 @@ h2 > * {
 }
 
 .SymbolEntry td:nth-child(1),
-.SymbolEntry td:nth-child(2),
 .SymbolEntry td:nth-last-child(1) {
     width: 0;
 }
@@ -107,6 +111,7 @@ h2 > * {
     display: inline-block;
     position: relative;
     border: 1px solid black;
+    overflow: hidden;
 }
 
 .Annotation img {
@@ -119,6 +124,10 @@ h2 > * {
     position: absolute;
     pointer-events: none;
     border: 2px solid black;
+}
+
+.BBox.editing {
+    outline: 100vw solid rgba(0,0,0,0.2);
 }
 
 pre {

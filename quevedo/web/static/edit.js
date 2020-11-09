@@ -195,7 +195,7 @@ function SymbolList ({ symbols, columns }) {
     return html`<div class="SymbolList">
         <${Annotation} ...${{symbols, colors, editing_symbol, setEditing}} />
         <div><table>
-            <thead><tr><th /><th />
+            <thead><tr><th />
                 ${columns.map(c => html`<th>${c}</th>`)}
                 <th />
             </tr></thead>
@@ -210,7 +210,10 @@ function SymbolList ({ symbols, columns }) {
                     columns=${columns}
                     color=${colors.list[i]} changeColor=${c => colors.update(i, c)}
                     remove=${() => removeSymbol(i)}
-                    editBox=${() => setEditing(current?null:{ idx: i })}
+                    markEditing=${e => {
+                        setEditing({ idx: i });
+                        e.stopPropagation();
+                    }}
                     editing=${current}
                 />`;
             })}</tbody>
@@ -219,15 +222,15 @@ function SymbolList ({ symbols, columns }) {
 }
 
 function SymbolEntry ({ tags, changeTag, columns, remove,
-        color, changeColor, editBox, editing }) {
+        color, changeColor, markEditing, editing }) {
     return html`<tr class=${`SymbolEntry ${editing?'editing':''}`}
-        onmousedown=${editing?(e => e.stopPropagation()):null}>
+        onmousedown=${markEditing}>
         <td><input type=color value=${color}
             oninput=${e => changeColor(e.target.value)} /></td>
-        <td><button onclick=${editBox}>📐</button></td>
         ${columns.map((c, i) => html`<td><input type=text
             placeholder=${c} tabIndex=1 value=${tags[i]}
-            oninput=${e => changeTag(i, e.target.value)}/></td>`)}
+            oninput=${e => changeTag(i, e.target.value)}
+            onfocus=${markEditing} /></td>`)}
         <td><button onclick=${remove}>🗑️</button></td>
     </tr>`;
 }
@@ -295,11 +298,12 @@ function Annotation ({ symbols, colors, editing_symbol, setEditing }) {
                 color=${colors.list[i]}
                 image_width=${image_width}
                 image_height=${image_height}
+                current=${editing_symbol && editing_symbol.idx==i}
         />`)}
     </div>`;
 }
 
-function BBox ({ x, y, w, h, color, image_width, image_height }) {
+function BBox ({ x, y, w, h, color, image_width, image_height, current }) {
 
     if (x === undefined) return null;
     const left = Math.round((x-w/2.0)*image_width)+'px';
@@ -307,7 +311,7 @@ function BBox ({ x, y, w, h, color, image_width, image_height }) {
     const width = Math.round(w*1.0*image_width)+'px';
     const height = Math.round(h*1.0*image_height)+'px';
 
-    return html`<span class="BBox" style=${`
+    return html`<span class=${`BBox ${current?'editing':''}`} style=${`
         left: ${left}; top: ${top};
         width: ${width}; height: ${height};
         border-color: ${color};`} />`;
