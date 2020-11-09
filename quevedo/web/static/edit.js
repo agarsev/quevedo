@@ -96,11 +96,22 @@ function App ({ annotation_help, mount_path, links, anot, columns, exp_list }) {
             } else throw r;
         }).then(data => {
             console.log(data);
-            symbols.set(data.symbols.map(({ box, name }) => {
+            let new_symbols = data.symbols.map(({ box, name }) => {
                 let tags = [];
                 tags[data.tag_index] = name;
                 return { box, tags };
-            }));
+            });
+            // sort left-to-right (roughly) and top-to-bottom (strict)
+            new_symbols.sort((a, b) => {
+                let left_a = a.box[0]-a.box[2]/2;
+                let left_b = b.box[0]-b.box[2]/2;
+                if (Math.abs(left_b-left_a)<0.09) {
+                    let top_a = a.box[1]-a.box[3]/2;
+                    let top_b = b.box[1]-b.box[3]/2;
+                    return top_a - top_b;
+                } else return left_a - left_b;
+            });
+            symbols.set(new_symbols);
         }).catch(setError);
     };
 
