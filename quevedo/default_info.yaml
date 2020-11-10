@@ -20,6 +20,12 @@ darknet:
   options:
     - -dont_show
 
+default_experiment: default
+
+# Web app configuration
+web:
+  lang: 'en'
+
 # Configuration for the artificial transcription generation
 generate:
   count: 500

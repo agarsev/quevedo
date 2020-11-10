@@ -1,4 +1,5 @@
 - Remember: images need to be 3 channel
+- To add languages for the web, copy and edit a file in `/quevedo/web/static/i18n`
 
 # TODO
 

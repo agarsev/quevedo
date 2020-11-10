@@ -27,8 +27,9 @@ def get_transcription_info(idx):
     }
 
 
-def load_dataset(dataset):
+def load_dataset(dataset, language):
     app_data['dataset'] = dataset
+    app_data['lang'] = language
     resolved = dataset.path.resolve()
     app_data['path'] = resolved
     data_dir = resolved / 'real'
@@ -121,6 +122,11 @@ def get_auto_annotations(idx):
 @app.route('/')
 def index():
     return app.send_static_file('list.html')
+
+
+@app.route('/i18n.js')
+def internationalization():
+    return app.send_static_file('i18n/{}.js'.format(app_data['lang']))
 
 
 @app.route('/img/<filename>')

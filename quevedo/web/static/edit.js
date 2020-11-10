@@ -1,3 +1,5 @@
+import Text from './i18n.js';
+
 const html = htm.bind(preact.h);
 const { useState, useEffect, useRef } = preactHooks;
 
@@ -35,7 +37,7 @@ fetch(`api/transcriptions/${t_id}`).then(r => r.json()).then(data => {
 
 function preventLostChanges (e) {
     e.preventDefault();
-    e.returnValue = "Warning: unsaved changes will be lost";
+    e.returnValue = Text['warning_save'];
 }
 
 function App ({ annotation_help, mount_path, links, anot, columns, exp_list }) {
@@ -60,15 +62,15 @@ function App ({ annotation_help, mount_path, links, anot, columns, exp_list }) {
     const [ message, setMessage ] = useState('');
     const setError = resp => {
         if (resp.status < 500) {
-            resp.text().then(e => setMessage(`Error: ${e}`));
+            resp.text().then(e => setMessage(`${Text['error']}: ${e}`));
         } else {
-            setMessage(`Error: ${resp.statusText}`);
+            setMessage(`${Text['error']}: ${resp.statusText}`);
         }
     }
 
     const saveChanges = () => {
         setDirty(2);
-        setMessage("Saving...");
+        setMessage(Text['saving']);
         fetch(`api/transcriptions/${t_id}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -79,14 +81,14 @@ function App ({ annotation_help, mount_path, links, anot, columns, exp_list }) {
         }).then(r => {
             if (r.ok) {
                 setDirty(0);
-                setMessage("Saved");
+                setMessage(Text['saved']);
             } else throw r;
         }).catch(setError);
     };
 
     const autoAnnotate = experiment => {
         if (symbols.list.length > 0 && 
-            !confirm("WARNING: Existing annotations will be removed")) {
+            !confirm(Text['confirm_generate'])) {
             return;
         }
         fetch(`api/auto_annotate/${t_id}${experiment?`?exp=${experiment}`:''}`)
@@ -120,7 +122,7 @@ function App ({ annotation_help, mount_path, links, anot, columns, exp_list }) {
             message, show_save: dirty>0, autoAnnotate,
             exp_list }} />
         <${MeaningList} ...${{meanings}} />
-        <h2>Symbols (drag to draw)</h2>
+        <h2>${Text['symbols']}</h2>
         <${SymbolList} ...${{symbols, columns}} />
         <pre>${annotation_help}</pre>
     `;
@@ -148,7 +150,7 @@ function Header ({ mount_path, links, saveChanges, message, show_save,
 
 function MeaningList ({ meanings }) {
     return html`<div class="MeaningList">
-        <h2>Meanings
+        <h2>${Text['meanings']}
             <button onclick=${() => meanings.add()}>➕</button>
         </h2>
         <ul>

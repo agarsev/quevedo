@@ -1,3 +1,5 @@
+import Text from './i18n.js';
+
 const html = htm.bind(preact.h);
 
 let mount_path = '';
@@ -24,7 +26,7 @@ function App ({ title, path, description, trans_list, columns }) {
     return html`
         <h1>${title}</h1>
         <pre><b>(${path})</b></pre>
-        <pre><b>Columns: ${columns.join(', ')}</b></pre>
+        <pre><b>${Text['columns']}: ${columns.join(', ')}</b></pre>
         <pre>${description}</pre>
         <${List} trans_list=${trans_list} />
     `;
