@@ -1,7 +1,6 @@
 # 2020-04-09 Antonio F. G. Sevilla <afgs@ucm.es>
 
 import click
-import json
 from pathlib import Path
 import random
 from shutil import copyfile
@@ -10,6 +9,7 @@ from subprocess import run
 import yaml
 
 from quevedo.experiment import Experiment
+from quevedo.transcription import Transcription
 
 
 class Dataset:
@@ -42,6 +42,11 @@ class Dataset:
             return Experiment(self, self.info['default_experiment'])
         else:
             return Experiment(self, name)
+
+    def get_real(self):
+        '''Returns a generator that yields all real annotations'''
+        return (Transcription(file) for file in
+                (self.path / 'real').glob('**/*.png'))
 
     def __getattr__(self, attr):
         if attr == 'path':
@@ -91,27 +96,26 @@ def style(condition, right, wrong=None):
 @click.pass_obj
 @click.option('--image_dir', '-i', multiple=True, type=click.Path(exists=True),
               required=True, help="Directory from which to import images")
-def add_images(obj, image_dir):
+@click.option('--name', '-n', help="Name for the subset of the dataset where to import the images")
+def add_images(obj, image_dir, name='default'):
     ''' Import images from directories to a dataset.'''
     dataset = obj['dataset']
 
-    real = dataset.path / 'real'
-    idx = max((int(f.stem) for f in real.glob('*.png')), default=0) + 1
+    dest = dataset.path / 'real' / name
+    dest.mkdir(parents=True, exist_ok=True)
+
+    idx = max((int(f.stem) for f in dest.glob('*.png')), default=0) + 1
     for d in image_dir:
-        click.echo("Importing images from '{}'... ".format(d), nl=False)
-        count = 0
+        click.echo("Importing images from '{}' to '{}'...".format(
+            d, dest.resolve()), nl=False)
+        num = 0
         d = Path(d)
         for img in d.glob('*.png'):
-            new_name = real / str(idx)
-            copyfile(img, new_name.with_suffix('.png'))
-            new_name.with_suffix(".json").write_text(json.dumps({
-                "meanings": [img.stem],
-                "symbols": [],
-                "set": "train",
-            }))
+            new_trans = Transcription(dest / str(idx))
+            new_trans.create_from(img)
             idx = idx + 1
-            count = count + 1
-        click.echo("imported {}".format(style(count > 0, count)))
+            num = num + 1
+        click.echo("imported {}".format(style(num > 0, num)))
     click.echo("\n")
 
 
@@ -125,26 +129,23 @@ def train_test_split(obj, train_percentage, seed):
     common to all experiments.'''
     dataset = obj['dataset']
 
-    if seed is not None:
-        random.seed(seed)
+    random.seed(seed)
 
-    ano_files = list((dataset.path / 'real').glob('*.json'))
-    random.shuffle(ano_files)
+    real = list(dataset.get_real())
+    random.shuffle(real)
 
-    split_point = round(len(ano_files) * train_percentage / 100)
+    split_point = round(len(real) * train_percentage / 100)
 
-    for t in ano_files[:split_point]:
-        ano = json.loads(t.read_text())
-        ano['set'] = 'train'
-        t.write_text(json.dumps(ano))
+    for t in real[:split_point]:
+        t.anot['set'] = 'train'
+        t.save()
 
-    for t in ano_files[split_point:]:
-        ano = json.loads(t.read_text())
-        ano['set'] = 'test'
-        t.write_text(json.dumps(ano))
+    for t in real[split_point:]:
+        t.anot['set'] = 'test'
+        t.save()
 
     click.echo("Dataset split into train ({} files) and test ({} files)".format(
-               split_point, len(ano_files) - split_point))
+               split_point, len(real) - split_point))
 
 
 def count(l):
@@ -163,13 +164,12 @@ def info(obj):
     click.echo(info["description"])
     click.secho('Tag schema: {}\n'.format(', '.join(info["tag_schema"])), bold=True)
 
-    real = path / 'real'
-    num_real = count(real.glob('*.png'))
+    real = list(dataset.get_real())
+    num_real = count(real)
     click.echo('Real transcriptions: {}'.format(style(num_real > 0, num_real)))
-    num_annot = sum(len(json.loads(annot.read_text())['symbols']) > 0
-                    for annot in real.glob('*.json'))
-    click.echo('Annotated: {}/{}'.format(style(num_annot == num_real, num_annot),
-                                           num_real))
+    num_annot = sum(len(t.anot['symbols']) > 0 for t in real)
+    click.echo('Annotated: {}/{}'.format(
+        style(num_annot == num_real, num_annot), num_real))
 
     symbols = path / 'symbols'
     num_sym = count(symbols.glob('*.png'))
@@ -197,7 +197,7 @@ def info(obj):
     click.echo("{}\n".format(experiment.info['subject']))
 
     darknet = experiment.path / 'darknet.cfg'
-    num_txt = count(real.glob('*.txt')) + count(gen.glob('*.txt'))
+    num_txt = sum(1 for r in real if r._txt.exists()) + count(gen.glob('*.txt'))
     click.echo('Dataset {} ready for training'.format(style(
         darknet.exists() and num_txt == num_gen + num_real,
         'is', "is not")))

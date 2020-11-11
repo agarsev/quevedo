@@ -7,6 +7,8 @@ from PIL.ImageOps import invert
 import random
 import re
 
+from quevedo.transcription import Transcription
+
 # Used only if force layout
 try:
     import numpy as np
@@ -102,13 +104,13 @@ def create_transcription(path, symbols):
         positions[:, 1] = (ys - min_y) * scale_y + canvas_h * .1
 
     # Create the actual transcription
+    t = Transcription(path)
     canvas = Image.new("RGBA", (canvas_w, canvas_h), "white")
-    bboxes = []
     for [x, y], name, file_info, rotate in zip(positions, class_names, files, rotate):
-        bboxes.append(put_symbol(canvas, int(x), int(y),
-                      file_info, name, rotate))
-    canvas.save(path.with_suffix(".png"))
-    path.with_suffix(".json").write_text(json.dumps({'symbols': bboxes}))
+        t.anot['symbols'].append(put_symbol(canvas, int(x), int(y),
+                                 file_info, name, rotate))
+    canvas.save(t.image)
+    t.save()
 
 
 @click.command()

@@ -1,6 +1,13 @@
 - Remember: images need to be 3 channel
 - To add languages for the web, copy and edit a file in `/quevedo/web/static/i18n`
 
+# RIGHT NOW
+
+Multi dir arch
+
+TODO: web
+TODO: darknet
+
 # TODO
 
 - Check that letterboxing is working with AlexeyAB's darknet

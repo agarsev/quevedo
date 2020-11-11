@@ -2,7 +2,7 @@
 
 import click
 from os import getcwd
-from quevedo import extract_symbols, generate, darknet, migrate, web, dataset as ds
+from quevedo import extract_symbols, generate, darknet, web, dataset as ds
 
 
 @click.group(commands={
@@ -11,7 +11,6 @@ from quevedo import extract_symbols, generate, darknet, migrate, web, dataset as
     'generate': generate.generate,
     'pre_train': darknet.train.prepare, 'train': darknet.train.train,
     'test': darknet.test, 'predict': darknet.predict_image,
-    'migrate': migrate.migrate,
     'info': ds.info, 'create': ds.create, 'add_images': ds.add_images,
     'web': web.launcher
 }, chain=True, invoke_without_command=True)
