@@ -4,6 +4,8 @@ from flask import Flask, send_from_directory, request
 import json
 import logging
 import os
+from pathlib import Path
+from string import Template
 
 os.environ['WERKZEUG_RUN_MAIN'] = 'true'
 app = Flask(__name__, static_url_path='')
@@ -34,10 +36,18 @@ def load_dataset(dataset, language):
     app_data['path'] = resolved
     data_dir = resolved / 'real'
     app_data['data_dir'] = data_dir
-    ids = sorted(int(trans.stem) for trans in data_dir.glob("*.png"))
-    app_data['last_id'] = ids[-1]
-    app_data['trans_list'] = list(map(get_transcription_info, ids))
     app_data['exp_list'] = dataset.list_experiments()
+    app_data['dirs'] = {}
+    for d in app_data['data_dir'].glob('*'):
+        if not d.is_dir():
+            continue
+        name = str(d.stem)
+        ids = sorted(int(trans.stem) for trans in
+                     d.glob("*.png"))
+        dir_data = {'last_id': ids[-1]}
+        ids = ('{}/{}'.format(name, t) for t in ids)
+        dir_data['trans_list'] = list(map(get_transcription_info, ids))
+        app_data['dirs'][name] = dir_data
 
 
 def run(host, port, path):
@@ -46,19 +56,6 @@ def run(host, port, path):
 
 
 # ------------ API ------------------
-
-@app.route('/api/transcriptions')
-def all_transcriptions():
-    ds = app_data['dataset']
-    return {
-        'title': ds.info['title'],
-        'mount_path': app_data['mount_path'],
-        'path': str(app_data['path']),
-        'description': ds.info['description'],
-        'columns': ds.info['tag_schema'],
-        'trans_list': app_data['trans_list'],
-    }
-
 
 @app.route('/api/transcriptions/<idx>', methods=["GET"])
 def one_transcription(idx):
@@ -119,9 +116,32 @@ def get_auto_annotations(idx):
 
 # ----------------- WEB APP ----------------
 
-@app.route('/')
-def index():
-    return app.send_static_file('list.html')
+html_template = Template((Path(__file__).parent /
+                          'static/page.html').read_text())
+
+
+@app.route('/list/<dir>')
+@app.route('/', defaults={'dir': None})
+def index(dir):
+    ds = app_data['dataset']
+    data = {
+        'title': ds.info['title'],
+        'path': str(app_data['path']),
+        'description': ds.info['description'],
+        'columns': ds.info['tag_schema'],
+    }
+
+    if dir is None:
+        data['list'] = [{'name': k} for k in app_data['dirs'].keys()]
+    else:
+        data['dir_name'] = dir
+        data['list'] = app_data['dirs'][dir]['trans_list']
+
+    return html_template.substitute(
+        title=ds.info['title'],
+        mount_path=app_data['mount_path'],
+        page='list',
+        data=json.dumps(data))
 
 
 @app.route('/i18n.js')
@@ -129,6 +149,6 @@ def internationalization():
     return app.send_static_file('i18n/{}.js'.format(app_data['lang']))
 
 
-@app.route('/img/<filename>')
-def send_image(filename):
-    return send_from_directory(app_data['data_dir'], filename)
+@app.route('/img/<dir>/<filename>')
+def send_image(dir, filename):
+    return send_from_directory(app_data['data_dir'] / dir, filename)

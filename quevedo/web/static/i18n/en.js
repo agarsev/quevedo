@@ -5,6 +5,7 @@ export default {
     error: 'Error',
     // LIST.js
     columns: 'Columns', // Tag schema info
+    back: 'Back to list', // Link back to home view
     // EDIT.js
     warning_save: 'Warning: unsaved changes will be lost', // Warning when trying to leave without saving
     saving: 'Saving...', // Message when sending changes to server

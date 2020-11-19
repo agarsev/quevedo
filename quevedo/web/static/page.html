@@ -2,15 +2,17 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Quevedo</title>
+    <title>Quevedo: $title</title>
+    <base href="$mount_path" />
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    <link rel="stylesheet" href="edit.css" />
+    <link rel="stylesheet" href="$page.css" />
 </head>
 <body>
     <noscript>Please enable javascript to use this application.</noscript>
     <script src="lib/preact.js"></script>
     <script src="lib/preactHooks.js"></script>
     <script src="lib/htm.js"></script>
-    <script type="module" src="edit.js"></script>
+    <script>window.quevedo_data = $data;</script>
+    <script type="module" src="$page.js"></script>
 </body>
 </html>
