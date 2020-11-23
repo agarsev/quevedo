@@ -1,40 +1,7 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    padding: 2vw;
-}
-
-header {
-    font-size: 2.4em;
-    font-weight: bold;
-    margin-bottom: 1ex;
-    padding: 0 0 0.5vw 1vw;
-    border-bottom: 1px solid gray;
-    display: flex;
-    align-items: center;
-}
-
-header > * {
-    flex: 0;
-    margin: 0 1vw;
-}
+@import 'common.css';
 
 header select {
-    margin-right: -0.5vw;
     margin-left: 3em;
-}
-
-a, a:visited {
-    text-decoration: none;
-    color: #00A;
-}
-
-a:hover {
-    color: #00F;
 }
 
 .message_text {

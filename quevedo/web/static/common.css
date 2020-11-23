@@ -1,0 +1,37 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    padding: 2vw;
+}
+
+header {
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 1ex;
+    padding: 0 0 0.5vw 1vw;
+    border-bottom: 1px solid gray;
+    display: flex;
+    align-items: center;
+}
+
+header > *:first-child {
+    margin-left: 0;
+}
+
+header > * {
+    flex: 0;
+    margin: 0 0.5vw;
+}
+
+a, a:visited {
+    text-decoration: none;
+    color: #00A;
+}
+
+a:hover {
+    color: #00F;
+}

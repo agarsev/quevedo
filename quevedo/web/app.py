@@ -57,26 +57,6 @@ def run(host, port, path):
 
 # ------------ API ------------------
 
-@app.route('/api/transcriptions/<idx>', methods=["GET"])
-def one_transcription(idx):
-    idn = int(idx)
-    anot_file = app_data['data_dir'] / '{}.json'.format(idx)
-    anot = json.loads(anot_file.read_text())
-    ds = app_data['dataset']
-    return {
-        'title': ds.info['title'],
-        'annotation_help': ds.info['annotation_help'],
-        'exp_list': app_data['exp_list'],
-        'mount_path': app_data['mount_path'],
-        'columns': ds.info['tag_schema'],
-        'links': {
-            'prev': idn - 1 if idn > 1 else app_data['last_id'],
-            'next': idn + 1 if idn < app_data['last_id'] else 1,
-        },
-        'anot': anot,
-    }
-
-
 @app.route('/api/transcriptions/<idx>', methods=["POST"])
 def edit_post(idx):
     anot_file = app_data['data_dir'] / '{}.json'.format(idx)
@@ -141,6 +121,32 @@ def index(dir):
         title=ds.info['title'],
         mount_path=app_data['mount_path'],
         page='list',
+        data=json.dumps(data))
+
+
+@app.route('/edit/<dir>/<idx>')
+def edit(dir, idx):
+    ds = app_data['dataset']
+    full_id = '{}/{}'.format(dir, idx)
+    idn = int(idx)
+    anot = json.loads((app_data['data_dir'] / (full_id + '.json')).read_text())
+    last_id = app_data['dirs'][dir]['last_id']
+    data = {
+        'title': ds.info['title'],
+        'id': {'dir': dir, 'num': idn, 'full': full_id},
+        'annotation_help': ds.info['annotation_help'],
+        'exp_list': app_data['exp_list'],
+        'columns': ds.info['tag_schema'],
+        'links': {
+            'prev': '{}/{}'.format(dir, idn - 1 if idn > 1 else last_id),
+            'next': '{}/{}'.format(dir, idn + 1 if idn < last_id else 1),
+        },
+        'anot': anot,
+    }
+    return html_template.substitute(
+        title='{} - {}'.format(ds.info['title'], idx),
+        mount_path=app_data['mount_path'],
+        page='edit',
         data=json.dumps(data))
 
 

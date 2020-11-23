@@ -3,12 +3,6 @@ import Text from './i18n.js';
 const html = htm.bind(preact.h);
 const { useState, useEffect, useRef } = preactHooks;
 
-
-let mount_path = '';
-let t_id  = (new URL(document.location)).hash.substring(1);
-window.onhashchange = () => window.location.reload();
-
-
 function useList (initial_value, cb = () => null) {
     const [ list, setList ] = useState(initial_value);
     const set = l => { setList(l); cb(); }
@@ -29,18 +23,24 @@ function useList (initial_value, cb = () => null) {
     };
 }
 
-fetch(`api/transcriptions/${t_id}`).then(r => r.json()).then(data => {
-    document.title = `${document.title}: ${data.title} (${t_id})`;
-    mount_path = data.mount_path;
-    preact.render(html`<${App} ...${data} />`, document.body);
-});
-
 function preventLostChanges (e) {
     e.preventDefault();
     e.returnValue = Text['warning_save'];
 }
 
-function App ({ annotation_help, mount_path, links, anot, columns, exp_list }) {
+const color_list = [ '#FF0000', '#00FF00', '#0000FF', '#FF00FF',
+    '#00FFFF', '#880000', '#008800', '#000088', '#888800', '#008888' ];
+let next_color = 0;
+function getNextColor () {
+    const r = color_list[next_color];
+    next_color = (next_color + 1) % color_list.length;
+    return r;
+}
+
+
+preact.render(html`<${App} ...${window.quevedo_data} />`, document.body);
+
+function App ({ title, id, annotation_help, links, anot, columns, exp_list }) {
 
     /* Prevent loss of changes by unintentional page unloading:
      * 0: no changes/all changes saved
@@ -71,7 +71,7 @@ function App ({ annotation_help, mount_path, links, anot, columns, exp_list }) {
     const saveChanges = () => {
         setDirty(2);
         setMessage(Text['saving']);
-        fetch(`api/transcriptions/${t_id}`, {
+        fetch(`api/transcriptions/${id.full}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -91,7 +91,7 @@ function App ({ annotation_help, mount_path, links, anot, columns, exp_list }) {
             !confirm(Text['confirm_generate'])) {
             return;
         }
-        fetch(`api/auto_annotate/${t_id}${experiment?`?exp=${experiment}`:''}`)
+        fetch(`api/auto_annotate/${id.full}${experiment?`?exp=${experiment}`:''}`)
         .then(r => {
             if (r.ok) {
                 return r.json();
@@ -118,26 +118,26 @@ function App ({ annotation_help, mount_path, links, anot, columns, exp_list }) {
     };
 
     return html`
-        <${Header} ...${{mount_path, links, saveChanges,
+        <${Header} ...${{title, id, links, saveChanges,
             message, show_save: dirty>0, autoAnnotate,
             exp_list }} />
         <${MeaningList} ...${{meanings}} />
         <h2>${Text['symbols']}</h2>
-        <${SymbolList} ...${{symbols, columns}} />
+        <${SymbolList} ...${{id, symbols, columns}} />
         <pre>${annotation_help}</pre>
     `;
 }
 
-function Header ({ mount_path, links, saveChanges, message, show_save,
+function Header ({ title, id, links, saveChanges, message, show_save,
     exp_list, autoAnnotate }) {
 
     const exp_select = useRef({ value: null });
 
     return html`<header>
-        <a href="edit.html#${links.prev}">⬅️</a>
-        <a href=${mount_path}>⬆️</a>
-        ${t_id}
-        <a href="edit.html#${links.next}" tabIndex=3 >➡️</a>
+        <a href="">${title}</a> » 
+        <a href="list/${id.dir}">${id.dir}</a> » ${id.num}
+        <a href="edit/${links.prev}">⬅️</a>
+        <a href="edit/${links.next}" tabIndex=3 >➡️</a>
         ${show_save?html`<button tabIndex=2
             onclick=${saveChanges} >💾</button>`:null}
         <span class="message_text">${message}</span>
@@ -171,16 +171,7 @@ function MeaningEntry ({ value, remove, change }) {
     `;
 }
 
-const color_list = [ '#FF0000', '#00FF00', '#0000FF', '#FF00FF',
-    '#00FFFF', '#880000', '#008800', '#000088', '#888800', '#008888' ];
-let next_color = 0;
-function getNextColor () {
-    const r = color_list[next_color];
-    next_color = (next_color + 1) % color_list.length;
-    return r;
-}
-
-function SymbolList ({ symbols, columns }) {
+function SymbolList ({ id, symbols, columns }) {
 
     const colors = useList([]);
     if (colors.list.length < symbols.list.length) {
@@ -206,7 +197,7 @@ function SymbolList ({ symbols, columns }) {
     };
 
     return html`<div class="SymbolList">
-        <${Annotation} ...${{symbols, colors, editing_symbol, setEditing}} />
+        <${Annotation} ...${{id, symbols, colors, editing_symbol, setEditing}} />
         <div><table>
             <thead><tr><th />
                 ${columns.map(c => html`<th>${c}</th>`)}
@@ -248,7 +239,7 @@ function SymbolEntry ({ tags, changeTag, columns, remove,
     </tr>`;
 }
 
-function Annotation ({ symbols, colors, editing_symbol, setEditing }) {
+function Annotation ({ id, symbols, colors, editing_symbol, setEditing }) {
 
     // Image bounding rectangle 
     const image_rect = useRef(null);
@@ -300,7 +291,7 @@ function Annotation ({ symbols, colors, editing_symbol, setEditing }) {
     }
 
     return html`<div class="Annotation">
-        <img src="${mount_path}img/${t_id}.png"
+        <img src="img/${id.full}.png"
             ref=${image_rect}
             onmousedown=${mouse_down}
             onmousemove=${mouse_move}

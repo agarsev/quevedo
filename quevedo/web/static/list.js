@@ -7,7 +7,9 @@ preact.render(html`<${App} ...${window.quevedo_data} />`, document.body);
 function App ({ title, path, description, columns, dir_name, list }) {
     const in_dir = dir_name !== undefined;
     return html`
-        <h1>${title}${in_dir?` » ${dir_name}`:''}</h1>
+        <header>
+            ${in_dir?html`<a href="">${title}</a> » ${dir_name}`:title}
+        </header>
         <pre><b>(${path})</b></pre>
         <pre><b>${Text['columns']}: ${columns.join(', ')}</b></pre>
         <pre>${description}</pre>
@@ -39,11 +41,12 @@ function UpEntry () {
 }
 
 function TransEntry ({ id, meanings, set, annotated }) {
+    const edit_link = `edit/${id}`;
     return html`<li class="Entry TransEntry">
         <h2>${meanings[0]} <span class="set">(${set})</span></h2>
-        <img src="img/${id}.png" />
+        <img src="img/${id}.png" onclick=${() => window.location=edit_link}/>
         <p>
-            <a href="edit.html#${id}">📝</a>
+            <a href="${edit_link}">📝</a>
             ${annotated>0?`✔️ (${annotated})`:null}
         </p>
     </li>`;
