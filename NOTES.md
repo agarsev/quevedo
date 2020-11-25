@@ -5,7 +5,6 @@
 
 Multi dir arch
 
-TODO: web api (edit save and auto annotate)
 TODO: darknet
 
 # TODO

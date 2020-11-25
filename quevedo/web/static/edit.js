@@ -71,7 +71,7 @@ function App ({ title, id, annotation_help, links, anot, columns, exp_list }) {
     const saveChanges = () => {
         setDirty(2);
         setMessage(Text['saving']);
-        fetch(`api/transcriptions/${id.full}`, {
+        fetch(`api/save/${id.full}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

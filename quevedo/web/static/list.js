@@ -40,11 +40,11 @@ function UpEntry () {
     </li>`;
 }
 
-function TransEntry ({ id, meanings, set, annotated }) {
-    const edit_link = `edit/${id}`;
+function TransEntry ({ dir, id, meanings, set, annotated }) {
+    const edit_link = `edit/${dir}/${id}`;
     return html`<li class="Entry TransEntry">
         <h2>${meanings[0]} <span class="set">(${set})</span></h2>
-        <img src="img/${id}.png" onclick=${() => window.location=edit_link}/>
+        <img src="img/${dir}/${id}.png" onclick=${() => window.location=edit_link}/>
         <p>
             <a href="${edit_link}">📝</a>
             ${annotated>0?`✔️ (${annotated})`:null}

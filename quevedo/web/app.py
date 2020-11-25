@@ -18,11 +18,11 @@ def annotated_status(anot):
     return len(anot.get('symbols', {}))
 
 
-def get_transcription_info(idx):
-    anot_file = app_data['data_dir'] / '{}.json'.format(idx)
+def get_transcription_info(dir, id):
+    anot_file = app_data['data_dir'] / '{}/{}.json'.format(dir, id)
     anot = json.loads(anot_file.read_text())
     return {
-        'id': idx,
+        'dir': dir, 'id': str(id),
         'annotated': annotated_status(anot),
         'set': anot.get('set', 'none'),
         'meanings': anot.get('meanings', [])
@@ -45,8 +45,8 @@ def load_dataset(dataset, language):
         ids = sorted(int(trans.stem) for trans in
                      d.glob("*.png"))
         dir_data = {'last_id': ids[-1]}
-        ids = ('{}/{}'.format(name, t) for t in ids)
-        dir_data['trans_list'] = list(map(get_transcription_info, ids))
+        dir_data['trans_list'] = list(map(lambda id: get_transcription_info(name, id),
+                                          ids))
         app_data['dirs'][name] = dir_data
 
 
@@ -57,12 +57,13 @@ def run(host, port, path):
 
 # ------------ API ------------------
 
-@app.route('/api/transcriptions/<idx>', methods=["POST"])
-def edit_post(idx):
-    anot_file = app_data['data_dir'] / '{}.json'.format(idx)
+@app.route('/api/save/<dir>/<idx>', methods=["POST"])
+def edit_post(dir, idx):
+    anot_file = app_data['data_dir'] / '{}/{}.json'.format(dir, idx)
     anot = json.loads(anot_file.read_text())
     new_info = {**anot, **request.get_json()}
-    trans = next(t for t in app_data['trans_list'] if t['id'] == int(idx))
+    trans = next(t for t in app_data['dirs'][dir]['trans_list']
+                 if t['id'] == idx)
     trans['annotated'] = annotated_status(new_info)
     anot_file.write_text(json.dumps(new_info))
     return 'OK'
@@ -72,8 +73,8 @@ predict = None  # Do not load neural network until requested
 last_experiment = None
 
 
-@app.route('/api/auto_annotate/<idx>')
-def get_auto_annotations(idx):
+@app.route('/api/auto_annotate/<dir>/<idx>')
+def get_auto_annotations(dir, idx):
     ds = app_data['dataset']
     experiment = ds.get_experiment(request.args.get('exp', None))
 
@@ -87,7 +88,7 @@ def get_auto_annotations(idx):
         except SystemExit as e:
             return str(e), 400
 
-    img = (app_data['data_dir'] / '{}.png'.format(idx)).resolve()
+    img = (app_data['data_dir'] / '{}/{}.png'.format(dir, idx)).resolve()
     return {
         'symbols': predict(img),
         'tag_index': experiment._tag_index
