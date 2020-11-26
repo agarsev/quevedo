@@ -19,8 +19,6 @@ def prepare(obj):
     be used.'''
 
     dataset = obj['dataset']
-    real_d = dataset.path / 'real'
-
     experiment = dataset.get_experiment(obj['experiment'])
     experiment.path.mkdir(exist_ok=True)
 
@@ -29,16 +27,15 @@ def prepare(obj):
     symbols = []
     annotation_files = []
 
-    all_annotation_files = real_d.glob('*.json')
+    all_annotation_files = dataset.get_real()
     if experiment.info['generate']:
-        all_annotation_files = chain(all_annotation_files, (dataset.path / 'generated').glob('*.json'))
+        all_annotation_files = chain(all_annotation_files, dataset.get_generated())
 
-    for an in all_annotation_files:
-        annotation = json.loads(an.read_text())
-        if annotation.get('set', 'train') != 'train':
+    for t in all_annotation_files:
+        if t.anot.get('set', 'train') != 'train':
             continue
         bboxes = []
-        for s in annotation['symbols']:
+        for s in t.anot['symbols']:
             tag = experiment.get_tag(s['tags'])
             try:
                 index = symbols.index(tag)
@@ -46,8 +43,8 @@ def prepare(obj):
                 symbols.append(tag)
                 index = len(symbols) - 1
             bboxes.append("{} {} {} {} {}\n".format(index, *s['box']))
-        an.with_suffix(".txt").write_text("".join(bboxes))
-        annotation_files.append(an)
+        t._txt.write_text("".join(bboxes))
+        annotation_files.append(t)
 
     num_classes = len(symbols)
 
@@ -57,7 +54,7 @@ def prepare(obj):
     # Write train file with the list of files to train on, that is real +
     # generated transcriptions
     train_file = experiment.path / 'train.txt'
-    train_file.write_text("\n".join(str(f.with_suffix(".png").resolve())
+    train_file.write_text("\n".join(str(f.image.resolve())
                                     for f in annotation_files) + "\n")
 
     # In this directory, the weights of the trained network will be stored

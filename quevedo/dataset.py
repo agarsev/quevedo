@@ -48,6 +48,11 @@ class Dataset:
         return (Transcription(file) for file in
                 (self.path / 'real').glob('**/*.png'))
 
+    def get_generated(self):
+        '''Returns a generator that yields all generated annotations'''
+        return (Transcription(file) for file in
+                (self.path / 'generated').glob('*.png'))
+
     def __getattr__(self, attr):
         if attr == 'path':
             if not self._path.exists():

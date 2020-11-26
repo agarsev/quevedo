@@ -73,16 +73,12 @@ def test(obj, do_print, csv):
     false_positives = dict()
     false_negatives = dict()
 
-    def get_tag(sym):
-        return sym['tags'][0]
-
-    for image in (dataset.path / 'real').glob('*.png'):
-        anot = json.loads(image.with_suffix('.json').read_text())
-        if anot.get('set') != 'test':
+    for trans in dataset.get_real():
+        if trans.anot.get('set') != 'test':
             continue
-        predictions = predict(image)
-        for sym in anot['symbols']:
-            tag = get_tag(sym)
+        predictions = predict(trans.image)
+        for sym in trans.anot['symbols']:
+            tag = experiment.get_tag(sym['tags'])
             real = {'box': sym['box'], 'name': tag}
             if tag not in all_symbols:
                 all_symbols.add(tag)
