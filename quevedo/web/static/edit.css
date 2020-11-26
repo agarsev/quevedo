@@ -4,13 +4,6 @@ header select {
     margin-left: 3em;
 }
 
-.message_text {
-    flex: 1;
-    padding-top: 0.5em;
-    font-weight: normal;
-    font-size: 50%;
-}
-
 h2 {
     display: inline-flex;
     margin-bottom: 1ex;

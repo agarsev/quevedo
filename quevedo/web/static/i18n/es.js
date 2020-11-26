@@ -6,6 +6,7 @@ export default {
     // LIST.js
     columns: 'Columnas', // Tag schema info
     back: 'Volver arriba', // Link back to home view
+    new_entry: 'Añadir nueva', // Entry to add a new transcription
     // EDIT.js
     warning_save: 'Atención: se perderán los cambios sin guardar', // Warning when trying to leave without saving
     saving: 'Guardando...', // Message when sending changes to server

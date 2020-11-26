@@ -117,7 +117,7 @@ def add_images(obj, image_dir, name='default'):
         d = Path(d)
         for img in d.glob('*.png'):
             new_trans = Transcription(dest / str(idx))
-            new_trans.create_from(img)
+            new_trans.create_from(image=img)
             idx = idx + 1
             num = num + 1
         click.echo("imported {}".format(style(num > 0, num)))

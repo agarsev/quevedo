@@ -7,6 +7,8 @@ import os
 from pathlib import Path
 from string import Template
 
+from quevedo.transcription import Transcription
+
 os.environ['WERKZEUG_RUN_MAIN'] = 'true'
 app = Flask(__name__, static_url_path='')
 logging.getLogger('werkzeug').disabled = True
@@ -67,6 +69,17 @@ def edit_post(dir, idx):
     trans['annotated'] = annotated_status(new_info)
     anot_file.write_text(json.dumps(new_info))
     return 'OK'
+
+
+@app.route('/api/new/<dir>', methods=["POST"])
+def new_trans(dir):
+    dir_data = app_data['dirs'][dir]
+    idx = dir_data['last_id'] + 1
+    dir_data['last_id'] = idx
+    new_t = Transcription(app_data['data_dir'] / '{}/{}'.format(dir, idx))
+    new_t.create_from(binary_data=request.data)
+    dir_data['trans_list'].append(get_transcription_info(dir, idx)),
+    return {'id': new_t.id}
 
 
 predict = None  # Do not load neural network until requested

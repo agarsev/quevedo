@@ -27,6 +27,13 @@ header > * {
     margin: 0 0.5vw;
 }
 
+header .message_text {
+    flex: 1;
+    padding-top: 0.5em;
+    font-weight: normal;
+    font-size: 50%;
+}
+
 a, a:visited {
     text-decoration: none;
     color: #00A;

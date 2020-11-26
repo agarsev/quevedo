@@ -11,6 +11,7 @@ class Transcription:
 
     def __init__(self, path):
         path = Path(path)
+        self.id = path.stem
         self._json = path.with_suffix('.json')
         self.image = path.with_suffix('.png')
         self._txt = path.with_suffix('.txt')
@@ -22,9 +23,13 @@ class Transcription:
             "set": "train",
         }))
 
-    def create_from(self, image):
-        copyfile(image, self.image)
-        self._init_json(meanings=[image.stem])
+    def create_from(self, image=None, binary_data=None):
+        if image is not None:
+            copyfile(image, self.image)
+            self._init_json(meanings=[image.stem])
+        elif binary_data is not None:
+            self.image.write_bytes(binary_data)
+            self._init_json()
 
     def save(self):
         self._json.write_text(json.dumps(self.anot))
