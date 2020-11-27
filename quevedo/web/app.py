@@ -37,7 +37,8 @@ def load_dataset(dataset, language):
     app_data['path'] = resolved
     data_dir = resolved / 'real'
     app_data['data_dir'] = data_dir
-    app_data['exp_list'] = dataset.list_experiments()
+    app_data['exp_list'] = [e.name for e in dataset.list_experiments() if
+                            e.is_trained()]
     app_data['dirs'] = {}
     for d in app_data['data_dir'].glob('*'):
         if not d.is_dir():

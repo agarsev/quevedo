@@ -27,3 +27,9 @@ class Experiment:
             return symbol_tags[self._tag_index]
         except IndexError:
             return None
+
+    def is_trained(self):
+        '''Checks whether the experiment's neural network has been trained and
+        can be used to predict.'''
+        weights = self.path / 'darknet_final.weights'
+        return weights.exists()

@@ -35,7 +35,8 @@ class Dataset:
         run([darknet['path'], *args, *darknet['options']])
 
     def list_experiments(self):
-        return [e.stem for e in self.path.glob('experiments/*.yaml')]
+        return [Experiment(self, e.stem) for e in
+                self.path.glob('experiments/*.yaml')]
 
     def get_experiment(self, name):
         if name is None:
@@ -191,9 +192,8 @@ def info(obj):
     exps = dataset.list_experiments()
     if len(exps) > 1:
         click.echo('\nExperiments:')
-        for e in dataset.list_experiments():
-            exp = dataset.get_experiment(e)
-            click.echo('- {}: {}'.format(e, exp.info['subject']))
+        for e in exps:
+            click.echo('- {}: {}'.format(e.name, e.info['subject']))
 
     experiment = dataset.get_experiment(obj['experiment'])
 
@@ -207,8 +207,7 @@ def info(obj):
         darknet.exists() and num_txt == num_gen + num_real,
         'is', "is not")))
 
-    weights = experiment.path / 'darknet_final.weights'
-    click.echo('Neural network {}'.format(style(weights.exists(),
+    click.echo('Neural network {}'.format(style(experiment.is_trained(),
                'has been trained', "hasn't been trained")))
 
     click.echo('')
