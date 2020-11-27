@@ -16,19 +16,18 @@ logging.getLogger('werkzeug').disabled = True
 app_data = {}
 
 
-def annotated_status(anot):
-    return len(anot.get('symbols', {}))
+def annotation_info(anot):
+    return {
+        'annotated': len(anot.get('symbols', {})),
+        'set': anot.get('set', 'none'),
+        'meanings': anot.get('meanings', []),
+    }
 
 
 def get_transcription_info(dir, id):
     anot_file = app_data['data_dir'] / '{}/{}.json'.format(dir, id)
     anot = json.loads(anot_file.read_text())
-    return {
-        'dir': dir, 'id': str(id),
-        'annotated': annotated_status(anot),
-        'set': anot.get('set', 'none'),
-        'meanings': anot.get('meanings', [])
-    }
+    return {'dir': dir, 'id': str(id), **annotation_info(anot)}
 
 
 def load_dataset(dataset, language):
@@ -66,7 +65,7 @@ def edit_post(dir, idx):
     new_info = {**anot, **request.get_json()}
     trans = next(t for t in app_data['dirs'][dir]['trans_list']
                  if t['id'] == idx)
-    trans['annotated'] = annotated_status(new_info)
+    trans.update(annotation_info(new_info))
     anot_file.write_text(json.dumps(new_info))
     return 'OK'
 
