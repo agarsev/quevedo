@@ -20,11 +20,21 @@ darknet:
   options:
     - -dont_show
 
-default_experiment: default
-
 # Web app configuration
 web:
   lang: 'en'
+
+# Experiment configuration
+default_experiment: default # Change the experiment to run with the -E flag
+
+experiments:
+  default:
+    subject: focus on symbol type learning and recognition
+    tag: tag # Use here the tag name (from tag_schema)
+    generate: false # Whether to generate artificial transcriptions
+    split:
+      train_percentage: 80 # Percentage of real annotations to use for training
+      #seed: 0 # Uncomment to set, then train/test sets will always be the same
 
 # Configuration for the artificial transcription generation
 generate:

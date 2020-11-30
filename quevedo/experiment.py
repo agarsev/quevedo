@@ -1,19 +1,19 @@
 # 2020-10-08 Antonio F. G. Sevilla <afgs@ucm.es>
 
-import yaml
-
 
 class Experiment:
     ''' Class representing an experiment part of a dataset.'''
 
     def __init__(self, dataset, name):
         self.name = name
-        self.path = dataset.path / 'experiments' / name
-        info_path = self.path.with_suffix('.yaml')
-        if not info_path.exists():
+        try:
+            self.info = dataset.info['experiments'][name]
+        except ValueError:
             raise SystemExit("No such experiment: {}".format(name))
+
+        self.path = dataset.path / 'experiments' / name
         self.path.mkdir(exist_ok=True)
-        self.info = yaml.safe_load(info_path.read_text())
+
         try:
             self._tag_index = dataset.info['tag_schema'].index(self.info['tag'])
         except ValueError:

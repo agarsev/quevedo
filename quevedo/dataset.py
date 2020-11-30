@@ -35,8 +35,7 @@ class Dataset:
         run([darknet['path'], *args, *darknet['options']])
 
     def list_experiments(self):
-        return [Experiment(self, e.stem) for e in
-                self.path.glob('experiments/*.yaml')]
+        return [Experiment(self, e) for e in self.info['experiments'].keys()]
 
     def get_experiment(self, name):
         if name is None:
@@ -84,9 +83,6 @@ def create(obj):
     (path / 'info.yaml').write_text(default_info.substitute(
         title=title, description=description))
 
-    copyfile((Path(__file__).parent / 'default_experiment.yaml'),
-             (path / 'experiments') / 'default.yaml')
-
     click.secho(("Created dataset '{}' at '{}'\n"
                 "Please read and edit '{}'/info.yaml to adapt it for the dataset")
                 .format(title, path, path), bold=True)
@@ -126,7 +122,7 @@ def add_images(obj, image_dir, name='default'):
 
 
 @click.command()
-@click.argument('train_percentage', type=click.IntRange(0, 100))
+@click.option('--train_percentage', '-t', type=click.IntRange(0, 100), default=60)
 @click.option('--seed', '-s', type=click.INT, help='A seed for the random split algorithm.')
 @click.pass_obj
 def train_test_split(obj, train_percentage, seed):
