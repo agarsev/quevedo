@@ -9,7 +9,7 @@ from quevedo import extract_symbols, generate, darknet, web, dataset as ds
     'split': ds.train_test_split,
     'extract_symbols': extract_symbols.extract_symbols,
     'generate': generate.generate,
-    'pre_train': darknet.train.prepare, 'train': darknet.train.train,
+    'prepare': darknet.train.prepare, 'train': darknet.train.train,
     'test': darknet.test, 'predict': darknet.predict_image,
     'info': ds.info, 'create': ds.create, 'add_images': ds.add_images,
     'web': web.launcher

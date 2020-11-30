@@ -2,7 +2,6 @@
 
 import click
 from itertools import chain
-import json
 from pathlib import Path
 from string import Template
 from shutil import move, rmtree
@@ -11,8 +10,11 @@ from shutil import move, rmtree
 @click.command()
 @click.pass_obj
 def prepare(obj):
-    ''' Creates the files needed for training darknet yolo on this dataset and
+    ''' Creates the files needed for training and testing darknet yolo on this dataset and
     experiment.
+
+    Important: after moving (changing the path) of the dataset, this command
+    *must* be called again before any additional training or predicting.
 
     The transcriptions in the `real` directory must have been tagged. If enabled
     for this experiment, transcriptions in the `generated` directory will also
@@ -22,34 +24,29 @@ def prepare(obj):
     experiment = dataset.get_experiment(obj['experiment'])
     experiment.path.mkdir(exist_ok=True)
 
-    # Collect all symbol names/classes used while making darknet/yolo bounding
-    # box files
-    symbols = []
-    annotation_files = []
-
     all_annotation_files = dataset.get_real()
     if experiment.info['generate']:
         all_annotation_files = chain(all_annotation_files, dataset.get_generated())
 
-    for t in all_annotation_files:
-        if t.anot.get('set', 'train') != 'train':
-            continue
-        bboxes = []
-        for s in t.anot['symbols']:
-            tag = experiment.get_tag(s['tags'])
-            try:
-                index = symbols.index(tag)
-            except ValueError:
-                symbols.append(tag)
-                index = len(symbols) - 1
-            bboxes.append("{} {} {} {} {}\n".format(index, *s['box']))
-        t._txt.write_text("".join(bboxes))
-        annotation_files.append(t)
+    annotation_files = [t for t in all_annotation_files if t.anot.get('set') == 'train']
 
+    # Collect all symbol names/classes (1st pass)
+    symbols = set()
+    for t in annotation_files:
+        symbols |= set(experiment.get_tag(s['tags'])
+                       for s in t.anot['symbols'])
+    # (we need two passes to get a sorted, and thus predictable, symbol list)
+    symbols = sorted(symbols)
     num_classes = len(symbols)
 
     names_file = experiment.path / 'obj.names'
     names_file.write_text("\n".join(symbols) + "\n")
+
+    # Write darknet/yolo bounding box files (2nd pass)
+    for t in annotation_files:
+        t._txt.write_text("".join("{} {} {} {} {}\n".format(
+            symbols.index(experiment.get_tag(s['tags'])), *s['box'])
+            for s in t.anot['symbols']))
 
     # Write train file with the list of files to train on, that is real +
     # generated transcriptions
