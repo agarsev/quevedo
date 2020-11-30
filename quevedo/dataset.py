@@ -3,10 +3,9 @@
 import click
 from pathlib import Path
 import random
-from shutil import copyfile
 from string import Template
 from subprocess import run
-import yaml
+import toml
 
 from quevedo.experiment import Experiment
 from quevedo.transcription import Transcription
@@ -39,7 +38,7 @@ class Dataset:
 
     def get_experiment(self, name):
         if name is None:
-            return Experiment(self, self.info['default_experiment'])
+            return next(e for e in self.list_experiments() if e.info['default'])
         else:
             return Experiment(self, name)
 
@@ -60,10 +59,10 @@ class Dataset:
             self.path = self._path
             return self.path
         if attr == 'info':
-            info_path = self.path / 'info.yaml'
+            info_path = self.path / 'info.toml'
             if not info_path.exists():
                 raise SystemExit("Path '{}' is not a valid dataset".format(self._path))
-            self.info = yaml.safe_load(info_path.read_text())
+            self.info = toml.loads(info_path.read_text())
             return self.info
 
 
@@ -79,12 +78,12 @@ def create(obj):
     title = click.prompt("Title of the dataset")
     description = click.prompt("Description of the dataset")
 
-    default_info = Template((Path(__file__).parent / 'default_info.yaml').read_text())
-    (path / 'info.yaml').write_text(default_info.substitute(
+    default_info = Template((Path(__file__).parent / 'default_info.toml').read_text())
+    (path / 'info.toml').write_text(default_info.substitute(
         title=title, description=description))
 
     click.secho(("Created dataset '{}' at '{}'\n"
-                "Please read and edit '{}'/info.yaml to adapt it for the dataset")
+                "Please read and edit '{}'/info.toml to adapt it for the dataset")
                 .format(title, path, path), bold=True)
 
 
@@ -182,7 +181,7 @@ def info(obj):
     click.echo('Transcriptions generated: {}'.format(style(gen.exists(), num_gen, 'no')))
 
     dn_binary = (dataset.info.get('darknet', {}).get('path'))
-    click.echo('Darknet {} properly configured in info.yaml'.format(
+    click.echo('Darknet {} properly configured in info.toml'.format(
         style(dn_binary is not None and Path(dn_binary).exists(), 'is', 'is not')))
 
     exps = dataset.list_experiments()

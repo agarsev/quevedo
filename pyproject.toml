@@ -8,9 +8,9 @@ authors = ["Antonio F. G. Sevilla <afgs@ucm.es>"]
 python = "^3.7"
 click = "^7.1.1"
 pillow = "^7.1.1"
-pyyaml = "^5.3.1"
 flask = { version = "^1.1.2", optional = true }
 forcelayout = { version = "^1.0.6", optional = true }
+toml = "^0.10.2"
 
 [tool.poetry.extras]
 web = [ "flask" ]

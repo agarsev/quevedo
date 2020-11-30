@@ -39,7 +39,7 @@ def cli(ctx, dataset, experiment):
 @click.pass_context
 def run(ctx, quiet):
     '''Runs all commands for an experiment, from dataset preparation to training
-    and up to testing the result. Configure options in `info.yaml`.'''
+    and up to testing the result. Configure options in `info.toml`.'''
 
     dataset = ctx.obj['dataset']
     experiment = dataset.get_experiment(ctx.obj['experiment'])

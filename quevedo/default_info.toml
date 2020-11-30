@@ -1,0 +1,60 @@
+title = "$title"
+
+description = """ 
+$description
+"""
+
+tag_schema = [ "tag" ]
+# For a multi-tag schema, use:
+# tag_schema = [ "tag1", "tag2" ]
+
+annotation_help = """
+Write here any help for annotators, like lists of symbols or other
+instructions. For example:
+
+Make boxes slightly larger than the symbols, not too tight.
+"""
+
+[darknet]
+path = "darknet/darknet" 
+library = "darknet/libdarknet.so"
+options = [ "-dont_show" ]
+
+[experiments.default]
+default = true # Experiment to use if not specified
+subject = "focus on symbol type learning and recognition"
+tag = "tag" # Choose the tag name from tag_schema to train and test
+generate = false # Whether to generate artificial transcriptions for this experiment
+
+[experiments.default.split]
+train_percentage = 80 # Percentage of real annotations to use for training
+#seed = 0 # Uncomment to set, then train/test sets will always be the same
+
+# Add more experiments like so:
+# [experiment.other]
+# subject = "the subject"
+# tag = "tag"
+# ...
+
+[web]
+lang = "en"
+
+[generate]
+# Configuration for the artificial transcription generation
+count = 500
+width_range = [ 200, 300 ]
+height_range = [ 200, 300 ]
+tag = "tag" # Tag to guide symbol placement
+
+[[generate.params]]
+match = 'one' # Match symbols tagged with class "one"
+mode = 'one' # Only put one of these symbols
+freq = 0.4 # How often to add one of these
+rotate = false
+
+[[generate.params]]
+match = '.*' # Match any symbol (it's a regex)
+mode = 'many' # Add potentially many of these symbols
+max = 3 # How many to potentially add
+prob = 0.6 # Probability for a single symbol to appear (times max = expected number)
+rotate = true

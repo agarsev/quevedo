@@ -18,7 +18,7 @@ try:
 except ImportError:
     can_use_force = False
 
-# Default configuration, override in the dataset's info.yaml file, using the key
+# Default configuration, override in the dataset's info.toml file, using the key
 # 'generate'
 config = {
     'count': 500,  # Number of files to generate
