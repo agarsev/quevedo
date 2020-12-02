@@ -2,9 +2,10 @@
 
 import click
 from itertools import chain
+from os import replace
 from pathlib import Path
 from string import Template
-from shutil import move, rmtree
+from shutil import rmtree
 
 
 @click.command()
@@ -99,5 +100,5 @@ def train(obj):
     darknet_cfg = (experiment.path / 'darknet.cfg').resolve()
     dataset.run_darknet('detector', 'train', darknet_data, darknet_cfg)
 
-    move(str(weight_d / 'darknet_final.weights'), str(experiment.path))
+    replace(str(weight_d / 'darknet_final.weights'), str(experiment.path))
     rmtree(str(weight_d))

@@ -1,3 +1,5 @@
+// 2020-12-02 Antonio F. G. Sevilla <afgs@ucm.es>
+
 import Text from '../i18n.js';
 
 const html = htm.bind(preact.h);

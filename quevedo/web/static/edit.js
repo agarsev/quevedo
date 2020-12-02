@@ -1,32 +1,10 @@
+// 2020-12-02 Antonio F. G. Sevilla <afgs@ucm.es>
+
 import Text from './i18n.js';
+import { useChangeStack, useList } from './common_state.js';
 
 const html = htm.bind(preact.h);
 const { useState, useEffect, useRef } = preactHooks;
-
-function useList (initial_value, cb = () => null) {
-    const [ list, setList ] = useState(initial_value);
-    const set = l => { setList(l); cb(); }
-    return { list, set,
-        add: v => set(list.concat([v])),
-        remove: i => {
-            let nl = list.slice(); nl.splice(i, 1);
-            set(nl);
-        },
-        update: (i, v) => {
-            let nl = list.slice(); nl[i] = v;
-            set(nl);
-        },
-        update_fn: (i, fn) => {
-            let nl = list.slice(); nl[i] = fn(list[i]);
-            set(nl);
-        }
-    };
-}
-
-function preventLostChanges (e) {
-    e.preventDefault();
-    e.returnValue = Text['warning_save'];
-}
 
 const color_list = [ '#FF0000', '#00FF00', '#0000FF', '#FF00FF',
     '#00FFFF', '#880000', '#008800', '#000088', '#888800', '#008888' ];
@@ -42,22 +20,10 @@ preact.render(html`<${App} ...${window.quevedo_data} />`, document.body);
 
 function App ({ title, id, annotation_help, links, anot, columns, exp_list }) {
 
-    /* Prevent loss of changes by unintentional page unloading:
-     * 0: no changes/all changes saved
-     * 1: changes done
-     * 2: changes submitted to server
-     */
-    const [ dirty, setDirty ] = useState(0);
-    const markDirty = () => setDirty(1);
-    useEffect(() => {
-        if (dirty>0) {
-            window.addEventListener('beforeunload', preventLostChanges);
-            return () => window.removeEventListener('beforeunload', preventLostChanges);
-        }
-    }, [dirty]);
+    const changes = useChangeStack();
 
-    const meanings = useList(anot.meanings, markDirty)
-    const symbols = useList(anot.symbols, markDirty)
+    const meanings = useList(anot.meanings, changes)
+    const symbols = useList(anot.symbols, changes)
 
     const [ message, setMessage ] = useState('');
     const setError = resp => {
@@ -69,7 +35,7 @@ function App ({ title, id, annotation_help, links, anot, columns, exp_list }) {
     }
 
     const saveChanges = () => {
-        setDirty(2);
+        changes.setSaving();
         setMessage(Text['saving']);
         fetch(`api/save/${id.full}`, {
             method: 'POST',
@@ -80,7 +46,7 @@ function App ({ title, id, annotation_help, links, anot, columns, exp_list }) {
             })
         }).then(r => {
             if (r.ok) {
-                setDirty(0);
+                changes.setSaved();
                 setMessage(Text['saved']);
             } else throw r;
         }).catch(setError);
@@ -119,8 +85,8 @@ function App ({ title, id, annotation_help, links, anot, columns, exp_list }) {
 
     return html`
         <${Header} ...${{title, id, links, saveChanges,
-            message, show_save: dirty>0, autoAnnotate,
-            exp_list }} />
+            message, show_save: changes.dirty>0, autoAnnotate,
+            exp_list, changes }} />
         <${MeaningList} ...${{meanings}} />
         <h2>${Text['symbols']}</h2>
         <${SymbolList} ...${{id, symbols, columns}} />
@@ -129,7 +95,7 @@ function App ({ title, id, annotation_help, links, anot, columns, exp_list }) {
 }
 
 function Header ({ title, id, links, saveChanges, message, show_save,
-    exp_list, autoAnnotate }) {
+    exp_list, autoAnnotate, changes }) {
 
     const exp_select = useRef({ value: null });
 
@@ -138,6 +104,7 @@ function Header ({ title, id, links, saveChanges, message, show_save,
         <a href="list/${id.dir}">${id.dir}</a> » ${id.num}
         <a href="edit/${links.prev}">⬅️</a>
         <a href="edit/${links.next}" tabIndex=3 >➡️</a>
+        ${changes.some?html`<button onclick=${changes.undo}>↩️</button>`:null}
         ${show_save?html`<button tabIndex=2
             onclick=${saveChanges} >💾</button>`:null}
         <span class="message_text">${message}</span>
@@ -156,7 +123,7 @@ function MeaningList ({ meanings }) {
         <ul>
             ${meanings.list.map((m, i) => html`<li>
                 <${MeaningEntry} value=${m}
-                    change=${val => meanings.update(i, val)}
+                    change=${val => meanings.update(i, val, `MEAN_UPD_${i}`)}
                     remove=${() => meanings.remove(i)} />
             </li>`)}
         </ul>
@@ -209,7 +176,8 @@ function SymbolList ({ id, symbols, columns }) {
                     changeTag=${(t_id, t_val) => {
                         let ntags = s.tags?s.tags.slice():[];
                         ntags[t_id] = t_val;
-                        symbols.update_fn(i, s => ({ ...s, tags: ntags }));
+                        symbols.update_fn(i, s => ({ ...s, tags: ntags }),
+                            `SYMB_${i}_UPD_TAG_${t_id}`);
                     }}
                     columns=${columns}
                     color=${colors.list[i]} changeColor=${c => colors.update(i, c)}
@@ -257,9 +225,10 @@ function Annotation ({ id, symbols, colors, editing_symbol, setEditing }) {
 
     const mouse_down = e => {
         if (editing_symbol === null) {
-            symbols.add({ box: [0,0,0,0], tags: [] });
-            colors.add(getNextColor());
             editing_symbol = { idx: symbols.list.length };
+            symbols.add({ box: [0,0,0,0], tags: [] },
+                `SYMB_${editing_symbol.idx}_UPD_BOX`);
+            colors.add(getNextColor());
         } else {
             editing_symbol = { ...editing_symbol }; // should be cloned
         }
@@ -268,7 +237,7 @@ function Annotation ({ id, symbols, colors, editing_symbol, setEditing }) {
         editing_symbol.start_y = e.clientY - top;
         symbols.update_fn(editing_symbol.idx, s => ({ ...s, box: [
             editing_symbol.start_x/image_width, editing_symbol.start_y/image_height,
-            0,0] }));
+            0,0] }), `SYMB_${editing_symbol.idx}_UPD_BOX`);
         setEditing(editing_symbol);
         e.preventDefault();
         e.stopPropagation();
@@ -286,7 +255,7 @@ function Annotation ({ id, symbols, colors, editing_symbol, setEditing }) {
             (editing_symbol.start_y + bh/2)/image_height, // y
             (bw>=0?bw:-bw)/image_width, // w
             (bh>=0?bh:-bh)/image_height, // h
-        ] }));
+        ] }), `SYMB_${editing_symbol.idx}_UPD_BOX`);
         e.preventDefault();
     }
 
