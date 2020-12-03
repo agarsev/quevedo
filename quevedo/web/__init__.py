@@ -22,10 +22,10 @@ def launcher(obj, host, port, browser, mount_path, language):
     from quevedo.web import app
 
     dataset = obj['dataset']
-    click.echo("Loading dataset '{}'...".format(dataset.info['title']))
+    click.echo("Loading dataset '{}'...".format(dataset.config['title']))
 
     if language is None:
-        language = dataset.info.get('web', {}).get('lang', 'en')
+        language = dataset.config.get('web', {}).get('lang', 'en')
 
     app.load_dataset(dataset, language)
     url = "http://{}:{}".format(host, port)

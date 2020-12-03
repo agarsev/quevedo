@@ -63,7 +63,7 @@ def init_darknet(dataset, experiment):
 
     with DarknetShutup():
         perform_detect = init(
-            libraryPath=cstr(dataset.info['darknet']['library']),
+            libraryPath=cstr(dataset.config['darknet']['library']),
             configPath=cstr(darknet_cfg),
             weightPath=cstr(weights),
             metaPath=cstr(darknet_data))

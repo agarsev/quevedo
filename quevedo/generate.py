@@ -18,7 +18,7 @@ try:
 except ImportError:
     can_use_force = False
 
-# Default configuration, override in the dataset's info.toml file, using the key
+# Default configuration, override in the dataset's config.toml file, using the key
 # 'generate'
 config = {
     'count': 500,  # Number of files to generate
@@ -135,12 +135,12 @@ def generate(obj):
         for f in gen_d.glob('*'):
             f.unlink()
 
-    config.update(dataset.info.get('generate', {}))
+    config.update(dataset.config.get('generate', {}))
 
     if config['seed'] is not None:
         random.seed(config['seed'])
 
-    tag_index = dataset.info['tag_schema'].index(config['tag'])
+    tag_index = dataset.config['tag_schema'].index(config['tag'])
 
     for param in config['params']:
         param['match'] = re.compile(param['match'])

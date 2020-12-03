@@ -19,6 +19,7 @@ class Dataset:
         directory but other commands to fail if it doesn't exist. This is due to how
         click works, and unlikely to be fixed. '''
         self._path = Path(path)
+        self.config_path = self._path / 'config.toml'
 
     def mkdir(self):
         if self._path.exists():
@@ -28,17 +29,17 @@ class Dataset:
         (self.path / 'experiments').mkdir()
 
     def run_darknet(self, *args):
-        darknet = self.info.get('darknet')
+        darknet = self.config.get('darknet')
         if darknet is None:
             raise SystemExit("Darknet not configured for this dataset, configure it first")
         run([darknet['path'], *args, *darknet['options']])
 
     def list_experiments(self):
-        return [Experiment(self, e) for e in self.info['experiments'].keys()]
+        return [Experiment(self, e) for e in self.config['experiments'].keys()]
 
     def get_experiment(self, name):
         if name is None:
-            return next(e for e in self.list_experiments() if e.info['default'])
+            return next(e for e in self.list_experiments() if e.config['default'])
         else:
             return Experiment(self, name)
 
@@ -58,12 +59,11 @@ class Dataset:
                 raise SystemExit("Dataset '{}' does not exist".format(self._path))
             self.path = self._path
             return self.path
-        if attr == 'info':
-            info_path = self.path / 'info.toml'
-            if not info_path.exists():
+        if attr == 'config':
+            if not self.config_path.exists():
                 raise SystemExit("Path '{}' is not a valid dataset".format(self._path))
-            self.info = toml.loads(info_path.read_text())
-            return self.info
+            self.config = toml.loads(self.config_path.read_text())
+            return self.config
 
 
 @click.command()
@@ -78,13 +78,16 @@ def create(obj):
     title = click.prompt("Title of the dataset")
     description = click.prompt("Description of the dataset")
 
-    default_info = Template((Path(__file__).parent / 'default_info.toml').read_text())
-    (path / 'info.toml').write_text(default_info.substitute(
+    default_config = Template((Path(__file__).parent / 'default_config.toml').read_text())
+    dataset.config_path.write_text(default_config.substitute(
         title=title, description=description))
 
     click.secho(("Created dataset '{}' at '{}'\n"
-                "Please read and edit '{}'/info.toml to adapt it for the dataset")
+                "Please read and edit '{}'/config.toml to adapt it for the dataset")
                 .format(title, path, path), bold=True)
+
+    if click.confirm("Edit now?"):
+        config_edit(obj)
 
 
 def style(condition, right, wrong=None):
@@ -160,10 +163,10 @@ def info(obj):
     dataset = obj['dataset']
 
     path = dataset.path
-    info = dataset.info
-    click.secho('{}\n{}'.format(info["title"], '▔' * len(info['title'])), bold=True)
-    click.echo(info["description"])
-    click.secho('Tag schema: {}\n'.format(', '.join(info["tag_schema"])), bold=True)
+    config = dataset.config
+    click.secho('{}\n{}'.format(config["title"], '▔' * len(config['title'])), bold=True)
+    click.echo(config["description"])
+    click.secho('Tag schema: {}\n'.format(', '.join(config["tag_schema"])), bold=True)
 
     real = list(dataset.get_real())
     num_real = count(real)
@@ -180,21 +183,21 @@ def info(obj):
     num_gen = count(gen.glob('*.png'))
     click.echo('Transcriptions generated: {}'.format(style(gen.exists(), num_gen, 'no')))
 
-    dn_binary = (dataset.info.get('darknet', {}).get('path'))
-    click.echo('Darknet {} properly configured in info.toml'.format(
+    dn_binary = (dataset.config.get('darknet', {}).get('path'))
+    click.echo('Darknet {} properly configured in config.toml'.format(
         style(dn_binary is not None and Path(dn_binary).exists(), 'is', 'is not')))
 
     exps = dataset.list_experiments()
     if len(exps) > 1:
         click.echo('\nExperiments:')
         for e in exps:
-            click.echo('- {}: {}'.format(e.name, e.info['subject']))
+            click.echo('- {}: {}'.format(e.name, e.config['subject']))
 
     experiment = dataset.get_experiment(obj['experiment'])
 
     header = "Experiment: '{}'".format(experiment.name)
     click.secho("\n{}\n{}".format(header, '▔' * len(header)), bold=True)
-    click.echo("{}\n".format(experiment.info['subject']))
+    click.echo("{}\n".format(experiment.config['subject']))
 
     darknet = experiment.path / 'darknet.cfg'
     num_txt = sum(1 for r in real if r._txt.exists()) + count(gen.glob('*.txt'))
@@ -206,3 +209,13 @@ def info(obj):
                'has been trained', "hasn't been trained")))
 
     click.echo('')
+
+
+@click.command()
+@click.option('--editor', '-e', help="Editor to use instead of the automatically detected one")
+@click.pass_obj
+def config_edit(obj, editor):
+    ''' Edit dataset configuration file (config.toml).'''
+    dataset = obj['dataset']
+    click.edit(filename=dataset.config_path, editor=editor)
+

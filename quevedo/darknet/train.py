@@ -26,7 +26,7 @@ def prepare(obj):
     experiment.path.mkdir(exist_ok=True)
 
     all_annotation_files = dataset.get_real()
-    if experiment.info['generate']:
+    if experiment.config['generate']:
         all_annotation_files = chain(all_annotation_files, dataset.get_generated())
 
     annotation_files = [t for t in all_annotation_files if t.anot.get('set') == 'train']

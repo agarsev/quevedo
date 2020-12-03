@@ -27,7 +27,7 @@ For more information, and the list of commands, run `poetry run quevedo --help`.
 
 Datasets are plain directories with a specified structure inside:
 
-- `info.toml`: information and configuration for the dataset.
+- `config.toml`: information and configuration for the dataset.
 - `real`: directory with "real" SW transcriptions (from humans), organized in
   subdirectories. Transcriptions are numbered starting from `1`. For each
   transcription, there must be an image file (`{number}.png`). There can be also

@@ -119,10 +119,10 @@ html_template = Template((Path(__file__).parent /
 def index(dir):
     ds = app_data['dataset']
     data = {
-        'title': ds.info['title'],
+        'title': ds.config['title'],
         'path': str(app_data['path']),
-        'description': ds.info['description'],
-        'columns': ds.info['tag_schema'],
+        'description': ds.config['description'],
+        'columns': ds.config['tag_schema'],
     }
 
     if dir is None:
@@ -132,7 +132,7 @@ def index(dir):
         data['list'] = app_data['dirs'][dir]['trans_list']
 
     return html_template.substitute(
-        title=ds.info['title'],
+        title=ds.config['title'],
         mount_path=app_data['mount_path'],
         page='list',
         data=json.dumps(data))
@@ -146,11 +146,11 @@ def edit(dir, idx):
     anot = json.loads((app_data['data_dir'] / (full_id + '.json')).read_text())
     last_id = app_data['dirs'][dir]['last_id']
     data = {
-        'title': ds.info['title'],
+        'title': ds.config['title'],
         'id': {'dir': dir, 'num': idn, 'full': full_id},
-        'annotation_help': ds.info['annotation_help'],
+        'annotation_help': ds.config['annotation_help'],
         'exp_list': app_data['exp_list'],
-        'columns': ds.info['tag_schema'],
+        'columns': ds.config['tag_schema'],
         'links': {
             'prev': '{}/{}'.format(dir, idn - 1 if idn > 1 else last_id),
             'next': '{}/{}'.format(dir, idn + 1 if idn < last_id else 1),
@@ -158,7 +158,7 @@ def edit(dir, idx):
         'anot': anot,
     }
     return html_template.substitute(
-        title='{} - {}'.format(ds.info['title'], idx),
+        title='{} - {}'.format(ds.config['title'], idx),
         mount_path=app_data['mount_path'],
         page='edit',
         data=json.dumps(data))

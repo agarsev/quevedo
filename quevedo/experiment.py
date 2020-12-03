@@ -7,7 +7,7 @@ class Experiment:
     def __init__(self, dataset, name):
         self.name = name
         try:
-            self.info = dataset.info['experiments'][name]
+            self.config = dataset.config['experiments'][name]
         except ValueError:
             raise SystemExit("No such experiment: {}".format(name))
 
@@ -15,10 +15,10 @@ class Experiment:
         self.path.mkdir(exist_ok=True)
 
         try:
-            self._tag_index = dataset.info['tag_schema'].index(self.info['tag'])
+            self._tag_index = dataset.config['tag_schema'].index(self.config['tag'])
         except ValueError:
             raise SystemExit("Tag '{}' for experiment '{}' does not exist"
-                             " in the dataset".format(self.info['tag'], name))
+                             " in the dataset".format(self.config['tag'], name))
 
     def get_tag(self, symbol_tags):
         '''Get the actual tag for this experiment from the list of annotated

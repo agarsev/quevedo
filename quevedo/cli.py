@@ -10,7 +10,7 @@ from quevedo.generate import generate
 
 
 @click.group(commands={
-    'split': ds.train_test_split,
+    'split': ds.train_test_split, 'config': ds.config_edit,
     'extract_symbols': extract_symbols, 'generate': generate,
     'prepare': darknet.train.prepare, 'train': darknet.train.train,
     'test': darknet.test, 'predict': darknet.predict_image,
@@ -39,14 +39,14 @@ def cli(ctx, dataset, experiment):
 @click.pass_context
 def run(ctx, quiet):
     '''Runs all commands for an experiment, from dataset preparation to training
-    and up to testing the result. Configure options in `info.toml`.'''
+    and up to testing the result. Configure options in `config.toml`.'''
 
     dataset = ctx.obj['dataset']
     experiment = dataset.get_experiment(ctx.obj['experiment'])
 
     click.echo("[{}] Preparing dataset {}".format(time.asctime(), dataset.title))
-    ctx.invoke(ds.train_test_split, **experiment.info.get('split', {}))
-    if experiment.info.get('generate', False):
+    ctx.invoke(ds.train_test_split, **experiment.config.get('split', {}))
+    if experiment.config.get('generate', False):
         try:
             ctx.invoke(extract_symbols)
         except click.Abort:
