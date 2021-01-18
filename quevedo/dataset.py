@@ -1,6 +1,7 @@
 # 2020-04-09 Antonio F. G. Sevilla <afgs@ucm.es>
 
 import click
+from os import listdir
 from pathlib import Path
 import random
 from string import Template
@@ -21,10 +22,11 @@ class Dataset:
         self._path = Path(path)
         self.config_path = self._path / 'config.toml'
 
-    def mkdir(self):
-        if self._path.exists():
-            raise SystemExit("Dataset '{}' already exists".format(self._path))
-        self.path = self._path
+    def create(self):
+        p = self._path
+        if p.exists() and len(listdir(p))>0:
+            raise SystemExit("Directory '{}' not empty, aborting".format(p.resolve()))
+        self.path = p
         (self.path / 'real').mkdir(parents=True)  # We also create the required real directory
         (self.path / 'experiments').mkdir()
 
@@ -67,12 +69,12 @@ class Dataset:
 
 
 @click.command()
-@click.pass_obj
-def create(obj):
+@click.pass_context
+def create(ctx):
     ''' Creates a dataset directory with the correct structure.'''
-    dataset = obj['dataset']
+    dataset = ctx.obj['dataset']
 
-    dataset.mkdir()
+    dataset.create()
     path = dataset.path
 
     title = click.prompt("Title of the dataset")
@@ -82,12 +84,12 @@ def create(obj):
     dataset.config_path.write_text(default_config.substitute(
         title=title, description=description))
 
-    click.secho(("Created dataset '{}' at '{}'\n"
-                "Please read and edit '{}'/config.toml to adapt it for the dataset")
-                .format(title, path, path), bold=True)
-
-    if click.confirm("Edit now?"):
-        config_edit(obj)
+    click.secho("Created dataset '{}' at '{}'\n" .format(title, path), bold=True)
+    click.echo("Configuration can be found in 'config.toml'. We recommend \n"
+                "reading it now and adapting it to this dataset, but you can \n"
+                "always do it later or use the command `config`.")
+    if click.confirm("View config file now?", default=True):
+        ctx.invoke(config_edit)
 
 
 def style(condition, right, wrong=None):
@@ -217,5 +219,5 @@ def info(obj):
 def config_edit(obj, editor):
     ''' Edit dataset configuration file (config.toml).'''
     dataset = obj['dataset']
-    click.edit(filename=dataset.config_path, editor=editor)
-
+    info = dataset.config # Ensure valid dataset
+    click.edit(filename=str(dataset.config_path), editor=editor)
