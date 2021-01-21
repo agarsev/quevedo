@@ -1,6 +1,6 @@
 # 2020-04-07 Antonio F. G. Sevilla <afgs@ucm.es>
 
-from flask import Flask, send_from_directory, request
+from flask import Flask, request, send_from_directory
 import json
 import logging
 import os
@@ -20,7 +20,7 @@ def annotation_info(anot):
     return {
         'annotated': len(anot.get('symbols', {})),
         'set': anot.get('set', 'none'),
-        'meanings': anot.get('meanings', []),
+        'notes': anot.get('notes', ''),
     }
 
 

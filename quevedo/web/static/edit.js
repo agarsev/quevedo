@@ -22,7 +22,12 @@ function App ({ title, id, annotation_help, links, anot, columns, exp_list }) {
 
     const changes = useChangeStack();
 
-    const meanings = useList(anot.meanings, changes)
+    const [ notes, _setNotes ] = useState(anot.notes);
+    const setNotes = v => {
+        changes.push(() => _setNotes(notes), "UPD_NOTES");
+        _setNotes(v);
+    };
+
     const symbols = useList(anot.symbols, changes)
 
     const [ message, setMessage ] = useState('');
@@ -41,7 +46,7 @@ function App ({ title, id, annotation_help, links, anot, columns, exp_list }) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                meanings: meanings.list,
+                notes,
                 symbols: symbols.list
             })
         }).then(r => {
@@ -87,7 +92,7 @@ function App ({ title, id, annotation_help, links, anot, columns, exp_list }) {
         <${Header} ...${{title, id, links, saveChanges,
             message, show_save: changes.dirty>0, autoAnnotate,
             exp_list, changes }} />
-        <${MeaningList} ...${{meanings}} />
+        <${NoteEditor} ...${{notes, setNotes}} />
         <h2>${Text['symbols']}</h2>
         <${SymbolList} ...${{id, symbols, columns}} />
         <pre>${annotation_help}</pre>
@@ -115,27 +120,13 @@ function Header ({ title, id, links, saveChanges, message, show_save,
     </header>`;
 }
 
-function MeaningList ({ meanings }) {
-    return html`<div class="MeaningList">
-        <h2>${Text['meanings']}
-            <button onclick=${() => meanings.add()}>➕</button>
-        </h2>
-        <ul>
-            ${meanings.list.map((m, i) => html`<li>
-                <${MeaningEntry} value=${m}
-                    change=${val => meanings.update(i, val, `MEAN_UPD_${i}`)}
-                    remove=${() => meanings.remove(i)} />
-            </li>`)}
-        </ul>
+function NoteEditor ({ notes, setNotes }) {
+    return html`<div class="NoteEditor">
+        <h2>${Text['notes']}</h2>
+        <textarea rows="1" autocomplete="off"
+            oninput=${e => setNotes(e.target.value)}
+            value=${notes} />
     </div>`;
-}
-
-function MeaningEntry ({ value, remove, change }) {
-    return html`
-        <input type="text" value=${value}
-            oninput=${e => change(e.target.value)} />
-        <button onclick=${remove}>🗑️</button>
-    `;
 }
 
 function SymbolList ({ id, symbols, columns }) {

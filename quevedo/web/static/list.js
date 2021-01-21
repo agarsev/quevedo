@@ -2,6 +2,8 @@
 
 import Text from '../i18n.js';
 
+const MAX_TRANS_TITLE = 20;
+
 const html = htm.bind(preact.h);
 const { useState, useRef } = preactHooks;
 
@@ -92,10 +94,13 @@ function NewEntry ({ upload }) {
     </li>`;
 }
 
-function TransEntry ({ dir, id, meanings, set, annotated }) {
+function TransEntry ({ dir, id, notes, set, annotated }) {
     const edit_link = `edit/${dir}/${id}`;
+    const title = notes.length > MAX_TRANS_TITLE?
+        notes.substring(0, MAX_TRANS_TITLE-1)+'…':
+        notes;
     return html`<li class="Entry TransEntry">
-        <h2>${meanings[0]} <span class="set">(${set})</span></h2>
+        <h2>${title} <span class="set">(${set})</span></h2>
         <img src="img/${dir}/${id}.png" onclick=${() => window.location=edit_link}/>
         <p>
             <a href="${edit_link}">📝</a>

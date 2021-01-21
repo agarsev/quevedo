@@ -15,28 +15,19 @@ h2 > * {
     margin: 0 1vw;
 }
 
-.MeaningList, .SymbolList {
+.NoteEditor, .SymbolList {
     display: flex;
     align-items: start;
     justify-content: space-around;
+    margin-bottom: 1.5em;
 }
 
-.MeaningList ul {
+.NoteEditor textarea {
+    font-family: inherit;
+    margin-left: 1.5em;
+    padding: 0.8ex;
     flex: 1;
-    display: inline-block;
 }
-
-.MeaningList li {
-    list-style-type: none;
-    margin-bottom: 0.5ex;
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-}
-
-.MeaningList li > * { margin: 0 0.5ex; }
-
-.MeaningList input[type="text"] { flex: 1; }
 
 .SymbolList div:nth-child(2) {
     flex: 1;

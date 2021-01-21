@@ -29,7 +29,11 @@ export function useChangeStack () {
     const [ some, setSome ] = useState(false);
 
     return { 
-        dirty, setSaving: () => setDirty(2), setSaved: () => setDirty(0),
+        dirty, setSaving: () => setDirty(2),
+        setSaved: () => {
+            setDirty(0);
+            stack.forEach(step => step.dirty = 1);
+        },
         some, // there are changes to undo
         push: (cb, action) => {
             /* cb is the "undoer" function that reverts the change, "action" is
