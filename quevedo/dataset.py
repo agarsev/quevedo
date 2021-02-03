@@ -102,8 +102,9 @@ def style(condition, right, wrong=None):
 @click.pass_obj
 @click.option('--image_dir', '-i', multiple=True, type=click.Path(exists=True),
               required=True, help="Directory from which to import images")
-@click.option('--name', '-n', help="Name for the subset of the dataset where to import the images")
-def add_images(obj, image_dir, name='default'):
+@click.option('--name', '-n', default='default',
+              help="Name for the subset of the dataset where to import the images")
+def add_images(obj, image_dir, name):
     ''' Import images from directories to a dataset.'''
     dataset = obj['dataset']
 
