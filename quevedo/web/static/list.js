@@ -94,11 +94,11 @@ function NewEntry ({ upload }) {
     </li>`;
 }
 
-function TransEntry ({ dir, id, notes, set, annotated }) {
+function TransEntry ({ dir, id, title, set, annotated }) {
     const edit_link = `edit/${dir}/${id}`;
-    const title = notes.length > MAX_TRANS_TITLE?
-        notes.substring(0, MAX_TRANS_TITLE-1)+'…':
-        notes;
+    title = title.length > MAX_TRANS_TITLE?
+        title.substring(0, MAX_TRANS_TITLE-1)+'…':
+        title;
     return html`<li class="Entry TransEntry">
         <h2>${title} <span class="set">(${set})</span></h2>
         <img src="img/${dir}/${id}.png" onclick=${() => window.location=edit_link}/>

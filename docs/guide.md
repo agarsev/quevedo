@@ -107,8 +107,8 @@ directory in the filesystem, and must have `.png` extension. Then, just run
 
 Example:
 
-    $ quevedo add_images -i /home/agarsev/b22_vocab/
-    Importing images from '/home/agarsev/b22_vocab/' to '/home/agarsev/visse/signwriting/real/default'...imported 136
+    $ quevedo add_images -i /home/agarsev/vocab/
+    Importing images from '/home/agarsev/vocab/' to '/home/agarsev/visse/signwriting/real/default'...imported 136
 
 Quevedo reports how many images were succesfully imported, and the path where
 they were stored. As you can see, it put the images in a subdirectory of the

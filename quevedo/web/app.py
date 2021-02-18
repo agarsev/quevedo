@@ -17,10 +17,11 @@ app_data = {}
 
 
 def annotation_info(anot):
+    title_tag = app_data['meta_tags'][0]
     return {
         'annotated': len(anot.get('symbols', {})),
         'set': anot.get('set', 'none'),
-        'notes': anot.get('notes', ''),
+        'title': anot['meta'].get(title_tag, '')
     }
 
 
@@ -33,6 +34,7 @@ def get_transcription_info(dir, id):
 def load_dataset(dataset, language):
     app_data['dataset'] = dataset
     app_data['lang'] = language
+    app_data['meta_tags'] = dataset.config['meta_tags']
     resolved = dataset.path.resolve()
     app_data['path'] = resolved
     data_dir = resolved / 'real'
@@ -121,15 +123,18 @@ def index(dir):
     data = {
         'title': ds.config['title'],
         'path': str(app_data['path']),
-        'description': ds.config['description'],
         'columns': ds.config['tag_schema'],
     }
 
     if dir is None:
         data['list'] = [{'name': k} for k in app_data['dirs'].keys()]
+        data['description'] = ds.config['description']
     else:
         data['dir_name'] = dir
         data['list'] = app_data['dirs'][dir]['trans_list']
+        readme = app_data['data_dir'] / dir / 'README.md'
+        if readme.exists():
+            data['description'] = readme.read_text()
 
     return html_template.substitute(
         title=ds.config['title'],
@@ -150,6 +155,7 @@ def edit(dir, idx):
         'id': {'dir': dir, 'num': idn, 'full': full_id},
         'annotation_help': ds.config['annotation_help'],
         'exp_list': app_data['exp_list'],
+        'meta_tags': app_data['meta_tags'],
         'columns': ds.config['tag_schema'],
         'links': {
             'prev': '{}/{}'.format(dir, idn - 1 if idn > 1 else last_id),

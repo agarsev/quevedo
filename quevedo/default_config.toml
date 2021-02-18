@@ -8,6 +8,10 @@ tag_schema = [ "tag" ]
 # For a multi-tag schema, use:
 # tag_schema = [ "tag1", "tag2" ]
 
+# Meta tags affect the whole transcription, rather than individual symbols. The
+# first one will be used as title for the transcription in the listing.
+meta_tags = [ "filename", "meaning" ]
+
 annotation_help = """
 Write here any help for annotators, like lists of symbols or other
 instructions. For example:

@@ -18,14 +18,14 @@ function getNextColor () {
 
 preact.render(html`<${App} ...${window.quevedo_data} />`, document.body);
 
-function App ({ title, id, annotation_help, links, anot, columns, exp_list }) {
+function App ({ title, id, annotation_help, links, anot, columns, exp_list, meta_tags }) {
 
     const changes = useChangeStack();
 
-    const [ notes, _setNotes ] = useState(anot.notes);
-    const setNotes = v => {
-        changes.push(() => _setNotes(notes), "UPD_NOTES");
-        _setNotes(v);
+    const [ meta, _setMeta ] = useState(anot.meta);
+    const setMeta = (k, v) => {
+        changes.push(() => _setMeta(meta), `UPD_META_${k}`);
+        _setMeta({ ...meta, [k]: v });
     };
 
     const symbols = useList(anot.symbols, changes)
@@ -46,7 +46,7 @@ function App ({ title, id, annotation_help, links, anot, columns, exp_list }) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                notes,
+                meta,
                 symbols: symbols.list
             })
         }).then(r => {
@@ -92,7 +92,7 @@ function App ({ title, id, annotation_help, links, anot, columns, exp_list }) {
         <${Header} ...${{title, id, links, saveChanges,
             message, show_save: changes.dirty>0, autoAnnotate,
             exp_list, changes }} />
-        <${NoteEditor} ...${{notes, setNotes}} />
+        <${MetaEditor} ...${{meta_tags, meta, setMeta}} />
         <h2>${Text['symbols']}</h2>
         <${SymbolList} ...${{id, symbols, columns}} />
         <pre>${annotation_help}</pre>
@@ -120,12 +120,16 @@ function Header ({ title, id, links, saveChanges, message, show_save,
     </header>`;
 }
 
-function NoteEditor ({ notes, setNotes }) {
-    return html`<div class="NoteEditor">
-        <h2>${Text['notes']}</h2>
-        <textarea rows="1" autocomplete="off"
-            oninput=${e => setNotes(e.target.value)}
-            value=${notes} />
+function MetaEditor ({ meta_tags, meta, setMeta }) {
+    return html`<div class="MetaEditor">
+        <h2>${Text['meta']}</h2>
+        <table>${meta_tags.map(k => html`<tr>
+            <th>${k}:</th>
+            <td><textarea rows="1" autocomplete="off"
+                oninput=${e => setMeta(k, e.target.value)}
+                value=${meta[k] || ''} />
+            </td>
+        </tr>`)}</table>
     </div>`;
 }
 

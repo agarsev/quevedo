@@ -5,28 +5,34 @@ header select {
 }
 
 h2 {
-    display: inline-flex;
     margin-bottom: 1ex;
-    align-items: center;
 }
 
-h2 > * {
-    flex: 0;
-    margin: 0 1vw;
-}
-
-.NoteEditor, .SymbolList {
+.MetaEditor, .SymbolList {
     display: flex;
     align-items: start;
     justify-content: space-around;
     margin-bottom: 1.5em;
 }
 
-.NoteEditor textarea {
-    font-family: inherit;
+.MetaEditor table {
     margin-left: 1.5em;
-    padding: 0.8ex;
     flex: 1;
+}
+
+.MetaEditor td {
+    width: 100%;
+}
+
+.MetaEditor th {
+    text-align: right;
+    padding-right: 1ex;
+}
+
+.MetaEditor textarea {
+    font-family: inherit;
+    padding: 0.5ex;
+    width: 100%;
 }
 
 .SymbolList div:nth-child(2) {

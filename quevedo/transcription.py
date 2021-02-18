@@ -16,17 +16,19 @@ class Transcription:
         self.image = path.with_suffix('.png')
         self._txt = path.with_suffix('.txt')
 
-    def _init_json(self, notes=''):
+    def _init_json(self, meta={}):
         self._json.write_text(json.dumps({
-            "notes": notes,
             "symbols": [],
             "set": "train",
+            "meta": meta,
         }))
 
     def create_from(self, image=None, binary_data=None):
         if image is not None:
             copyfile(image, self.image)
-            self._init_json(notes=image.stem)
+            self._init_json(meta={
+                'filename': image.stem
+            })
         elif binary_data is not None:
             self.image.write_bytes(binary_data)
             self._init_json()
