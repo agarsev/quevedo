@@ -45,10 +45,15 @@ class Dataset:
         else:
             return Experiment(self, name)
 
-    def get_real(self):
-        '''Returns a generator that yields all real annotations'''
+    def get_real(self, subset=None):
+        '''Returns a generator that yields all real annotations, or only those
+        in a given subset.'''
+        if subset is None:
+            pattern = '**/*.png'
+        else:
+            pattern = subset+'/*.png'
         return (Transcription(file) for file in
-                (self.path / 'real').glob('**/*.png'))
+                (self.path / 'real').glob(pattern))
 
     def get_generated(self):
         '''Returns a generator that yields all generated annotations'''
