@@ -182,6 +182,25 @@ function SymbolList ({ id, symbols, columns }) {
                         e.stopPropagation();
                     }}
                     editing=${current}
+                    navigate=${e => { switch(e.key) {
+                        case "Enter": setEditing(null); break;
+                        case "ArrowDown": {
+                            let ts = Array.from(document.querySelectorAll(".SymbolEntry input[type=text]"));
+                            let act = ts.findIndex(el => el==document.activeElement);
+                            let nx = act+columns.length;
+                            if (nx < ts.length) ts[nx].focus();
+                            break; }
+                        case "ArrowUp": {
+                            let ts = Array.from(document.querySelectorAll(".SymbolEntry input[type=text]"));
+                            let act = ts.findIndex(el => el==document.activeElement);
+                            let nx = act-columns.length;
+                            if (nx >= 0) ts[nx].focus();
+                            break; }
+                        default: return;
+                        }
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }}
                 />`;
             })}</tbody>
         </table></div>
@@ -189,7 +208,7 @@ function SymbolList ({ id, symbols, columns }) {
 }
 
 function SymbolEntry ({ tags, changeTag, columns, remove,
-        color, changeColor, markEditing, editing }) {
+        color, changeColor, markEditing, editing, navigate }) {
     return html`<tr class=${`SymbolEntry ${editing?'editing':''}`}
         onmousedown=${markEditing}>
         <td><input type=color value=${color}
@@ -197,6 +216,7 @@ function SymbolEntry ({ tags, changeTag, columns, remove,
         ${columns.map((c, i) => html`<td><input type=text
             placeholder=${c} tabIndex=1 value=${tags[i]}
             oninput=${e => changeTag(i, e.target.value)}
+            onkeydown=${navigate}
             onfocus=${markEditing} /></td>`)}
         <td><button onclick=${remove}>🗑️</button></td>
     </tr>`;
