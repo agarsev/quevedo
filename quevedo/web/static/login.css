@@ -1,0 +1,41 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+.LoginBox {
+    display: inline-block;
+    margin: auto;
+    text-align: right;
+}
+
+.LoginBox label {
+    display: flex;
+    align-items: baseline;
+}
+
+.LoginBox span {
+    margin-right: 1em;
+}
+
+.LoginBox input {
+    width: 200px;
+    margin: 0.6ex 0 0.6ex auto;
+}
+
+.LoginBox button {
+    margin-top: 0.6ex;
+}
+
+.error {
+    color: maroon;
+    font-style: italic;
+}
+
+.loading {
+    color: darkgray;
+    font-style: italic;
+}

@@ -1,6 +1,7 @@
 # 2020-04-07 Antonio F. G. Sevilla <afgs@ucm.es>
 
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_from_directory, session, redirect, url_for
+import hashlib
 import json
 import logging
 import os
@@ -42,13 +43,18 @@ def load_dataset(dataset, language):
     app_data['exp_list'] = [e.name for e in dataset.list_experiments() if
                             e.is_trained()]
     app_data['dirs'] = {}
+    app_data['config'] = dataset.config['web']
+    app.secret_key = app_data['config']['secret_key']
     for d in app_data['data_dir'].glob('*'):
         if not d.is_dir():
             continue
         name = str(d.stem)
         ids = sorted(int(trans.stem) for trans in
                      d.glob("*.png"))
-        dir_data = {'last_id': ids[-1]}
+        if len(ids)>0:
+            dir_data = {'last_id': ids[-1]}
+        else:
+            dir_data = {'last_id': 0 }
         dir_data['trans_list'] = list(map(lambda id: get_transcription_info(name, id),
                                           ids))
         app_data['dirs'][name] = dir_data
@@ -110,15 +116,46 @@ def get_auto_annotations(dir, idx):
     }
 
 
+@app.route('/api/login', methods=["POST"])
+def do_login():
+    data = request.get_json()
+    try:
+        user = app_data['config']['users'][data["user"]]
+        password = hashlib.new("sha1", data["pass"].encode("utf8")).hexdigest()
+        if password == user['password']:
+            session['user'] = user
+            return redirect(url_for('index'))
+    except KeyError:
+        pass
+    return "Unauthorized", 403
+
+
 # ----------------- WEB APP ----------------
 
 html_template = Template((Path(__file__).parent /
                           'static/page.html').read_text())
 
 
+@app.route('/login')
+def login_page():
+    if app_data['config']['public']:
+        return redirect(url_for('index'))
+    ds = app_data['dataset']
+    return html_template.substitute(
+        title=ds.config['title'],
+        mount_path=app_data['mount_path'],
+        page='login',
+        data="{}"
+    )
+
+
 @app.route('/list/<dir>')
 @app.route('/', defaults={'dir': None})
 def index(dir):
+    if (not app_data['config']['public'] and 
+            session.get('user', None) is None):
+        return redirect(url_for('login_page'))
+
     ds = app_data['dataset']
     data = {
         'title': ds.config['title'],

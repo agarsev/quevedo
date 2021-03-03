@@ -89,7 +89,7 @@ function NewEntry ({ upload }) {
     return html`<li class="Entry DirEntry">
         <h2>${Text['new_entry']}</h2>
         <a href="#" onclick=${clickLink}>📤</a>
-        <input ref=${inputRef} type="file" accept="image/*"
+        <input ref=${inputRef} type="file" accept=".png"
             onchange=${sendFile} style="display: none" />
     </li>`;
 }

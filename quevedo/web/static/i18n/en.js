@@ -3,6 +3,12 @@
 export default {
     // Common
     error: 'Error',
+    // LOGIN.js
+    user: 'User', // username
+    pass: 'Password', // password
+    login: 'Login', // login button text
+    loadlogin: 'Loading...', // login info sent
+    wronglogin: 'Wrong username or password', // Error during login
     // LIST.js
     columns: 'Columns', // Tag schema info
     back: 'Back to list', // Link back to home view

@@ -16,6 +16,7 @@ header {
     border-bottom: 1px solid gray;
     display: flex;
     align-items: center;
+    white-space: nowrap;
 }
 
 header > *:first-child {
