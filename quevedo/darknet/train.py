@@ -47,5 +47,6 @@ def train(obj):
     dataset.run_darknet(experiment.get_network_type(),
                         'train', darknet_data, darknet_cfg)
 
-    replace(str(weight_d / 'darknet_final.weights'), str(experiment.path))
+    replace(str(weight_d / 'darknet_final.weights'),
+            str(experiment.path / 'darknet_final.weights'))
     rmtree(str(weight_d))

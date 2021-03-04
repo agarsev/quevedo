@@ -1,7 +1,9 @@
 # 2020-10-08 Antonio F. G. Sevilla <afgs@ucm.es>
 
 from itertools import chain
+from os import symlink
 from pathlib import Path
+from shutil import rmtree
 from string import Template
 
 
@@ -66,6 +68,14 @@ class Experiment:
         task = self.config['task']
         annotation_files = self.get_train_files()
 
+        train_path = self.path / 'train'
+        if task == 'classify':
+            try:
+                train_path.mkdir()
+            except FileExistsError:
+                rmtree(train_path)
+                train_path.mkdir()
+
         # Collect all symbol names/classes (1st pass)
         symbols = set()
         for t in annotation_files:
@@ -81,20 +91,25 @@ class Experiment:
         names_file = self.path / 'obj.names'
         names_file.write_text("\n".join(symbols) + "\n")
 
-        # Write darknet/yolo bounding box files (2nd pass)
+        # (2nd pass)
+        train_file = self.path / 'train.txt'
+        train_fd = open(train_file, 'w')
+        num = 0
         for t in annotation_files:
             if task == 'detect':
+                # Write darknet/yolo bounding box files
                 t._txt.write_text("".join("{} {} {} {} {}\n".format(
                     symbols.index(self.get_tag(s['tags'])), *s['box'])
                     for s in t.anot['symbols']))
+                train_fd.write("{}\n".format(t.image.resolve()))
             elif task == 'classify':
-                t._txt.write_text("{}\n".format(self.get_tag(t.anot['tags'])))
-
-        # Write train file with the list of files to train on, that is real +
-        # generated transcriptions
-        train_file = self.path / 'train.txt'
-        train_file.write_text("\n".join(str(f.image.resolve())
-                                        for f in annotation_files) + "\n")
+                # Symlink real annotation with correct name
+                num = num + 1
+                link_name = (train_path / "{}_{}.png".format(
+                    self.get_tag(t.anot['tags']), num)).resolve()
+                symlink(t.image.resolve(), link_name)
+                train_fd.write("{}\n".format(link_name))
+        train_fd.close()
 
         # In this directory, the weights of the trained network will be stored
         weight_d = self.path / 'weights'
@@ -126,6 +141,6 @@ class Experiment:
             template = Template((Path(__file__).parent / 'darknet/alexnet.cfg').read_text())
             net_config = template.substitute(
                 num_classes=num_classes,
-                num_max_batches=num_classes * 2000,  # maybe?
-                num_connected=num_classes * 5)  # Complete bs by me
+                num_max_batches=num_classes * 500,  # maybe?
+                num_connected=num_classes * 10)  # Read somewhere how to choose these params
             (self.path / 'darknet.cfg').write_text(net_config)
