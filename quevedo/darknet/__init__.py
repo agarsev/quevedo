@@ -15,4 +15,4 @@ def predict_image(obj, image):
     dataset = obj['dataset']
     experiment = dataset.get_experiment(obj['experiment'])
     init_darknet(dataset, experiment)
-    print(predict(image))
+    print(predict(image, experiment))

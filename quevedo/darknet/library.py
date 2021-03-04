@@ -207,7 +207,8 @@ def init (libraryPath=None, configPath=None, weightPath=None, metaPath=None):
                                        c_float, c_float, POINTER(c_int), c_int, c_int]
     network_predict_batch.restype = POINTER(DETNUMPAIR)
 
-    def classify(net, meta, im):
+    def classify(net, meta, image):
+        im = load_image(image, 0, 0)
         out = predict_image(net, im)
         res = []
         for i in range(meta.classes):
@@ -302,4 +303,8 @@ def init (libraryPath=None, configPath=None, weightPath=None, metaPath=None):
         global metaMain, netMain, altNames
         return detect(netMain, metaMain, imagePath, thresh)
 
-    return performDetect
+    def performClassify(imagePath=None):
+        global metaMain, netMain, altNames
+        return classify(netMain, metaMain, imagePath)
+
+    return performDetect, performClassify

@@ -6,7 +6,9 @@ import sys
 
 from quevedo.darknet.library import init
 
-perform_detect = None  # Function that performs the actual detection after loading the neural net
+# Functions that perform the actual predictions after loading the neural net
+perform_detect = None
+perform_classify = None
 
 
 def cstr(s):
@@ -49,7 +51,7 @@ class DarknetShutup(object):
 def init_darknet(dataset, experiment):
     '''Loads the trained neural network. Must be called before predict.'''
 
-    global perform_detect
+    global perform_detect, perform_classify
 
     if not (experiment.path / 'darknet.cfg').exists():
         raise SystemExit("Neural network has not been trained")
@@ -62,20 +64,23 @@ def init_darknet(dataset, experiment):
         raise SystemExit("Neural network has not been trained")
 
     with DarknetShutup():
-        perform_detect = init(
+        perform_detect, perform_classify = init(
             libraryPath=cstr(dataset.config['darknet']['library']),
             configPath=cstr(darknet_cfg),
             weightPath=cstr(weights),
             metaPath=cstr(darknet_data))
 
 
-def predict(image_path):
+def predict(image_path, experiment):
     '''Get symbols in an image using the trained neural network (which must have
     been loaded using init_darknet)'''
 
-    width, height = Image.open(image_path).size
-    return [{
-        'name': s,
-        'confidence': c,
-        'box': make_bbox(width, height, *b)
-    } for (s, c, b) in perform_detect(cstr(image_path))]
+    if experiment.config['task'] == 'detect':
+        width, height = Image.open(image_path).size
+        return [{
+            'name': s,
+            'confidence': c,
+            'box': make_bbox(width, height, *b)
+        } for (s, c, b) in perform_detect(cstr(image_path))]
+    elif experiment.config['task'] == 'classify':
+        return [c for c in perform_classify(cstr(image_path))]

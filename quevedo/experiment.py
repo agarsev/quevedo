@@ -110,8 +110,7 @@ class Experiment:
                 names_file_name,
                 names_file.resolve(), weight_d.resolve()))
 
-        # Write net configuration. See the darknet.cfg file provided from upstream,
-        # the template is filled in here.
+        # Write net configuration. See the cfg template file provided from upstream
         if task == 'detect':
             num_max_batches = num_classes * 2000
             template = Template((Path(__file__).parent / 'darknet/yolo.cfg').read_text())
@@ -123,6 +122,10 @@ class Experiment:
                 num_steps_2=int(num_max_batches * 90 / 100))
             (self.path / 'darknet.cfg').write_text(net_config)
         if task == 'classify':
+            num_max_batches = num_classes * 2000
             template = Template((Path(__file__).parent / 'darknet/alexnet.cfg').read_text())
-            net_config = template.substitute(num_classes=num_classes)
+            net_config = template.substitute(
+                num_classes=num_classes,
+                num_max_batches=num_classes * 2000,  # maybe?
+                num_connected=num_classes * 5)  # Complete bs by me
             (self.path / 'darknet.cfg').write_text(net_config)

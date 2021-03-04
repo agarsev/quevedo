@@ -76,7 +76,7 @@ def test(obj, do_print, csv):
     for trans in dataset.get_real():
         if trans.anot.get('set') != 'test':
             continue
-        predictions = predict(trans.image)
+        predictions = predict(trans.image, experiment)
         for sym in trans.anot['symbols']:
             tag = experiment.get_tag(sym['tags'])
             real = {'box': sym['box'], 'name': tag}
