@@ -60,6 +60,11 @@ class Dataset:
         return (Transcription(file) for file in
                 (self.path / 'generated').glob('*.png'))
 
+    def get_symbols(self):
+        '''Returns a generator for all the symbols.'''
+        return (Transcription(file) for file in
+                (self.path / 'symbols').glob('*.png'))
+
     def __getattr__(self, attr):
         if attr == 'path':
             if not self._path.exists():
