@@ -2,38 +2,53 @@
 
 import click
 import json
+from pathlib import Path
 from PIL import Image
+
+from quevedo.annotation import Annotation, Target
 
 
 @click.command()
+@click.option('-f', '--from', 'dir_from', default='default',
+              help='''Transcription subset from which to extract symbols''')
+@click.option('-t', '--to', 'dir_to', default='default',
+              help='''Symbol subset where to place extracted symbols''')
+@click.option('-m', '--merge', 'existing', flag_value='m',
+              help='''Merge new symbols with existing ones, if any.''')
+@click.option('-r', '--replace', 'existing', flag_value='r',
+              help='''Replace old symbols with new ones, if any.''')
 @click.pass_obj
-def extract_symbols(obj):
-    '''Extracts the symbols from the *real* transcriptions into their own files,
-    and places them in the `symbols` directory.'''
+def extract_symbols(obj, dir_from, dir_to, existing):
+    '''Extracts symbols from annotated transcriptions into their own files'''
 
     dataset = obj['dataset']
-    symbol_d = dataset.path / 'symbols'
+    symbol_d = dataset.path / 'symbols' / dir_to
 
     try:
         symbol_d.mkdir()
     except FileExistsError:
-        click.confirm('Symbol directory already exists. Overwrite?', abort=True)
-        for f in symbol_d.glob('*'):
-            f.unlink()
+        if existing is None:
+            existing = click.prompt('''Symbol directory already exists.
+                What to do? (m)erge/(r)eplace/(a)bort''', default='a')[0]
+        if existing == 'r':
+            for f in symbol_d.glob('*'):
+                f.unlink()
+        elif existing == 'm':
+            pass
+        else:
+            click.Abort()
 
-    number = 0
-    for t in dataset.get_real():
-        if t.anot['set'] != 'train':
-            continue
+    number = max((int(f.stem) for f in symbol_d.glob('*.png')), default=0) + 1
+    for t in dataset.get_real(subset=dir_from):
         number = number + 1
         transcription = Image.open(t.image)
         width, height = transcription.size
-        for idx, symb in enumerate(t.anot['symbols'], start=1):
+        for symb in t.anot['symbols']:
             w = float(symb['box'][2]) * width
             h = float(symb['box'][3]) * height
             l = float(symb['box'][0]) * width - (w / 2)
             u = float(symb['box'][1]) * height - (h / 2)
             region = transcription.crop((l, u, l + w, u + h))
-            filename = symbol_d / ('{}_{}'.format(number, idx))
-            region.save(filename.with_suffix('.png'))
-            filename.with_suffix('.json').write_text(json.dumps({'tags': symb['tags']}))
+            symbol = Annotation(symbol_d / number, target=Target.SYMB)
+            symbol.create_from(pil_image=region, set=t.anot['set'])
+            symbol.save()

@@ -9,7 +9,7 @@ from subprocess import run
 import toml
 
 from quevedo.experiment import Experiment
-from quevedo.transcription import Transcription
+from quevedo.annotation import Annotation, Target
 
 
 class Dataset:
@@ -28,6 +28,7 @@ class Dataset:
             raise SystemExit("Directory '{}' not empty, aborting".format(p.resolve()))
         self.path = p
         (self.path / 'real').mkdir(parents=True)  # We also create the required real directory
+        (self.path / 'symbols').mkdir()
         (self.path / 'experiments').mkdir()
 
     def run_darknet(self, *args):
@@ -52,17 +53,17 @@ class Dataset:
             pattern = '**/*.png'
         else:
             pattern = subset+'/*.png'
-        return (Transcription(file) for file in
+        return (Annotation(file, target=Target.TRAN) for file in
                 (self.path / 'real').glob(pattern))
 
-    def get_generated(self):
-        '''Returns a generator that yields all generated annotations'''
-        return (Transcription(file) for file in
-                (self.path / 'generated').glob('*.png'))
-
-    def get_symbols(self):
-        '''Returns a generator for all the symbols.'''
-        return (Transcription(file) for file in
+    def get_symbols(self, subset=None):
+        '''Returns a generator for all the symbols, or only those in a given
+        subset.'''
+        if subset is None:
+            pattern = '**/*.png'
+        else:
+            pattern = subset+'/*.png'
+        return (Annotation(file, target=Target.SYMB) for file in
                 (self.path / 'symbols').glob('*.png'))
 
     def __getattr__(self, attr):
@@ -96,8 +97,8 @@ def create(ctx):
 
     click.secho("Created dataset '{}' at '{}'\n" .format(title, path), bold=True)
     click.echo("Configuration can be found in 'config.toml'. We recommend \n"
-                "reading it now and adapting it to this dataset, but you can \n"
-                "always do it later or use the command `config`.")
+               "reading it now and adapting it to this dataset, but you can \n"
+               "always do it later or use the command `config`.")
     if click.confirm("View config file now?", default=True):
         ctx.invoke(config_edit)
 
@@ -114,12 +115,38 @@ def style(condition, right, wrong=None):
               required=True, help="Directory from which to import images")
 @click.option('--name', '-n', default='default',
               help="Name for the subset of the dataset where to import the images")
-def add_images(obj, image_dir, name):
+@click.option('--symb', '-s', 'target', flag_value='s',
+              help="Import the images as symbols rather than full transcriptions")
+@click.option('--tran', '-t', 'target', flag_value='t', default=True,
+              help="Import the images as transcriptions (the default)")
+@click.option('-m', '--merge', 'existing', flag_value='m',
+              help='''Merge new images with existing ones, if any.''')
+@click.option('-r', '--replace', 'existing', flag_value='r',
+              help='''Replace old images with new ones, if any.''')
+def add_images(obj, image_dir, name, target, existing):
     ''' Import images from directories to a dataset.'''
     dataset = obj['dataset']
 
-    dest = dataset.path / 'real' / name
-    dest.mkdir(parents=True, exist_ok=True)
+    if target == 'symb':
+        dest = dataset.path / 'symbols' / name
+        target = Target.SYMB
+    else:
+        dest = dataset.path / 'real' / name
+        target = Target.TRAN
+
+    try:
+        dest.mkdir()
+    except FileExistsError:
+        if existing is None:
+            existing = click.prompt('''Target directory already exists.
+                What to do? (m)erge/(r)eplace/(a)bort''', default='a')[0]
+        if existing == 'r':
+            for f in dest.glob('*'):
+                f.unlink()
+        elif existing == 'm':
+            pass
+        else:
+            click.Abort()
 
     idx = max((int(f.stem) for f in dest.glob('*.png')), default=0) + 1
     for d in image_dir:
@@ -128,8 +155,8 @@ def add_images(obj, image_dir, name):
         num = 0
         d = Path(d)
         for img in d.glob('*.png'):
-            new_trans = Transcription(dest / str(idx))
-            new_trans.create_from(image=img)
+            new_tran = Annotation(dest / str(idx), target)
+            new_tran.create_from(image=img)
             idx = idx + 1
             num = num + 1
         click.echo("imported {}".format(style(num > 0, num)))
@@ -137,20 +164,37 @@ def add_images(obj, image_dir, name):
 
 
 @click.command()
+@click.option('--subsets', multiple=True, help="Subsets to split.")
+@click.option('--symb', '-s', 'target', flag_value='s',
+              help="Split symbols")
+@click.option('--tran', '-t', 'target', flag_value='t', default=True,
+              help="Split transcriptions (the default)")
 @click.option('--train_percentage', '-t', type=click.IntRange(0, 100), default=60)
-@click.option('--seed', '-s', type=click.INT, help='A seed for the random split algorithm.')
+@click.option('--seed', type=click.INT, help='A seed for the random split algorithm.')
 @click.pass_obj
-def train_test_split(obj, train_percentage, seed):
-    '''Split real annotation files into two sets, one for training and one for
-    test. Test files will not be used for symbol extraction either. The split is
-    common to all experiments.'''
+def train_test_split(obj, subsets, target, train_percentage, seed):
+    '''Split annotation files in the given subsets into two sets, one for
+    training and one for test, in the given subsets. This split will not be done
+    physically but rather as a mark on the annotation file.
+
+    If no subsets are given, all annotations will be marked. If homogeneous
+    split is required, call this command once for each set.'''
     dataset = obj['dataset']
 
     random.seed(seed)
 
-    real = list(dataset.get_real())
-    random.shuffle(real)
+    if target == 's':
+        if len(subsets)==0:
+            real = list(dataset.get_real())
+        else:
+            real = [an for an in (dataset.get_real(d) for d in subsets)]
+    else:
+        if len(subsets)==0:
+            real = list(dataset.get_symbols())
+        else:
+            real = [an for an in (dataset.get_symbols(d) for d in subsets)]
 
+    random.shuffle(real)
     split_point = round(len(real) * train_percentage / 100)
 
     for t in real[:split_point]:
