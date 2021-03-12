@@ -73,11 +73,11 @@ def test(obj, do_print, csv):
     false_positives = dict()
     false_negatives = dict()
 
-    for trans in dataset.get_real():
-        if trans.anot.get('set') != 'test':
+    for tran in dataset.get_real():
+        if tran.anot.get('set') != 'test':
             continue
-        predictions = predict(trans.image, experiment)
-        for sym in trans.anot['symbols']:
+        predictions = predict(tran.image, experiment)
+        for sym in tran.anot['symbols']:
             tag = experiment.get_tag(sym['tags'])
             real = {'box': sym['box'], 'name': tag}
             if tag not in all_symbols:

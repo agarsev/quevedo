@@ -11,13 +11,6 @@ generation). Later we can put these again into some kind of chain/pipeline that
 can include "experiments" (probably should rename) and other things (like
 train test split, generation, and new preprocessing)
 
-# TO TEST
-
-- [ ] add images
-- [ ] train test split
-- [ ] extract, generate, check only train used
-- [ ] train and test
-
 # PLAN
 
 Right now we are moving to an architecture where symbols are very much like
@@ -35,7 +28,7 @@ classify)
         remove get_generated), confirmation when overwriting. Marked all as
         "train", only use training symbols.
     - [X] remove extra things from experiment running
-    - [ ] Rename trans to tran everywhere
+    - [X] Rename trans to tran everywhere
     - [X] get_generated no longer works, adapt experiments to include multiple
         subsets
 - [ ] Adapt for classifier and new symbol arch
@@ -53,6 +46,13 @@ classify)
 - [ ] Add preproc option for experiments, create rotator script (in examples maybe)
    that uses rotation tab to realign symbols according to rotation tab
 - [ ] Anotar vocab JM y entrenar incrementalmente como dice el folio
+
+## test everything correct
+
+- [ ] add images
+- [ ] train test split
+- [ ] extract, generate, check only train used
+- [ ] train and test
 
 
 # ISSUES (move to github?)

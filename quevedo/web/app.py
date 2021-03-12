@@ -49,13 +49,13 @@ def load_dataset(dataset, language):
         if not d.is_dir():
             continue
         name = str(d.stem)
-        ids = sorted(int(trans.stem) for trans in
+        ids = sorted(int(tran.stem) for tran in
                      d.glob("*.png"))
         if len(ids)>0:
             dir_data = {'last_id': ids[-1]}
         else:
             dir_data = {'last_id': 0 }
-        dir_data['trans_list'] = list(map(lambda id: get_transcription_info(name, id),
+        dir_data['tran_list'] = list(map(lambda id: get_transcription_info(name, id),
                                           ids))
         app_data['dirs'][name] = dir_data
 
@@ -72,21 +72,21 @@ def edit_post(dir, idx):
     anot_file = app_data['data_dir'] / '{}/{}.json'.format(dir, idx)
     anot = json.loads(anot_file.read_text())
     new_info = {**anot, **request.get_json()}
-    trans = next(t for t in app_data['dirs'][dir]['trans_list']
-                 if t['id'] == idx)
-    trans.update(annotation_info(new_info))
+    tran = next(t for t in app_data['dirs'][dir]['tran_list']
+                if t['id'] == idx)
+    tran.update(annotation_info(new_info))
     anot_file.write_text(json.dumps(new_info))
     return 'OK'
 
 
 @app.route('/api/new/<dir>', methods=["POST"])
-def new_trans(dir):
+def new_tran(dir):
     dir_data = app_data['dirs'][dir]
     idx = dir_data['last_id'] + 1
     dir_data['last_id'] = idx
     new_t = Transcription(app_data['data_dir'] / '{}/{}'.format(dir, idx))
     new_t.create_from(binary_data=request.data)
-    dir_data['trans_list'].append(get_transcription_info(dir, idx)),
+    dir_data['tran_list'].append(get_transcription_info(dir, idx)),
     return {'id': new_t.id}
 
 
@@ -168,7 +168,7 @@ def index(dir):
         data['description'] = ds.config['description']
     else:
         data['dir_name'] = dir
-        data['list'] = app_data['dirs'][dir]['trans_list']
+        data['list'] = app_data['dirs'][dir]['tran_list']
         readme = app_data['data_dir'] / dir / 'README.md'
         if readme.exists():
             data['description'] = readme.read_text()
