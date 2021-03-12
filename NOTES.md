@@ -10,6 +10,7 @@
 
 - [ ] add images
 - [ ] train test split
+- [ ] extract, generate, check only train used
 
 # PLAN
 
@@ -18,14 +19,15 @@ Right now we are moving to an architecture where symbols are very much like
 classify)
 
 - [X] Make sure CNN works (previously, classifier symlink names not correctly generated)
-- [o] Change symbol management to separate directories:
+- [O] Change symbol management to separate directories:
     - [X] class Annotation with enum Trans/Symbol
     - [X] add_images flag either trans or symbols
     - [X] train test split
     - [X] extract_symbols specifies from (tran) and to (symb), and preserves
-        train/test mark IMPORTANT (TODO: TEST!!!)
-    - [ ] generate from (symb) to (trans) (preserve train/test, mark somehow,
-        remove get_generated), confirmation when overwriting
+        train/test mark
+    - [X] generate from (symb) to (trans) (preserve train/test, mark somehow,
+        remove get_generated), confirmation when overwriting. Marked all as
+        "train", only use training symbols.
     - [ ] Experiment configuration, if detect, can have `generate = [ list of symbol
        directories to generate from ]`. Remove extract_symbols from experiment run
        pipeline (for now)? or maybe improve options or something

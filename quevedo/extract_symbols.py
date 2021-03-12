@@ -51,4 +51,3 @@ def extract_symbols(obj, dir_from, dir_to, existing):
             region = transcription.crop((l, u, l + w, u + h))
             symbol = Annotation(symbol_d / number, target=Target.SYMB)
             symbol.create_from(pil_image=region, set=t.anot['set'])
-            symbol.save()

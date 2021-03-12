@@ -21,7 +21,7 @@ class Annotation:
         self._txt = path.with_suffix('.txt')
 
     def _init_json(self, meta={}, **more):
-        d = {"set": "train", "meta": meta, **more }
+        d = {"set": "train", "meta": meta, **more}
         if self.target == Target.TRAN:
             d['symbols'] = []
         elif self.target == Target.SYMB:

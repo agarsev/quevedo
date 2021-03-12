@@ -7,7 +7,7 @@ from PIL.ImageOps import invert
 import random
 import re
 
-from quevedo.transcription import Transcription
+from quevedo.annotation import Annotation
 
 # Used only if force layout
 try:
@@ -104,41 +104,48 @@ def create_transcription(path, symbols):
         positions[:, 1] = (ys - min_y) * scale_y + canvas_h * .1
 
     # Create the actual transcription
-    t = Transcription(path)
     canvas = Image.new("RGBA", (canvas_w, canvas_h), "white")
-    for [x, y], name, file_info, rotate in zip(positions, class_names, files, rotate):
-        t.anot['symbols'].append(put_symbol(canvas, int(x), int(y),
-                                 file_info, name, rotate))
-    canvas.save(t.image)
-    t.save()
+    symbols = [put_symbol(canvas, int(x), int(y), file_info, name, rotate)
+               for [x, y], name, file_info, rotate
+               in zip(positions, class_names, files, rotate)]
+    Annotation(path).create_from(pil_image=canvas, symbols=symbols)
 
 
 @click.command()
+@click.option('-f', '--from', 'dir_from', default='default',
+              help='''Symbol subset to use''')
+@click.option('-t', '--to', 'dir_to', default='default',
+              help='''Transcription subset where to place generated transcriptions''')
+@click.option('-m', '--merge', 'existing', flag_value='m',
+              help='''Merge new transcriptions with existing ones, if any.''')
+@click.option('-r', '--replace', 'existing', flag_value='r',
+              help='''Replace old transcriptions with new ones, if any.''')
 @click.pass_obj
-def generate(obj):
-    ''' Generates artificial "transcriptions" for training.
-
-    It uses the symbols in the `symbols` directory of the dataset (so these must
-    have been extracted before), and places them randomly on a white canvas that
-    mimicks the real SW transcriptions. The generated transcriptions will be
-    placed in the `generated` directory.
-    '''
+def generate(obj, dir_from, dir_to, existing):
+    '''Generates artificial "transcriptions" for training (data augmentation) by
+    randomly combining symbols together. Some direction can be given to the
+    generation process, see options in config file. Only symbols marked for
+    training will be used.'''
 
     dataset = obj['dataset']
-    symbol_d = dataset.path / 'symbols'
+    gen_d = dataset.path / 'real' / dir_to
 
-    gen_d = dataset.path / 'generated'
     try:
         gen_d.mkdir()
     except FileExistsError:
-        click.confirm('Generated directory already exists. Overwrite?', abort=True)
-        for f in gen_d.glob('*'):
-            f.unlink()
+        if existing is None:
+            existing = click.prompt('''Transcription directory already exists.
+                What to do? (m)erge/(r)eplace/(a)bort''', default='a')[0]
+        if existing == 'r':
+            for f in gen_d.glob('*'):
+                f.unlink()
+        elif existing == 'm':
+            pass
+        else:
+            click.Abort()
 
     config.update(dataset.config.get('generate', {}))
-
-    if config['seed'] is not None:
-        random.seed(config['seed'])
+    random.seed(config['seed'])
 
     tag_index = dataset.config['tag_schema'].index(config['tag'])
 
@@ -147,13 +154,15 @@ def generate(obj):
 
     # Find the different symbols to use
     symbols = {}
-    for symbol_file in symbol_d.glob('*.png'):
-        annotation = json.loads(symbol_file.with_suffix('.json').read_text())
-        name = annotation['tags'][tag_index]
+    for symbol in dataset.get_symbols(subset=dir_from):
+        if symbol.anot['set'] != 'train':
+            continue
+        tags = symbol.anot['tags']
+        name = tags[tag_index]
         if name in symbols:
             symbols[name]['files'].append({
-                'filename': symbol_file.resolve(),
-                'tags': annotation['tags'],
+                'filename': symbol.image.resolve(),
+                'tags': tags,
             })
         else:
             s = {}
@@ -164,8 +173,8 @@ def generate(obj):
             else:
                 raise SystemExit("Configuration not found for symbol {}".format(name))
             s['files'] = [{
-                'filename': symbol_file.resolve(),
-                'tags': annotation['tags'],
+                'filename': symbol.image.resolve(),
+                'tags': tags,
             }]
             symbols[name] = s
 
