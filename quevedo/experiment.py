@@ -51,9 +51,9 @@ class Experiment:
             raise SystemExit("Unsupported task for experiment {}: {}".format(
                 self.name, task))
 
-    def get_train_annotations(self):
+    def get_annotations(self, set='train'):
         task = self.config['task']
-        subsets = self.config['subsets']
+        subsets = self.config.get('subsets')
         if task == 'classify':
             fun = self.dataset.get_symbols
         else:
@@ -62,14 +62,14 @@ class Experiment:
             annotations = fun()
         else:
             annotations = (fun(s) for s in subsets)
-        return [a for a in annotations if a.anot.get('set') == 'train']
+        return [a for a in annotations if a.anot.get('set') == set]
 
     def prepare(self):
         ''' Creates the files needed for training and testing darknet on this dataset and
         experiment.'''
 
         task = self.config['task']
-        annotations = self.get_train_annotations()
+        annotations = self.get_annotations('train')
 
         train_path = self.path / 'train'
         if task == 'classify':

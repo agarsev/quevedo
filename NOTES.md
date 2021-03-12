@@ -31,10 +31,12 @@ classify)
     - [X] Rename trans to tran everywhere
     - [X] get_generated no longer works, adapt experiments to include multiple
         subsets
-- [ ] Adapt for classifier and new symbol arch
-    - [ ] adapt test and predict commands
-    - [ ] test with trained in holstein
-- [ ] Check CNN still works
+    - [ ] dataset info!!
+- [X] Adapt for classifier and new symbol arch
+    - [X] adapt test and predict commands
+    - [X] test with trained in server
+- [X] Check CNN still works
+- [ ] Check YOLO still works
 - [ ] Adapt web for symbols, y ya que estamos más
     a. en lista básica, también listar directorios de símbolos (bajo otro
         encabezado)
@@ -50,9 +52,9 @@ classify)
 ## test everything correct
 
 - [ ] add images
-- [ ] train test split
+- [X] train test split
 - [ ] extract, generate, check only train used
-- [ ] train and test
+- [X] train and test
 
 
 # ISSUES (move to github?)
@@ -62,4 +64,6 @@ classify)
     dataset, you might change the tag schema, and then start adding images, but
     not adjust the experiment yet. It shouldn't then complain that the tag
     schema is wrong. maybe.
+- [ ] In test, compute a confusion matrix (at least for classify) for deeper
+    inspection
 

@@ -57,10 +57,10 @@ def incr(dic, name):
 @click.option('--csv/--no-csv', default=True,
               help='Print results into a `results.csv` file in the experiment directory')
 def test(obj, do_print, csv):
-    '''Compute evaluation metrics for the trained neural network.
+    '''Compute evaluation metrics for a trained neural network.
 
-    The transcriptions in the test set are used (so a train/test split must have
-    been done) and precision, recall and f-score are computed for each class.'''
+    Only annotations marked as "test" (see train/test split) are used.
+    Precision, recall and f-score are computed for each class.'''
 
     from quevedo.darknet.predict import init_darknet, predict
 
@@ -73,27 +73,43 @@ def test(obj, do_print, csv):
     false_positives = dict()
     false_negatives = dict()
 
-    for tran in dataset.get_real():
-        if tran.anot.get('set') != 'test':
-            continue
-        predictions = predict(tran.image, experiment)
-        for sym in tran.anot['symbols']:
-            tag = experiment.get_tag(sym['tags'])
-            real = {'box': sym['box'], 'name': tag}
-            if tag not in all_symbols:
-                all_symbols.add(tag)
-            if len(predictions) > 0:
-                similarities = sorted(((similarity(p, real), i) for (i, p) in
-                                      enumerate(predictions)), reverse=True)
-                (sim, idx) = similarities[0]
-                if sim > 0.7:
-                    predictions.pop(idx)
-                    incr(true_positives, tag)
-                    continue
-            incr(false_negatives, tag)
-        # Unassigned predictions are false positives
-        for pred in predictions:
-            incr(false_positives, pred['name'])
+    task = experiment.config['task']
+
+    for an in experiment.get_annotations('test'):
+        predictions = predict(an.image, experiment)
+        if task == 'detect':
+            for sym in an.anot['symbols']:
+                tag = experiment.get_tag(sym['tags'])
+                real = {'box': sym['box'], 'name': tag}
+                if tag not in all_symbols:
+                    all_symbols.add(tag)
+                if len(predictions) > 0:
+                    similarities = sorted(((similarity(p, real), i) for (i, p) in
+                                          enumerate(predictions)), reverse=True)
+                    (sim, idx) = similarities[0]
+                    if sim > 0.7:
+                        predictions.pop(idx)
+                        incr(true_positives, tag)
+                        continue
+                incr(false_negatives, tag)
+            # Unassigned predictions are false positives
+            for pred in predictions:
+                incr(false_positives, pred['name'])
+
+        else:  # classify
+            best = predictions[0]
+            true_tag = experiment.get_tag(an.anot['tags'])
+            if true_tag not in all_symbols:
+                all_symbols.add(true_tag)
+            # TODO thresholds should be configuration, in detect too
+            if best['confidence'] < 0.5:  # no prediction
+                if true_tag != '':
+                    incr(false_negatives, true_tag)
+            else:
+                if true_tag == best['tag']:
+                    incr(true_positives, true_tag)
+                else:
+                    incr(false_positives, best['tag'])
 
     results = {}
     for name in sorted(all_symbols):

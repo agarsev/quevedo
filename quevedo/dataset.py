@@ -1,6 +1,7 @@
 # 2020-04-09 Antonio F. G. Sevilla <afgs@ucm.es>
 
 import click
+from itertools import chain
 from os import listdir
 from pathlib import Path
 import random
@@ -64,7 +65,7 @@ class Dataset:
         else:
             pattern = subset+'/*.png'
         return (Annotation(file, target=Target.SYMB) for file in
-                (self.path / 'symbols').glob('*.png'))
+                (self.path / 'symbols').glob(pattern))
 
     def __getattr__(self, attr):
         if attr == 'path':
@@ -164,15 +165,15 @@ def add_images(obj, image_dir, name, target, existing):
 
 
 @click.command()
-@click.option('--subsets', multiple=True, help="Subsets to split.")
+@click.option('--names', '-n', 'subsets', multiple=True, help="Subsets to split.")
 @click.option('--symb', '-s', 'target', flag_value='s',
               help="Split symbols")
 @click.option('--tran', '-t', 'target', flag_value='t', default=True,
               help="Split transcriptions (the default)")
-@click.option('--train_percentage', '-t', type=click.IntRange(0, 100), default=60)
+@click.option('--percentage', '-p', type=click.IntRange(0, 100), default=60)
 @click.option('--seed', type=click.INT, help='A seed for the random split algorithm.')
 @click.pass_obj
-def train_test_split(obj, subsets, target, train_percentage, seed):
+def train_test_split(obj, subsets, target, percentage, seed):
     '''Split annotation files in the given subsets into two sets, one for
     training and one for test, in the given subsets. This split will not be done
     physically but rather as a mark on the annotation file.
@@ -183,19 +184,19 @@ def train_test_split(obj, subsets, target, train_percentage, seed):
 
     random.seed(seed)
 
-    if target == 's':
-        if len(subsets)==0:
+    if target == 't':
+        if len(subsets) == 0:
             real = list(dataset.get_real())
         else:
-            real = [an for an in (dataset.get_real(d) for d in subsets)]
+            real = list(chain(*(dataset.get_real(d) for d in subsets)))
     else:
-        if len(subsets)==0:
+        if len(subsets) == 0:
             real = list(dataset.get_symbols())
         else:
-            real = [an for an in (dataset.get_symbols(d) for d in subsets)]
+            real = list(chain(*(dataset.get_symbols(d) for d in subsets)))
 
     random.shuffle(real)
-    split_point = round(len(real) * train_percentage / 100)
+    split_point = round(len(real) * percentage / 100)
 
     for t in real[:split_point]:
         t.anot['set'] = 'train'

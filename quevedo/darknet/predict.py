@@ -83,4 +83,7 @@ def predict(image_path, experiment):
             'box': make_bbox(width, height, *b)
         } for (s, c, b) in perform_detect(cstr(image_path))]
     elif experiment.config['task'] == 'classify':
-        return [c for c in perform_classify(cstr(image_path))]
+        return [{
+            'tag': tag.decode('utf8'),
+            'confidence': conf
+        } for (tag, conf) in perform_classify(cstr(image_path))]
