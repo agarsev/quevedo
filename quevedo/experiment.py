@@ -51,22 +51,25 @@ class Experiment:
             raise SystemExit("Unsupported task for experiment {}: {}".format(
                 self.name, task))
 
-    def get_train_files(self):
+    def get_train_annotations(self):
         task = self.config['task']
-        if task == 'detect':
-            all_annotation_files = self.dataset.get_real()
-            if self.config['generate']:
-                all_annotation_files = chain(all_annotation_files, self.dataset.get_generated())
-            return [t for t in all_annotation_files if t.anot.get('set') == 'train']
+        subsets = self.config['subsets']
         if task == 'classify':
-            return [s for s in self.dataset.get_symbols()]
+            fun = self.dataset.get_symbols
+        else:
+            fun = self.dataset.get_real
+        if subsets is None:
+            annotations = fun()
+        else:
+            annotations = (fun(s) for s in subsets)
+        return [a for a in annotations if a.anot.get('set') == 'train']
 
     def prepare(self):
         ''' Creates the files needed for training and testing darknet on this dataset and
         experiment.'''
 
         task = self.config['task']
-        annotation_files = self.get_train_files()
+        annotations = self.get_train_annotations()
 
         train_path = self.path / 'train'
         if task == 'classify':
@@ -78,7 +81,7 @@ class Experiment:
 
         # Collect all symbol names/classes (1st pass)
         symbols = set()
-        for t in annotation_files:
+        for t in annotations:
             if task == 'detect':
                 symbols |= set(self.get_tag(s['tags'])
                                for s in t.anot['symbols'])
@@ -95,7 +98,7 @@ class Experiment:
         train_file = self.path / 'train.txt'
         train_fd = open(train_file, 'w')
         num = 0
-        for t in annotation_files:
+        for t in annotations:
             if task == 'detect':
                 # Write darknet/yolo bounding box files
                 t._txt.write_text("".join("{} {} {} {} {}\n".format(

@@ -9,7 +9,7 @@ tag_schema = [ "tag" ]
 # tag_schema = [ "tag1", "tag2" ]
 
 # Meta tags affect the whole transcription, rather than individual symbols. The
-# first one will be used as title for the transcription in the listing.
+# first one will be used as title for the transcription in the web listing.
 meta_tags = [ "filename", "meaning" ]
 
 annotation_help = """
@@ -24,20 +24,24 @@ path = "darknet/darknet"
 library = "darknet/libdarknet.so"
 options = [ "-dont_show" ]
 
-[experiments.default]
+[experiments.detect]
 default = true # Experiment to use if not specified
-subject = "focus on symbol type learning and recognition"
+task = "detect"
 tag = "tag" # Choose the tag name from tag_schema to train and test
-generate = false # Whether to generate artificial transcriptions for this experiment
+# subsets = [ "default" ] # If not specified, all subsets will be used
+subject = "focus on symbol type learning and recognition"
 
-[experiments.default.split]
-train_percentage = 80 # Percentage of real annotations to use for training
-#seed = 0 # Uncomment to set, then train/test sets will always be the same
+[experiments.classify]
+task = "classify"
+tag = "tag"
+subsets = [ "default" ]
+subject = "Classify symbols"
 
 # Add more experiments like so:
 # [experiment.other]
-# subject = "the subject"
+# task = "detect" or "classify"
 # tag = "tag"
+# subject = "human readable description"
 # ...
 
 [web]

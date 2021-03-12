@@ -6,11 +6,17 @@
 - Check that letterboxing is working with AlexeyAB's darknet
 - Try again with grayscale images now that we use AlexeyAB
 
+I have removed the embedded steps in the experiments (train test split,
+generation). Later we can put these again into some kind of chain/pipeline that
+can include "experiments" (probably should rename) and other things (like
+train test split, generation, and new preprocessing)
+
 # TO TEST
 
 - [ ] add images
 - [ ] train test split
 - [ ] extract, generate, check only train used
+- [ ] train and test
 
 # PLAN
 
@@ -19,7 +25,7 @@ Right now we are moving to an architecture where symbols are very much like
 classify)
 
 - [X] Make sure CNN works (previously, classifier symlink names not correctly generated)
-- [O] Change symbol management to separate directories:
+- [X] Change symbol management to separate directories:
     - [X] class Annotation with enum Trans/Symbol
     - [X] add_images flag either trans or symbols
     - [X] train test split
@@ -28,11 +34,9 @@ classify)
     - [X] generate from (symb) to (trans) (preserve train/test, mark somehow,
         remove get_generated), confirmation when overwriting. Marked all as
         "train", only use training symbols.
-    - [ ] Experiment configuration, if detect, can have `generate = [ list of symbol
-       directories to generate from ]`. Remove extract_symbols from experiment run
-       pipeline (for now)? or maybe improve options or something
+    - [X] remove extra things from experiment running
     - [ ] Rename trans to tran everywhere
-    - [ ] get_generated no longer works, adapt experiments to include multiple
+    - [X] get_generated no longer works, adapt experiments to include multiple
         subsets
 - [ ] Adapt for classifier and new symbol arch
     - [ ] adapt test and predict commands
