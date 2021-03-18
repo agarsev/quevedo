@@ -3,13 +3,14 @@
 
 # TODO
 
-- Check that letterboxing is working with AlexeyAB's darknet
-- Try again with grayscale images now that we use AlexeyAB
-
 I have removed the embedded steps in the experiments (train test split,
 generation). Later we can put these again into some kind of chain/pipeline that
 can include "experiments" (probably should rename) and other things (like
 train test split, generation, and new preprocessing)
+
+- Check that letterboxing is working with AlexeyAB's darknet
+- Try again with grayscale images now that we use AlexeyAB
+- Big section in documentation about config file
 
 # PLAN
 
@@ -53,17 +54,21 @@ classify)
 
 - [ ] add images
 - [X] train test split
-- [ ] extract, generate, check only train used
+- [X] extract
+- [ ] generate, check only train used
 - [X] train and test
 
 
 # ISSUES (move to github?)
 
 - [ ] ALLOW Deleting entries (just move the last to the hole).
+- [ ] RW permissions for users in web. Also user groups.
 - [ ] Experiments should not be "checked" if not to be used. E.g when creating a
     dataset, you might change the tag schema, and then start adding images, but
     not adjust the experiment yet. It shouldn't then complain that the tag
     schema is wrong. maybe.
 - [ ] In test, compute a confusion matrix (at least for classify) for deeper
     inspection
+- [ ] Use https://docs.python.org/3/library/collections.html#collections.Counter
+    in test
 

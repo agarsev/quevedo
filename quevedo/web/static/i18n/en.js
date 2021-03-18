@@ -13,6 +13,8 @@ export default {
     columns: 'Columns', // Tag schema info
     back: 'Back to list', // Link back to home view
     new_entry: 'Upload new', // Entry to add a new transcription
+    list_tran: 'Transcriptions',
+    list_symb: 'Symbols',
     // EDIT.js
     warning_save: 'Warning: unsaved changes will be lost', // Warning when trying to leave without saving
     saving: 'Saving...', // Message when sending changes to server

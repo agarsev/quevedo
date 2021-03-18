@@ -9,7 +9,8 @@ const { useState, useRef } = preactHooks;
 
 preact.render(html`<${App} ...${window.quevedo_data} />`, document.body);
 
-function App ({ title, path, description, columns, dir_name, list }) {
+function App ({ title, path, description, columns, dir_name, target,
+        list, list2 }) {
     const in_dir = dir_name !== undefined;
 
     const [ message, setMessage ] = useState('');
@@ -34,27 +35,36 @@ function App ({ title, path, description, columns, dir_name, list }) {
 
     return html`
         <header>
-            ${in_dir?html`<a href="">${title}</a> » ${dir_name}`:title}
+            ${in_dir?html`<a href="">${title}</a> » ${target}/${dir_name}`:title}
             <span class="message_text">${message}</span>
         </header>
         <pre><b>(${path})</b></pre>
         <pre><b>${Text['columns']}: ${columns.join(', ')}</b></pre>
         <pre>${description}</pre>
-        <${in_dir?TransList:DirList} list=${list} upload=${upload} />
+        <${in_dir?TransList:DirList} list=${list} list2=${list2}
+            upload=${upload} />
     `;
 }
 
-function DirList ({ list }) {
-    return html`<ul class="List">
-        ${list.map(t => html`<${DirEntry} ...${t} />`)}
-        <li class="extra-space"></li>
-    </ul>`;
+function DirList ({ list, list2 }) {
+    return html`<>
+        <h2>${Text['list_tran']}</h2>
+        <ul class="List">
+            ${list.map(t => html`<${DirEntry} target='real' ...${t} />`)}
+            <li class="extra-space"></li>
+        </ul>
+        <h2>${Text['list_symb']}</h2>
+        <ul class="List">
+            ${list2.map(t => html`<${DirEntry} target='symbols' ...${t} />`)}
+            <li class="extra-space"></li>
+        </ul>
+    `;
 }
 
-function DirEntry ({ name }) {
+function DirEntry ({ name, target }) {
     return html`<li class="Entry DirEntry">
         <h2>${name}</h2>
-        <a href="list/${name}">📂</a>
+        <a href="list/${target}/${name}">📂</a>
     </li>`;
 }
 
@@ -94,7 +104,9 @@ function NewEntry ({ upload }) {
     </li>`;
 }
 
-function TransEntry ({ dir, id, title, set, annotated }) {
+function TransEntry ({ id, title, set, annotated }) {
+    const { target, dir_name } = window.quevedo_data;
+    const dir = `${target}/${dir_name}`;
     const edit_link = `edit/${dir}/${id}`;
     title = title.length > MAX_TRANS_TITLE?
         title.substring(0, MAX_TRANS_TITLE-1)+'…':

@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 from string import Template
 
-from quevedo.transcription import Transcription
+from quevedo.annotation import Annotation, Target
 
 os.environ['WERKZEUG_RUN_MAIN'] = 'true'
 app = Flask(__name__, static_url_path='')
@@ -17,12 +17,24 @@ logging.getLogger('werkzeug').disabled = True
 app_data = {}
 
 
-def annotation_info(anot):
+def annotation_info(a: Annotation):
     title_tag = app_data['meta_tags'][0]
+    anot = a.anot
+    if a.target == Target.SYMB:
+        tags = anot['tags']
+        if len(tags) > 0:
+            annotated = True
+            title = tags[0]
+        else:
+            annotated = False
+            title = '?'
+    else:
+        annotated = len(anot.get('symbols', [])),
+        title = anot['meta'].get(title_tag, '')
     return {
-        'annotated': len(anot.get('symbols', {})),
+        'id': a.id, 'annotated': annotated,
         'set': anot.get('set', 'none'),
-        'title': anot['meta'].get(title_tag, '')
+        'title': title
     }
 
 
@@ -38,26 +50,10 @@ def load_dataset(dataset, language):
     app_data['meta_tags'] = dataset.config['meta_tags']
     resolved = dataset.path.resolve()
     app_data['path'] = resolved
-    data_dir = resolved / 'real'
-    app_data['data_dir'] = data_dir
     app_data['exp_list'] = [e.name for e in dataset.list_experiments() if
                             e.is_trained()]
-    app_data['dirs'] = {}
     app_data['config'] = dataset.config['web']
     app.secret_key = app_data['config']['secret_key']
-    for d in app_data['data_dir'].glob('*'):
-        if not d.is_dir():
-            continue
-        name = str(d.stem)
-        ids = sorted(int(tran.stem) for tran in
-                     d.glob("*.png"))
-        if len(ids)>0:
-            dir_data = {'last_id': ids[-1]}
-        else:
-            dir_data = {'last_id': 0 }
-        dir_data['tran_list'] = list(map(lambda id: get_transcription_info(name, id),
-                                          ids))
-        app_data['dirs'][name] = dir_data
 
 
 def run(host, port, path):
@@ -84,7 +80,7 @@ def new_tran(dir):
     dir_data = app_data['dirs'][dir]
     idx = dir_data['last_id'] + 1
     dir_data['last_id'] = idx
-    new_t = Transcription(app_data['data_dir'] / '{}/{}'.format(dir, idx))
+    new_t = Annotation(app_data['data_dir'] / '{}/{}'.format(dir, idx))
     new_t.create_from(binary_data=request.data)
     dir_data['tran_list'].append(get_transcription_info(dir, idx)),
     return {'id': new_t.id}
@@ -111,7 +107,7 @@ def get_auto_annotations(dir, idx):
 
     img = (app_data['data_dir'] / '{}/{}.png'.format(dir, idx)).resolve()
     return {
-        'symbols': predict(img),
+        'symbols': predict(img, experiment),
         'tag_index': experiment._tag_index
     }
 
@@ -149,9 +145,9 @@ def login_page():
     )
 
 
-@app.route('/list/<dir>')
-@app.route('/', defaults={'dir': None})
-def index(dir):
+@app.route('/list/<target>/<dir>')
+@app.route('/', defaults={'target': None, 'dir': None})
+def index(target, dir):
     if (not app_data['config']['public'] and 
             session.get('user', None) is None):
         return redirect(url_for('login_page'))
@@ -164,12 +160,22 @@ def index(dir):
     }
 
     if dir is None:
-        data['list'] = [{'name': k} for k in app_data['dirs'].keys()]
+        data['list'] = [{'name': d} for d in ds.list_real_subsets()]
+        data['list2'] = [{'name': d} for d in ds.list_symbol_subsets()]
         data['description'] = ds.config['description']
     else:
+        data['target'] = target
         data['dir_name'] = dir
-        data['list'] = app_data['dirs'][dir]['tran_list']
-        readme = app_data['data_dir'] / dir / 'README.md'
+        if target == 'real':
+            data['list'] = sorted((annotation_info(an)
+                                  for an in ds.get_real(dir)),
+                                  key=lambda i: i['id'])
+            readme = ds.path / target / dir / 'README.md'
+        else: #  if target == 'symbols':
+            data['list'] = sorted((annotation_info(an)
+                                  for an in ds.get_symbols(dir)),
+                                  key=lambda i: i['id'])
+            readme = ds.path / target / dir / 'README.md'
         if readme.exists():
             data['description'] = readme.read_text()
 
@@ -212,6 +218,6 @@ def internationalization():
     return app.send_static_file('i18n/{}.js'.format(app_data['lang']))
 
 
-@app.route('/img/<dir>/<filename>')
-def send_image(dir, filename):
-    return send_from_directory(app_data['data_dir'] / dir, filename)
+@app.route('/img/<target>/<dir>/<filename>')
+def send_image(target, dir, filename):
+    return send_from_directory(app_data['path'] / target / dir, filename)

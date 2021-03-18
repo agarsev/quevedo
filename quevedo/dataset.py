@@ -57,6 +57,10 @@ class Dataset:
         return (Annotation(file, target=Target.TRAN) for file in
                 (self.path / 'real').glob(pattern))
 
+    def list_real_subsets(self):
+        return [d.stem for d in (self.path / 'real').glob('*')
+                if d.is_dir()]
+
     def get_symbols(self, subset=None):
         '''Returns a generator for all the symbols, or only those in a given
         subset.'''
@@ -66,6 +70,10 @@ class Dataset:
             pattern = subset+'/*.png'
         return (Annotation(file, target=Target.SYMB) for file in
                 (self.path / 'symbols').glob(pattern))
+
+    def list_symbol_subsets(self):
+        return [d.stem for d in (self.path / 'symbols').glob('*')
+                if d.is_dir()]
 
     def __getattr__(self, attr):
         if attr == 'path':

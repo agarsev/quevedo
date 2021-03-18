@@ -1,8 +1,6 @@
 # 2020-04-07 Antonio F. G. Sevilla <afgs@ucm.es>
 
 import click
-import json
-from pathlib import Path
 from PIL import Image
 
 from quevedo.annotation import Annotation, Target
@@ -25,18 +23,18 @@ def extract_symbols(obj, dir_from, dir_to, existing):
     symbol_d = dataset.path / 'symbols' / dir_to
 
     try:
-        symbol_d.mkdir()
+        symbol_d.mkdir(parents=True)
     except FileExistsError:
         if existing is None:
-            existing = click.prompt('''Symbol directory already exists.
-                What to do? (m)erge/(r)eplace/(a)bort''', default='a')[0]
+            existing = click.prompt('Symbol directory already exists.\n' +
+                'What to do? (m)erge/(r)eplace/(a)bort', default='a')[0]
         if existing == 'r':
             for f in symbol_d.glob('*'):
                 f.unlink()
         elif existing == 'm':
             pass
         else:
-            click.Abort()
+            raise click.Abort()
 
     number = max((int(f.stem) for f in symbol_d.glob('*.png')), default=0) + 1
     for t in dataset.get_real(subset=dir_from):
@@ -49,5 +47,9 @@ def extract_symbols(obj, dir_from, dir_to, existing):
             l = float(symb['box'][0]) * width - (w / 2)
             u = float(symb['box'][1]) * height - (h / 2)
             region = transcription.crop((l, u, l + w, u + h))
-            symbol = Annotation(symbol_d / number, target=Target.SYMB)
-            symbol.create_from(pil_image=region, set=t.anot['set'])
+            symbol = Annotation(symbol_d / str(number), target=Target.SYMB)
+            symbol.create_from(pil_image=region, set=t.anot['set'],
+                               tags=symb['tags'])
+
+    (symbol_d / 'README.md').write_text(
+        'Symbols extracted automatically from {}'.format(dir_from))
