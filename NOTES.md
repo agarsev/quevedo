@@ -38,14 +38,17 @@ classify)
     - [X] test with trained in server
 - [X] Check CNN still works
 - [ ] Check YOLO still works
-- [ ] Adapt web for symbols, y ya que estamos más
-    a. en lista básica, también listar directorios de símbolos (bajo otro
+- [o] Adapt web for symbols, and some extras
+    - [X] en lista básica, también listar directorios de símbolos (bajo otro
         encabezado)
-    b. urls incluyen tran/symb
-    c. (ya que estamos añadir COPYRIGHT)
-    d. Contar en list.js el total de imágenes en un directorio.
-    e. If there are no folders under "real", the web interface should offer the
+    - [X] urls using real/symbols
+    - [ ] Make new page (different from edit) for symbol editing (some code is
+        probably the same, but not much)
+    - [ ] fix api (save, new, etc)
+    - [ ] If there are no folders under "real", the web interface should offer the
         default one even if the directory is not physically there.
+    - [ ] In list.js show total number of annotations in a subset
+    - [ ] nice to have: add Copyright note, and app logo
 - [ ] Add preproc option for experiments, create rotator script (in examples maybe)
    that uses rotation tab to realign symbols according to rotation tab
 - [ ] Anotar vocab JM y entrenar incrementalmente como dice el folio

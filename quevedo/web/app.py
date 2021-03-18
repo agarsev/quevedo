@@ -186,25 +186,43 @@ def index(target, dir):
         data=json.dumps(data))
 
 
-@app.route('/edit/<dir>/<idx>')
-def edit(dir, idx):
+@app.route('/edit/<target>/<dir>/<idx>')
+def edit(target, dir, idx):
     ds = app_data['dataset']
-    full_id = '{}/{}'.format(dir, idx)
+    full_dir = '{}/{}'.format(target, dir)
+    full_id = '{}/{}/{}'.format(target, dir, idx)
     idn = int(idx)
-    anot = json.loads((app_data['data_dir'] / (full_id + '.json')).read_text())
-    last_id = app_data['dirs'][dir]['last_id']
+
+    if idn > 1:
+        prev_link = idn - 1
+    else:
+        prev_link = sum(1 for _ in (ds.path / full_dir).glob('*.png'))
+
+    next_link = idn + 1
+    if not (ds.path / full_dir / str(next_link)).with_suffix('.png').exists():
+        next_link = 1
+
+    if target == 'real':
+        a = Annotation(ds.path / full_id, target=Target.TRAN)
+    else:
+        a = Annotation(ds.path / full_id, target=Target.SYMB)
+
     data = {
         'title': ds.config['title'],
-        'id': {'dir': dir, 'num': idn, 'full': full_id},
+        'id': {
+            'dir': full_dir,
+            'num': idn,
+            'full': full_id
+        },
+        'links': {
+            'prev': prev_link,
+            'next': next_link,
+        },
         'annotation_help': ds.config['annotation_help'],
         'exp_list': app_data['exp_list'],
         'meta_tags': app_data['meta_tags'],
         'columns': ds.config['tag_schema'],
-        'links': {
-            'prev': '{}/{}'.format(dir, idn - 1 if idn > 1 else last_id),
-            'next': '{}/{}'.format(dir, idn + 1 if idn < last_id else 1),
-        },
-        'anot': anot,
+        'anot': a.anot,
     }
     return html_template.substitute(
         title='{} - {}'.format(ds.config['title'], idx),

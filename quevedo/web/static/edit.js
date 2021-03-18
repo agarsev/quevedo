@@ -107,8 +107,8 @@ function Header ({ title, id, links, saveChanges, message, show_save,
     return html`<header>
         <a href="">${title}</a> » 
         <a href="list/${id.dir}">${id.dir}</a> » ${id.num}
-        <a href="edit/${links.prev}">⬅️</a>
-        <a href="edit/${links.next}" tabIndex=3 >➡️</a>
+        <a href="edit/${id.dir}/${links.prev}">⬅️</a>
+        <a href="edit/${id.dir}/${links.next}" tabIndex=3 >➡️</a>
         ${changes.some?html`<button onclick=${changes.undo}>↩️</button>`:null}
         ${show_save?html`<button tabIndex=2
             onclick=${saveChanges} >💾</button>`:null}
