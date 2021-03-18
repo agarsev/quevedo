@@ -1,3 +1,5 @@
+![Quevedo Logo](quevedo/logo.png)
+
 # Quevedo
 
 SignWriting recognition tool, part of VISSE project.

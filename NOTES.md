@@ -48,7 +48,7 @@ classify)
     - [ ] If there are no folders under "real", the web interface should offer the
         default one even if the directory is not physically there.
     - [ ] In list.js show total number of annotations in a subset
-    - [ ] nice to have: add Copyright note, and app logo
+    - [X] nice to have: add Copyright note, and app logo
 - [ ] Add preproc option for experiments, create rotator script (in examples maybe)
    that uses rotation tab to realign symbols according to rotation tab
 - [ ] Anotar vocab JM y entrenar incrementalmente como dice el folio
@@ -74,4 +74,6 @@ classify)
     inspection
 - [ ] Use https://docs.python.org/3/library/collections.html#collections.Counter
     in test
+- [ ] IMPORTANT Add license file, and license information for the dependencies.
+    This must be shown in the web somehow too.
 

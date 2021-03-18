@@ -239,3 +239,8 @@ def internationalization():
 @app.route('/img/<target>/<dir>/<filename>')
 def send_image(target, dir, filename):
     return send_from_directory(app_data['path'] / target / dir, filename)
+
+
+@app.route('/quevedo_logo.png')
+def favicon():
+    return send_from_directory(Path(__file__).parent.parent.resolve(), 'logo_icon.png')

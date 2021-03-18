@@ -43,3 +43,22 @@ a, a:visited {
 a:hover {
     color: #00F;
 }
+
+footer {
+    border-top: 1px solid gray;
+    padding-top: 1em;
+    font-size: 80%;
+    color: gray;
+    margin-top: 5em;
+}
+
+footer a {
+    color: inherit;
+}
+
+.QuevedoLogo {
+    width: 2em;
+    height: 2em;
+    vertical-align: middle;
+    margin: 0 1ex 0.3ex 0;
+}

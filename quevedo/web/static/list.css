@@ -4,6 +4,10 @@ pre {
     margin: 0 4vw 2ex 0;
 }
 
+body > h2 {
+    margin-top: 1em;
+}
+
 .List {
     text-align: center;
     width: 100%;
