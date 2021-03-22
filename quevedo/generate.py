@@ -7,7 +7,7 @@ from PIL.ImageOps import invert
 import random
 import re
 
-from quevedo.annotation import Annotation
+from quevedo.annotation import Annotation, Target
 
 # Used only if force layout
 try:
@@ -128,7 +128,7 @@ def generate(obj, dir_from, dir_to, existing):
     training will be used.'''
 
     dataset = obj['dataset']
-    gen_d = dataset.path / 'real' / dir_to
+    gen_d = dataset.real_path / dir_to
 
     try:
         gen_d.mkdir()
@@ -154,7 +154,7 @@ def generate(obj, dir_from, dir_to, existing):
 
     # Find the different symbols to use
     symbols = {}
-    for symbol in dataset.get_symbols(subset=dir_from):
+    for symbol in dataset.get_annotations(Target.SYMB, subset=dir_from):
         if symbol.anot['set'] != 'train':
             continue
         tags = symbol.anot['tags']

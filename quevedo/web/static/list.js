@@ -61,9 +61,9 @@ function DirList ({ list, list2 }) {
     `;
 }
 
-function DirEntry ({ name, target }) {
+function DirEntry ({ name, count, target }) {
     return html`<li class="Entry DirEntry">
-        <h2>${name}</h2>
+        <h2>${name} <span class="set">(${count})</span></h2>
         <a href="list/${target}/${name}">📂</a>
     </li>`;
 }

@@ -160,22 +160,20 @@ def index(target, dir):
     }
 
     if dir is None:
-        data['list'] = [{'name': d} for d in ds.list_real_subsets()]
-        data['list2'] = [{'name': d} for d in ds.list_symbol_subsets()]
+        data['list'] = ds.get_subsets(Target.TRAN)
+        data['list2'] = ds.get_subsets(Target.SYMB)
         data['description'] = ds.config['description']
     else:
         data['target'] = target
         data['dir_name'] = dir
         if target == 'real':
-            data['list'] = sorted((annotation_info(an)
-                                  for an in ds.get_real(dir)),
-                                  key=lambda i: i['id'])
-            readme = ds.path / target / dir / 'README.md'
+            annots = ds.get_annotations(Target.TRAN, dir)
         else: #  if target == 'symbols':
-            data['list'] = sorted((annotation_info(an)
-                                  for an in ds.get_symbols(dir)),
-                                  key=lambda i: i['id'])
-            readme = ds.path / target / dir / 'README.md'
+            annots = ds.get_annotations(Target.SYMB, dir)
+        data['list'] = sorted((annotation_info(an)
+                              for an in annots),
+                              key=lambda i: i['id'])
+        readme = ds.path / target / dir / 'README.md'
         if readme.exists():
             data['description'] = readme.read_text()
 

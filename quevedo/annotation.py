@@ -1,18 +1,18 @@
 # 2020-11-11 Antonio F. G. Sevilla <afgs@ucm.es>
 
-from enum import Enum
+from enum import Flag
 import json
 from pathlib import Path
 from shutil import copyfile
 
-Target = Enum('AnnotationTarget', 'TRAN SYMB')
+Target = Flag('AnnotationTarget', 'TRAN SYMB')
 
 
 class Annotation:
     '''Class representing a single annotation of either a transcription of a
     sign or signs in the dataset or an isolated symbol.'''
 
-    def __init__(self, path, target=Target.TRAN):
+    def __init__(self, path, target: Target):
         path = Path(path)
         self.id = path.stem
         self.target = target

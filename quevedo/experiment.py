@@ -6,6 +6,8 @@ from pathlib import Path
 from shutil import rmtree
 from string import Template
 
+from quevedo.annotation import Target
+
 
 class Experiment:
     ''' Class representing an experiment part of a dataset.'''
@@ -55,13 +57,13 @@ class Experiment:
         task = self.config['task']
         subsets = self.config.get('subsets')
         if task == 'classify':
-            fun = self.dataset.get_symbols
+            target = Target.SYMB
         else:
-            fun = self.dataset.get_real
+            target = Target.TRAN
         if subsets is None:
-            annotations = fun()
+            annotations = self.dataset.get_annotations(target)
         else:
-            annotations = (fun(s) for s in subsets)
+            annotations = (self.dataset.get_annotations(target, s) for s in subsets)
         return [a for a in annotations if a.anot.get('set') == set]
 
     def prepare(self):

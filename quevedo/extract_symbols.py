@@ -20,7 +20,7 @@ def extract_symbols(obj, dir_from, dir_to, existing):
     '''Extracts symbols from annotated transcriptions into their own files'''
 
     dataset = obj['dataset']
-    symbol_d = dataset.path / 'symbols' / dir_to
+    symbol_d = dataset.symbol_path / dir_to
 
     try:
         symbol_d.mkdir(parents=True)
@@ -37,7 +37,7 @@ def extract_symbols(obj, dir_from, dir_to, existing):
             raise click.Abort()
 
     number = max((int(f.stem) for f in symbol_d.glob('*.png')), default=0) + 1
-    for t in dataset.get_real(subset=dir_from):
+    for t in dataset.get_annotations(Target.TRAN, subset=dir_from):
         number = number + 1
         transcription = Image.open(t.image)
         width, height = transcription.size

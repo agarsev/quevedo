@@ -38,7 +38,7 @@ classify)
     - [X] test with trained in server
 - [X] Check CNN still works
 - [ ] Check YOLO still works
-- [o] Adapt web for symbols, and some extras
+- [O] Adapt web for symbols, and some extras
     - [X] en lista básica, también listar directorios de símbolos (bajo otro
         encabezado)
     - [X] urls using real/symbols
@@ -47,7 +47,7 @@ classify)
     - [ ] fix api (save, new, etc)
     - [ ] If there are no folders under "real", the web interface should offer the
         default one even if the directory is not physically there.
-    - [ ] In list.js show total number of annotations in a subset
+    - [X] In list.js show total number of annotations in a subset
     - [X] nice to have: add Copyright note, and app logo
 - [ ] Add preproc option for experiments, create rotator script (in examples maybe)
    that uses rotation tab to realign symbols according to rotation tab
@@ -55,11 +55,14 @@ classify)
 
 ## test everything correct
 
+I have changed function get_annotations and target is now a bit flag, so
+re-check everything
+
 - [ ] add images
-- [X] train test split
-- [X] extract
+- [ ] train test split
+- [ ] extract
 - [ ] generate, check only train used
-- [X] train and test
+- [ ] train and test
 
 
 # ISSUES (move to github?)

@@ -7,6 +7,7 @@
 import sys
 
 from quevedo.dataset import Dataset
+from quevedo.annotation import Target
 
 translation = {
     'symbol': 'Symbol',
@@ -17,7 +18,7 @@ translation = {
 
 if __name__ == '__main__':
     ds = Dataset(sys.argv[1])
-    for t in ds.get_real():
+    for t in ds.get_annotations(Target.TRAN):
         for s in t.anot.get('symbols', []):
             original = s['tags'][0]
             if original in translation:

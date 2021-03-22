@@ -1,9 +1,12 @@
+@import 'common.css';
+
 body {
     margin: 0;
     padding: 0;
     display: flex;
     width: 100vw;
     height: 100vh;
+    flex-direction: column;
 }
 
 .LoginBox {
@@ -38,4 +41,8 @@ body {
 .loading {
     color: darkgray;
     font-style: italic;
+}
+
+footer {
+    margin: 2vw;
 }

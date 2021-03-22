@@ -21,15 +21,17 @@ class Dataset:
         directory but other commands to fail if it doesn't exist. This is due to how
         click works, and unlikely to be fixed. '''
         self._path = Path(path)
+        self.real_path = self._path / 'real'
+        self.symbol_path = self._path / 'symbols'
         self.config_path = self._path / 'config.toml'
 
     def create(self):
         p = self._path
-        if p.exists() and len(listdir(p))>0:
+        if p.exists() and len(listdir(p)) > 0:
             raise SystemExit("Directory '{}' not empty, aborting".format(p.resolve()))
         self.path = p
-        (self.path / 'real').mkdir(parents=True)  # We also create the required real directory
-        (self.path / 'symbols').mkdir()
+        (self.real_path).mkdir(parents=True)  # We also create the required real directory
+        (self.symbol_path).mkdir()
         (self.path / 'experiments').mkdir()
 
     def run_darknet(self, *args):
@@ -47,33 +49,43 @@ class Dataset:
         else:
             return Experiment(self, name)
 
-    def get_real(self, subset=None):
-        '''Returns a generator that yields all real annotations, or only those
-        in a given subset.'''
+    def get_annotations(self, target: Target, subset=None):
+        '''Returns a generator that yields all annotations, those of a given
+        target, or only those in a given subset and target.'''
         if subset is None:
-            pattern = '**/*.png'
+            if Target.TRAN in target:
+                ret = (Annotation(file, Target.TRAN) for file in
+                       self.real_path.glob('**/*.png'))
+                if Target.SYMB in target:
+                    ret = chain(ret, (Annotation(file, Target.SYMB) for file in
+                       self.symbol_path.glob('**/*.png')))
+                return ret
+            elif Target.SYMB in target:
+                return (Annotation(file, Target.SYMB) for file in
+                       self.symbol_path.glob('**/*.png'))
+            else:
+                raise ValueError('A target needs to be specified')
         else:
-            pattern = subset+'/*.png'
-        return (Annotation(file, target=Target.TRAN) for file in
-                (self.path / 'real').glob(pattern))
+            if target == Target.TRAN:
+                return (Annotation(file, target=Target.TRAN) for file in
+                        (self.real_path / subset).glob('*.png'))
+            elif Target.SYMB in target:
+                return (Annotation(file, target=Target.SYMB) for file in
+                        (self.symbol_path / subset).glob('*.png'))
+            else:
+                raise ValueError('If a subset is specified, a single target is needed')
 
-    def list_real_subsets(self):
-        return [d.stem for d in (self.path / 'real').glob('*')
-                if d.is_dir()]
-
-    def get_symbols(self, subset=None):
-        '''Returns a generator for all the symbols, or only those in a given
-        subset.'''
-        if subset is None:
-            pattern = '**/*.png'
+    def get_subsets(self, target: Target):
+        '''Gets information about the subsets in a given target.'''
+        if target == Target.TRAN:
+            path = self.real_path
+        elif target == Target.SYMB:
+            path = self.symbol_path
         else:
-            pattern = subset+'/*.png'
-        return (Annotation(file, target=Target.SYMB) for file in
-                (self.path / 'symbols').glob(pattern))
-
-    def list_symbol_subsets(self):
-        return [d.stem for d in (self.path / 'symbols').glob('*')
-                if d.is_dir()]
+            raise ValueError('A single target is needed')
+        return [{'name': d.stem,
+                 'count': sum(1 for _ in d.glob('*.png'))}
+                for d in path.glob('*') if d.is_dir()]
 
     def __getattr__(self, attr):
         if attr == 'path':
@@ -137,10 +149,10 @@ def add_images(obj, image_dir, name, target, existing):
     dataset = obj['dataset']
 
     if target == 'symb':
-        dest = dataset.path / 'symbols' / name
+        dest = dataset.symbol_path / name
         target = Target.SYMB
     else:
-        dest = dataset.path / 'real' / name
+        dest = dataset.real_path / name
         target = Target.TRAN
 
     try:
@@ -194,14 +206,14 @@ def train_test_split(obj, subsets, target, percentage, seed):
 
     if target == 't':
         if len(subsets) == 0:
-            real = list(dataset.get_real())
+            real = list(dataset.get_annotations(Target.TRAN))
         else:
-            real = list(chain(*(dataset.get_real(d) for d in subsets)))
+            real = list(chain(*(dataset.get_annotations(Target.TRAN) for d in subsets)))
     else:
         if len(subsets) == 0:
-            real = list(dataset.get_symbols())
+            real = list(dataset.get_annotations(Target.SYMB))
         else:
-            real = list(chain(*(dataset.get_symbols(d) for d in subsets)))
+            real = list(chain(*(dataset.get_annotations(Target.SYMB) for d in subsets)))
 
     random.shuffle(real)
     split_point = round(len(real) * percentage / 100)
@@ -234,7 +246,7 @@ def info(obj):
     click.echo(config["description"])
     click.secho('Tag schema: {}\n'.format(', '.join(config["tag_schema"])), bold=True)
 
-    real = list(dataset.get_real())
+    real = list(dataset.get_annotations(Target.TRAN))
     num_real = count(real)
     click.echo('Real transcriptions: {}'.format(style(num_real > 0, num_real)))
     num_annot = sum(len(t.anot['symbols']) > 0 for t in real)

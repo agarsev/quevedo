@@ -8,6 +8,7 @@
 import sys
 
 from quevedo.dataset import Dataset
+from quevedo.annotation import Target
 
 translation = {
     'worng_name': 'correct_name',
@@ -17,7 +18,7 @@ translation = {
 
 if __name__ == '__main__':
     ds = Dataset(sys.argv[1])
-    for t in ds.get_real():
+    for t in ds.get_annotations(Target.TRAN):
         meta: dict = t.anot.get('meta')
         for orig, trad in translation.items():
             if orig in meta:

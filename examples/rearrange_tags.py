@@ -8,11 +8,12 @@
 import sys
 
 from quevedo.dataset import Dataset
+from quevedo.annotation import Target
 
 
 if __name__ == '__main__':
     ds = Dataset(sys.argv[1])
-    for t in ds.get_real(sys.argv[2]):
+    for t in ds.get_annotations(Target.TRAN, sys.argv[2]):
         for s in t.anot.get('symbols', []):
             s['tags'] = [''] + s['tags']
         t.save()
