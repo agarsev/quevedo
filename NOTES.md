@@ -37,14 +37,15 @@ classify)
     - [X] adapt test and predict commands
     - [X] test with trained in server
 - [X] Check CNN still works
-- [O] Adapt web for symbols, and some extras
+- [X] Adapt web for symbols, and some extras
     - [X] en lista básica, también listar directorios de símbolos (bajo otro
         encabezado)
     - [X] urls using real/symbols
     - [X] Make new page (different from edit) for symbol editing (some code is
         probably the same, but not much). Edit.js remains, has meta and footer,
         imports annotation editor from either tran or symb
-    - [ ] fix api (save, new, etc)
+    - [X] fix api (save, new)
+    - [ ] fix call experiment from web
     - [X] In list.js show total number of annotations in a subset
     - [X] nice to have: add Copyright note, and app logo
 - [ ] Add preproc option for experiments, create rotator script (in examples maybe)

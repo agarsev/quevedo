@@ -49,6 +49,25 @@ class Dataset:
         else:
             return Experiment(self, name)
 
+    def get_single(self, target: Target, subset, id):
+        if target == Target.TRAN:
+            path = self.real_path / subset / id
+        elif target == Target.SYMB:
+            path = self.symbol_path / subset / id
+        else:
+            raise ValueError('A single target is needed')
+        return Annotation(path, target)
+
+    def new_single(self, target: Target, subset):
+        if target == Target.TRAN:
+            path = self.real_path / subset
+        elif target == Target.SYMB:
+            path = self.symbol_path / subset
+        else:
+            raise ValueError('A single target is needed')
+        next_id = sum(1 for _ in path.glob('*.png')) + 1
+        return Annotation(path / str(next_id), target)
+
     def get_annotations(self, target: Target, subset=None):
         '''Returns a generator that yields all annotations, those of a given
         target, or only those in a given subset and target.'''

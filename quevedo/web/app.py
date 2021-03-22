@@ -18,7 +18,16 @@ logging.getLogger('werkzeug').disabled = True
 
 app_data = {}
 
-# {{{ ---- Dataset loading
+# {{{ ---- Dataset loading and utils
+
+
+def target_to_string(t):
+    return 'real' if t == Target.TRAN else 'symb'
+
+
+def string_to_target(t):
+    return Target.TRAN if t == 'real' else Target.SYMB
+
 
 def annotation_info(a: Annotation):
     title_tag = app_data['meta_tags'][0]
@@ -65,28 +74,50 @@ def run(host, port, path):
 
 
 # }}}
+# {{{ ---- AUTH
+
+@app.route('/login')
+def login_page():
+    if app_data['config']['public']:
+        return redirect(url_for('index'))
+    ds = app_data['dataset']
+    return html_template.substitute(
+        title=ds.config['title'],
+        mount_path=app_data['mount_path'],
+        page='login',
+        data="{}"
+    )
+
+
+def authenticated(func):
+    @wraps(func)
+    def check_auth(*args, **kwargs):
+        if (not app_data['config']['public'] and
+                session.get('user', None) is None):
+            return redirect(url_for('login_page'))
+        return func(*args, **kwargs)
+    return check_auth
+
+
+# }}}
 # {{{ ---- API
 
-@app.route('/api/save/<dir>/<idx>', methods=["POST"])
-def edit_post(dir, idx):
-    anot_file = app_data['data_dir'] / '{}/{}.json'.format(dir, idx)
-    anot = json.loads(anot_file.read_text())
-    new_info = {**anot, **request.get_json()}
-    tran = next(t for t in app_data['dirs'][dir]['tran_list']
-                if t['id'] == idx)
-    tran.update(annotation_info(new_info))
-    anot_file.write_text(json.dumps(new_info))
+@app.route('/api/save/<target>/<dir>/<idx>', methods=["POST"])
+@authenticated
+def edit_post(target, dir, idx):
+    ds = app_data['dataset']
+    single = ds.get_single(string_to_target(target), dir, idx)
+    single.anot.update(request.get_json())
+    single.save()
     return 'OK'
 
 
-@app.route('/api/new/<dir>', methods=["POST"])
-def new_tran(dir):
-    dir_data = app_data['dirs'][dir]
-    idx = dir_data['last_id'] + 1
-    dir_data['last_id'] = idx
-    new_t = Annotation(app_data['data_dir'] / '{}/{}'.format(dir, idx))
+@app.route('/api/new/<target>/<dir>', methods=["POST"])
+@authenticated
+def new_tran(target, dir):
+    ds = app_data['dataset']
+    new_t = ds.new_single(string_to_target(target), dir)
     new_t.create_from(binary_data=request.data)
-    dir_data['tran_list'].append(get_transcription_info(dir, idx)),
     return {'id': new_t.id}
 
 
@@ -95,6 +126,7 @@ last_experiment = None
 
 
 @app.route('/api/auto_annotate/<dir>/<idx>')
+@authenticated
 def get_auto_annotations(dir, idx):
     ds = app_data['dataset']
     experiment = ds.get_experiment(request.args.get('exp', None))
@@ -137,28 +169,6 @@ html_template = Template((Path(__file__).parent /
                           'static/page.html').read_text())
 
 
-@app.route('/login')
-def login_page():
-    if app_data['config']['public']:
-        return redirect(url_for('index'))
-    ds = app_data['dataset']
-    return html_template.substitute(
-        title=ds.config['title'],
-        mount_path=app_data['mount_path'],
-        page='login',
-        data="{}"
-    )
-
-def authenticated(func):
-    @wraps(func)
-    def check_auth(*args, **kwargs):
-        if (not app_data['config']['public'] and
-                session.get('user', None) is None):
-            return redirect(url_for('login_page'))
-        return func(*args, **kwargs)
-    return check_auth
-
-
 @app.route('/list/<target>/<dir>')
 @app.route('/', defaults={'target': None, 'dir': None})
 @authenticated
@@ -177,10 +187,7 @@ def index(target, dir):
     else:
         data['target'] = target
         data['dir_name'] = dir
-        if target == 'real':
-            annots = ds.get_annotations(Target.TRAN, dir)
-        else:  # if target == 'symbols':
-            annots = ds.get_annotations(Target.SYMB, dir)
+        annots = ds.get_annotations(string_to_target(target), dir)
         data['list'] = sorted((annotation_info(an)
                               for an in annots),
                               key=lambda i: i['id'])
@@ -212,10 +219,7 @@ def edit(target, dir, idx):
     if not (ds.path / full_dir / str(next_link)).with_suffix('.png').exists():
         next_link = 1
 
-    if target == 'real':
-        a = Annotation(ds.path / full_id, target=Target.TRAN)
-    else:  # target == 'symbol'
-        a = Annotation(ds.path / full_id, target=Target.SYMB)
+    a = ds.get_single(string_to_target(target), dir, idx)
 
     data = {
         'title': ds.config['title'],

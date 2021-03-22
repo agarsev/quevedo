@@ -40,13 +40,15 @@ function App ({ title, target, id, annotation_help, links, anot,
     const saveChanges = () => {
         changes.setSaving();
         setMessage(Text['saving']);
+        if (target == 'real') {
+            var body = { meta, symbols: symbols.list }
+        } else {
+            var body = { meta, tags: tags.list }
+        }
         fetch(`api/save/${id.full}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                meta,
-                symbols: symbols.list
-            })
+            body: JSON.stringify(body)
         }).then(r => {
             if (r.ok) {
                 changes.setSaved();

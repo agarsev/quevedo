@@ -22,14 +22,14 @@ function App ({ title, path, description, columns, dir_name, target,
         }
     }
     const upload = file => {
-        fetch(`api/new/${dir_name}`, {
+        fetch(`api/new/${target}/${dir_name}`, {
             method: 'POST',
             body: file
         }).then(r => {
             if (r.ok) return r.json();
             else throw r;
         }).then(({ id }) => {
-            window.location = `edit/${dir_name}/${id}`;
+            window.location = `edit/${target}/${dir_name}/${id}`;
         }).catch(setError);
     };
 
