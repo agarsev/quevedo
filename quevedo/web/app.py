@@ -1,6 +1,8 @@
 # 2020-04-07 Antonio F. G. Sevilla <afgs@ucm.es>
+# vi:foldmethod=marker
 
 from flask import Flask, request, send_from_directory, session, redirect, url_for
+from functools import wraps
 import hashlib
 import json
 import logging
@@ -16,6 +18,7 @@ logging.getLogger('werkzeug').disabled = True
 
 app_data = {}
 
+# {{{ ---- Dataset loading
 
 def annotation_info(a: Annotation):
     title_tag = app_data['meta_tags'][0]
@@ -61,7 +64,8 @@ def run(host, port, path):
     app.run(host=host, port=port)
 
 
-# ------------ API ------------------
+# }}}
+# {{{ ---- API
 
 @app.route('/api/save/<dir>/<idx>', methods=["POST"])
 def edit_post(dir, idx):
@@ -126,7 +130,8 @@ def do_login():
     return "Unauthorized", 403
 
 
-# ----------------- WEB APP ----------------
+# }}}
+# {{{ ---- WEB APP
 
 html_template = Template((Path(__file__).parent /
                           'static/page.html').read_text())
@@ -144,14 +149,20 @@ def login_page():
         data="{}"
     )
 
+def authenticated(func):
+    @wraps(func)
+    def check_auth(*args, **kwargs):
+        if (not app_data['config']['public'] and
+                session.get('user', None) is None):
+            return redirect(url_for('login_page'))
+        return func(*args, **kwargs)
+    return check_auth
+
 
 @app.route('/list/<target>/<dir>')
 @app.route('/', defaults={'target': None, 'dir': None})
+@authenticated
 def index(target, dir):
-    if (not app_data['config']['public'] and 
-            session.get('user', None) is None):
-        return redirect(url_for('login_page'))
-
     ds = app_data['dataset']
     data = {
         'title': ds.config['title'],
@@ -168,7 +179,7 @@ def index(target, dir):
         data['dir_name'] = dir
         if target == 'real':
             annots = ds.get_annotations(Target.TRAN, dir)
-        else: #  if target == 'symbols':
+        else:  # if target == 'symbols':
             annots = ds.get_annotations(Target.SYMB, dir)
         data['list'] = sorted((annotation_info(an)
                               for an in annots),
@@ -185,6 +196,7 @@ def index(target, dir):
 
 
 @app.route('/edit/<target>/<dir>/<idx>')
+@authenticated
 def edit(target, dir, idx):
     ds = app_data['dataset']
     full_dir = '{}/{}'.format(target, dir)
@@ -202,11 +214,12 @@ def edit(target, dir, idx):
 
     if target == 'real':
         a = Annotation(ds.path / full_id, target=Target.TRAN)
-    else:
+    else:  # target == 'symbol'
         a = Annotation(ds.path / full_id, target=Target.SYMB)
 
     data = {
         'title': ds.config['title'],
+        'target': target,
         'id': {
             'dir': full_dir,
             'num': idn,
@@ -242,3 +255,5 @@ def send_image(target, dir, filename):
 @app.route('/quevedo_logo.png')
 def favicon():
     return send_from_directory(Path(__file__).parent.parent.resolve(), 'logo_icon.png')
+
+# }}}

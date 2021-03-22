@@ -37,16 +37,14 @@ classify)
     - [X] adapt test and predict commands
     - [X] test with trained in server
 - [X] Check CNN still works
-- [ ] Check YOLO still works
 - [O] Adapt web for symbols, and some extras
     - [X] en lista básica, también listar directorios de símbolos (bajo otro
         encabezado)
     - [X] urls using real/symbols
-    - [ ] Make new page (different from edit) for symbol editing (some code is
-        probably the same, but not much)
+    - [X] Make new page (different from edit) for symbol editing (some code is
+        probably the same, but not much). Edit.js remains, has meta and footer,
+        imports annotation editor from either tran or symb
     - [ ] fix api (save, new, etc)
-    - [ ] If there are no folders under "real", the web interface should offer the
-        default one even if the directory is not physically there.
     - [X] In list.js show total number of annotations in a subset
     - [X] nice to have: add Copyright note, and app logo
 - [ ] Add preproc option for experiments, create rotator script (in examples maybe)
@@ -58,6 +56,7 @@ classify)
 I have changed function get_annotations and target is now a bit flag, so
 re-check everything
 
+- [ ] Check YOLO still works
 - [ ] add images
 - [ ] train test split
 - [ ] extract
@@ -75,6 +74,8 @@ re-check everything
     schema is wrong. maybe.
 - [ ] In test, compute a confusion matrix (at least for classify) for deeper
     inspection
+- [ ] If there are no folders under "real", the web interface should offer the
+    default one even if the directory is not physically there.
 - [ ] Use https://docs.python.org/3/library/collections.html#collections.Counter
     in test
 - [ ] IMPORTANT Add license file, and license information for the dependencies.

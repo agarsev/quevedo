@@ -49,6 +49,11 @@ h2 {
     padding: 2px;
 }
 
+.SymbolList tbody th {
+    text-align: right;
+    padding-right: 1em;
+}
+
 .SymbolEntry.editing {
     background-color: #aaf;
 }
