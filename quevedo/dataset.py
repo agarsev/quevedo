@@ -257,31 +257,35 @@ def count(l):
 @click.pass_obj
 def info(obj):
     ''' Returns status information about a dataset.'''
-    dataset = obj['dataset']
+    dataset: Dataset = obj['dataset']
 
     path = dataset.path
     config = dataset.config
-    click.secho('{}\n{}'.format(config["title"], '▔' * len(config['title'])), bold=True)
+    click.secho('{}\n{}'.format(config["title"], '▔' * len(config['title'])),
+                nl=False, bold=True)
     click.echo(config["description"])
     click.secho('Tag schema: {}\n'.format(', '.join(config["tag_schema"])), bold=True)
 
     real = list(dataset.get_annotations(Target.TRAN))
     num_real = count(real)
     click.echo('Real transcriptions: {}'.format(style(num_real > 0, num_real)))
+    click.echo('Subsets: {}'.format(
+        ', '.join(s['name'] for s in dataset.get_subsets(Target.TRAN))))
     num_annot = sum(len(t.anot['symbols']) > 0 for t in real)
     click.echo('Annotated: {}/{}'.format(
         style(num_annot == num_real, num_annot), num_real))
 
-    symbols = path / 'symbols'
-    num_sym = count(symbols.glob('*.png'))
-    click.echo('Symbols extracted: {}'.format(style(symbols.exists(), num_sym, 'no')))
-
-    gen = path / 'generated'
-    num_gen = count(gen.glob('*.png'))
-    click.echo('Transcriptions generated: {}'.format(style(gen.exists(), num_gen, 'no')))
+    symbols = list(dataset.get_annotations(Target.SYMB))
+    num_sym = count(symbols)
+    click.echo('\nIndividual symbols: {}'.format(style(num_sym > 0, num_sym)))
+    click.echo('Subsets: {}'.format(
+        ', '.join(s['name'] for s in dataset.get_subsets(Target.SYMB))))
+    num_annot = sum(len(s.anot['tags']) > 0 for s in symbols)
+    click.echo('Annotated: {}/{}'.format(
+        style(num_annot == num_sym, num_annot), num_sym))
 
     dn_binary = (dataset.config.get('darknet', {}).get('path'))
-    click.echo('Darknet {} properly configured in config.toml'.format(
+    click.echo('\nDarknet {} properly configured in config.toml'.format(
         style(dn_binary is not None and Path(dn_binary).exists(), 'is', 'is not')))
 
     exps = dataset.list_experiments()
@@ -296,14 +300,11 @@ def info(obj):
     click.secho("\n{}\n{}".format(header, '▔' * len(header)), bold=True)
     click.echo("{}\n".format(experiment.config['subject']))
 
-    darknet = experiment.path / 'darknet.cfg'
-    num_txt = sum(1 for r in real if r._txt.exists()) + count(gen.glob('*.txt'))
     click.echo('Dataset {} ready for training'.format(style(
-        darknet.exists() and num_txt == num_gen + num_real,
-        'is', "is not")))
+        experiment.is_prepared(), 'is', "is not")))
 
-    click.echo('Neural network {}'.format(style(experiment.is_trained(),
-               'has been trained', "hasn't been trained")))
+    click.echo('Neural network {}'.format(style(
+        experiment.is_trained(), 'has been trained', "hasn't been trained")))
 
     click.echo('')
 

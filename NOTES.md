@@ -32,7 +32,7 @@ classify)
     - [X] Rename trans to tran everywhere
     - [X] get_generated no longer works, adapt experiments to include multiple
         subsets
-    - [ ] dataset info!!
+    - [X] dataset info!!
 - [X] Adapt for classifier and new symbol arch
     - [X] adapt test and predict commands
     - [X] test with trained in server

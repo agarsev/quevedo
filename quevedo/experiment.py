@@ -37,6 +37,12 @@ class Experiment:
         except IndexError:
             return None
 
+    def is_prepared(self):
+        '''Checks whether the experiment's neural network has been trained and
+        can be used to predict.'''
+        darknet = self.path / 'darknet.cfg'
+        return darknet.exists()
+
     def is_trained(self):
         '''Checks whether the experiment's neural network has been trained and
         can be used to predict.'''
