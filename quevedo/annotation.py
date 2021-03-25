@@ -43,6 +43,9 @@ class Annotation:
         elif pil_image is not None:
             pil_image.save(self.image)
             self._init_json(**more)
+        else:
+            raise ValueError("At least an image path, binary data or PIL image"+
+                             " object is needed")
 
     def save(self):
         self._json.write_text(json.dumps(self.anot))

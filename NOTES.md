@@ -12,11 +12,11 @@ Do these tests while creating a new dataset that can be used to work on
 experiments in the next iteration.
 
 - [X] create dataset
-- [ ] add images
+- [X] add images
+- [ ] annotate graphemes in the web app
 - [ ] train test split
 - [ ] extract
 - [ ] generate, check only train used
-- [ ] annotate graphemes in the web app
 - [ ] train and test YOLO (pre-experiment refactor)
 - [ ] train and test CNN (pre-experiment refactor)
  

@@ -178,15 +178,15 @@ def add_images(obj, image_dir, name, target, existing):
         dest.mkdir()
     except FileExistsError:
         if existing is None:
-            existing = click.prompt('''Target directory already exists.
-                What to do? (m)erge/(r)eplace/(a)bort''', default='a')[0]
+            existing = click.prompt('Target directory already exists.\n' +
+                'What to do? (m)erge/(r)eplace/(a)bort', default='a')[0]
         if existing == 'r':
             for f in dest.glob('*'):
                 f.unlink()
         elif existing == 'm':
             pass
         else:
-            click.Abort()
+            raise click.Abort()
 
     idx = max((int(f.stem) for f in dest.glob('*.png')), default=0) + 1
     for d in image_dir:
@@ -196,7 +196,7 @@ def add_images(obj, image_dir, name, target, existing):
         d = Path(d)
         for img in d.glob('*.png'):
             new_logo = Annotation(dest / str(idx), target)
-            new_logo.create_from(image=img)
+            new_logo.create_from(image_path=img)
             idx = idx + 1
             num = num + 1
         click.echo("imported {}".format(style(num > 0, num)))
