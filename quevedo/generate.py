@@ -23,14 +23,14 @@ except ImportError:
 config = {
     'count': 500,  # Number of files to generate
     'seed': None,  # Random seed for generation
-    'use_force': True,  # Use a force layout algorithm to distribute symbols
+    'use_force': True,  # Use a force layout algorithm to distribute graphemes
     'width_range': [300, 500],  # A range of possible widths
     'height_range': [300, 500],  # A range of possible heights
 }
 
 
-def put_symbol(canvas, x, y, file_info, name, rotate=False):
-    '''Put a symbol into a transcription, and write the resulting darknet
+def put_grapheme(canvas, x, y, file_info, name, rotate=False):
+    '''Put a grapheme into a logogram, and write the resulting darknet
     bounding box annotation.'''
 
     canvas_w = canvas.width
@@ -63,32 +63,32 @@ def put_symbol(canvas, x, y, file_info, name, rotate=False):
     }
 
 
-def create_transcription(path, symbols):
-    '''Creates an image with randomly placed symbols'''
+def create_logogram(path, graphemes):
+    '''Creates an image with randomly placed graphemes'''
     canvas_w = random.randint(*config['width_range'])
     canvas_h = random.randint(*config['height_range'])
 
-    class_names = []    # list of the names of the symbols to place
+    class_names = []    # list of the names of the graphemes to place
     files = []          # list of the actual files
-    rotate = []         # list of whether to rotate each symbol
+    rotate = []         # list of whether to rotate each grapheme
     positions = []      # list of the positions
 
-    def add_symbol(name, params):
+    def add_grapheme(name, params):
         class_names.append(name)
         files.append(random.choice(params['files']))
         rotate.append(params['rotate'])
         positions.append([random.randint(0, canvas_w), random.randint(0, canvas_h)])
 
-    # Iterate over the list of symbols to find how many to place of each
-    for name, params in symbols.items():
+    # Iterate over the list of graphemes to find how many to place of each
+    for name, params in graphemes.items():
         if params['mode'] == 'one' and random.random() < params['freq']:
-            add_symbol(name, params)
+            add_grapheme(name, params)
         elif params['mode'] == 'many':
             for _ in range(random.randint(0, params['max'])):
                 if random.random() < params['prob']:
-                    add_symbol(name, params)
+                    add_grapheme(name, params)
 
-    #  Use force layout to spread symbols
+    #  Use force layout to spread graphemes
     if can_use_force and config['use_force'] and len(positions) > 1:
         layout = fl.draw_spring_layout(dataset=np.array(positions), algorithm=fl.SpringForce)
         positions = layout.spring_layout()
@@ -103,38 +103,38 @@ def create_transcription(path, symbols):
         scale_y = (canvas_h * .8) / (max_y - min_y)
         positions[:, 1] = (ys - min_y) * scale_y + canvas_h * .1
 
-    # Create the actual transcription
+    # Create the actual logogram
     canvas = Image.new("RGBA", (canvas_w, canvas_h), "white")
-    symbols = [put_symbol(canvas, int(x), int(y), file_info, name, rotate)
+    graphemes = [put_grapheme(canvas, int(x), int(y), file_info, name, rotate)
                for [x, y], name, file_info, rotate
                in zip(positions, class_names, files, rotate)]
-    Annotation(path).create_from(pil_image=canvas, symbols=symbols)
+    Annotation(path, target=Target.LOGO).create_from(pil_image=canvas, graphemes=graphemes)
 
 
 @click.command()
 @click.option('-f', '--from', 'dir_from', default='default',
-              help='''Symbol subset to use''')
+              help='''Grapheme subset to use''')
 @click.option('-t', '--to', 'dir_to', default='default',
-              help='''Transcription subset where to place generated transcriptions''')
+              help='''Logogram subset where to place generated logograms.''')
 @click.option('-m', '--merge', 'existing', flag_value='m',
-              help='''Merge new transcriptions with existing ones, if any.''')
+              help='''Merge new logograms with existing ones, if any.''')
 @click.option('-r', '--replace', 'existing', flag_value='r',
-              help='''Replace old transcriptions with new ones, if any.''')
+              help='''Replace old logograms with new ones, if any.''')
 @click.pass_obj
 def generate(obj, dir_from, dir_to, existing):
-    '''Generates artificial "transcriptions" for training (data augmentation) by
-    randomly combining symbols together. Some direction can be given to the
-    generation process, see options in config file. Only symbols marked for
+    '''Generates artificial logograms for training (data augmentation) by
+    randomly combining graphemes together. Some direction can be given to the
+    generation process, see options in config file. Only graphemes marked for
     training will be used.'''
 
     dataset = obj['dataset']
-    gen_d = dataset.real_path / dir_to
+    gen_d = dataset.logogram_path / dir_to
 
     try:
         gen_d.mkdir()
     except FileExistsError:
         if existing is None:
-            existing = click.prompt('''Transcription directory already exists.
+            existing = click.prompt('''Logogram directory already exists.
                 What to do? (m)erge/(r)eplace/(a)bort''', default='a')[0]
         if existing == 'r':
             for f in gen_d.glob('*'):
@@ -152,16 +152,16 @@ def generate(obj, dir_from, dir_to, existing):
     for param in config['params']:
         param['match'] = re.compile(param['match'])
 
-    # Find the different symbols to use
-    symbols = {}
-    for symbol in dataset.get_annotations(Target.SYMB, subset=dir_from):
-        if symbol.anot['set'] != 'train':
+    # Find the different graphemes to use
+    graphemes = {}
+    for g in dataset.get_annotations(Target.GRAPH, subset=dir_from):
+        if g.anot['set'] != 'train':
             continue
-        tags = symbol.anot['tags']
+        tags = g.anot['tags']
         name = tags[tag_index]
-        if name in symbols:
-            symbols[name]['files'].append({
-                'filename': symbol.image.resolve(),
+        if name in graphemes:
+            graphemes[name]['files'].append({
+                'filename': g.image.resolve(),
                 'tags': tags,
             })
         else:
@@ -171,13 +171,13 @@ def generate(obj, dir_from, dir_to, existing):
                     s.update(param)
                     break
             else:
-                raise SystemExit("Configuration not found for symbol {}".format(name))
+                raise SystemExit("Configuration not found for grapheme {}".format(name))
             s['files'] = [{
-                'filename': symbol.image.resolve(),
+                'filename': g.image.resolve(),
                 'tags': tags,
             }]
-            symbols[name] = s
+            graphemes[name] = s
 
-    # Generate as many transcriptions as requested, numbering them incrementally
+    # Generate as many logograms as requested, numbering them incrementally
     for i in range(config['count']):
-        create_transcription(gen_d / str(i + 1), symbols)
+        create_logogram(gen_d / str(i + 1), graphemes)

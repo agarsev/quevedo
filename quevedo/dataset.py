@@ -21,8 +21,8 @@ class Dataset:
         directory but other commands to fail if it doesn't exist. This is due to how
         click works, and unlikely to be fixed. '''
         self._path = Path(path)
-        self.real_path = self._path / 'real'
-        self.symbol_path = self._path / 'symbols'
+        self.logogram_path = self._path / 'logograms'
+        self.grapheme_path = self._path / 'graphemes'
         self.config_path = self._path / 'config.toml'
 
     def create(self):
@@ -30,8 +30,8 @@ class Dataset:
         if p.exists() and len(listdir(p)) > 0:
             raise SystemExit("Directory '{}' not empty, aborting".format(p.resolve()))
         self.path = p
-        (self.real_path).mkdir(parents=True)  # We also create the required real directory
-        (self.symbol_path).mkdir()
+        (self.logogram_path).mkdir(parents=True)
+        (self.grapheme_path).mkdir()
         (self.path / 'experiments').mkdir()
 
     def run_darknet(self, *args):
@@ -50,19 +50,19 @@ class Dataset:
             return Experiment(self, name)
 
     def get_single(self, target: Target, subset, id):
-        if target == Target.TRAN:
-            path = self.real_path / subset / id
-        elif target == Target.SYMB:
-            path = self.symbol_path / subset / id
+        if target == Target.LOGO:
+            path = self.logogram_path / subset / id
+        elif target == Target.GRAPH:
+            path = self.grapheme_path / subset / id
         else:
             raise ValueError('A single target is needed')
         return Annotation(path, target)
 
     def new_single(self, target: Target, subset):
-        if target == Target.TRAN:
-            path = self.real_path / subset
-        elif target == Target.SYMB:
-            path = self.symbol_path / subset
+        if target == Target.LOGO:
+            path = self.logogram_path / subset
+        elif target == Target.GRAPH:
+            path = self.grapheme_path / subset
         else:
             raise ValueError('A single target is needed')
         next_id = sum(1 for _ in path.glob('*.png')) + 1
@@ -72,34 +72,34 @@ class Dataset:
         '''Returns a generator that yields all annotations, those of a given
         target, or only those in a given subset and target.'''
         if subset is None:
-            if Target.TRAN in target:
-                ret = (Annotation(file, Target.TRAN) for file in
-                       self.real_path.glob('**/*.png'))
-                if Target.SYMB in target:
-                    ret = chain(ret, (Annotation(file, Target.SYMB) for file in
-                       self.symbol_path.glob('**/*.png')))
+            if Target.LOGO in target:
+                ret = (Annotation(file, Target.LOGO) for file in
+                       self.logogram_path.glob('**/*.png'))
+                if Target.GRAPH in target:
+                    ret = chain(ret, (Annotation(file, Target.GRAPH) for file in
+                       self.grapheme_path.glob('**/*.png')))
                 return ret
-            elif Target.SYMB in target:
-                return (Annotation(file, Target.SYMB) for file in
-                       self.symbol_path.glob('**/*.png'))
+            elif Target.GRAPH in target:
+                return (Annotation(file, Target.GRAPH) for file in
+                       self.grapheme_path.glob('**/*.png'))
             else:
                 raise ValueError('A target needs to be specified')
         else:
-            if target == Target.TRAN:
-                return (Annotation(file, target=Target.TRAN) for file in
-                        (self.real_path / subset).glob('*.png'))
-            elif Target.SYMB in target:
-                return (Annotation(file, target=Target.SYMB) for file in
-                        (self.symbol_path / subset).glob('*.png'))
+            if target == Target.LOGO:
+                return (Annotation(file, target=Target.LOGO) for file in
+                        (self.logogram_path / subset).glob('*.png'))
+            elif Target.GRAPH in target:
+                return (Annotation(file, target=Target.GRAPH) for file in
+                        (self.grapheme_path / subset).glob('*.png'))
             else:
                 raise ValueError('If a subset is specified, a single target is needed')
 
     def get_subsets(self, target: Target):
         '''Gets information about the subsets in a given target.'''
-        if target == Target.TRAN:
-            path = self.real_path
-        elif target == Target.SYMB:
-            path = self.symbol_path
+        if target == Target.LOGO:
+            path = self.logogram_path
+        elif target == Target.GRAPH:
+            path = self.grapheme_path
         else:
             raise ValueError('A single target is needed')
         return [{'name': d.stem,
@@ -155,10 +155,10 @@ def style(condition, right, wrong=None):
               required=True, help="Directory from which to import images")
 @click.option('--name', '-n', default='default',
               help="Name for the subset of the dataset where to import the images")
-@click.option('--symb', '-s', 'target', flag_value='s',
-              help="Import the images as symbols rather than full transcriptions")
-@click.option('--tran', '-t', 'target', flag_value='t', default=True,
-              help="Import the images as transcriptions (the default)")
+@click.option('--graph', '-g', 'target', flag_value='graph',
+              help="Import the images as graphemes rather than full logograms.")
+@click.option('--logo', '-l', 'target', flag_value='logo', default=True,
+              help="Import the images as logograms (the default)")
 @click.option('-m', '--merge', 'existing', flag_value='m',
               help='''Merge new images with existing ones, if any.''')
 @click.option('-r', '--replace', 'existing', flag_value='r',
@@ -167,12 +167,12 @@ def add_images(obj, image_dir, name, target, existing):
     ''' Import images from directories to a dataset.'''
     dataset = obj['dataset']
 
-    if target == 'symb':
-        dest = dataset.symbol_path / name
-        target = Target.SYMB
+    if target == 'graph':
+        dest = dataset.grapheme_path / name
+        target = Target.GRAPH
     else:
-        dest = dataset.real_path / name
-        target = Target.TRAN
+        dest = dataset.logogram_path / name
+        target = Target.LOGO
 
     try:
         dest.mkdir()
@@ -195,8 +195,8 @@ def add_images(obj, image_dir, name, target, existing):
         num = 0
         d = Path(d)
         for img in d.glob('*.png'):
-            new_tran = Annotation(dest / str(idx), target)
-            new_tran.create_from(image=img)
+            new_logo = Annotation(dest / str(idx), target)
+            new_logo.create_from(image=img)
             idx = idx + 1
             num = num + 1
         click.echo("imported {}".format(style(num > 0, num)))
@@ -205,10 +205,10 @@ def add_images(obj, image_dir, name, target, existing):
 
 @click.command()
 @click.option('--names', '-n', 'subsets', multiple=True, help="Subsets to split.")
-@click.option('--symb', '-s', 'target', flag_value='s',
-              help="Split symbols")
-@click.option('--tran', '-t', 'target', flag_value='t', default=True,
-              help="Split transcriptions (the default)")
+@click.option('--graph', '-g', 'target', flag_value='graph',
+              help="Split graphemes")
+@click.option('--logo', '-l', 'target', flag_value='logo', default=True,
+              help="Split logograms (the default)")
 @click.option('--percentage', '-p', type=click.IntRange(0, 100), default=60)
 @click.option('--seed', type=click.INT, help='A seed for the random split algorithm.')
 @click.pass_obj
@@ -223,30 +223,30 @@ def train_test_split(obj, subsets, target, percentage, seed):
 
     random.seed(seed)
 
-    if target == 't':
+    if target == 'logo':
         if len(subsets) == 0:
-            real = list(dataset.get_annotations(Target.TRAN))
+            an = list(dataset.get_annotations(Target.LOGO))
         else:
-            real = list(chain(*(dataset.get_annotations(Target.TRAN) for d in subsets)))
+            an = list(chain(*(dataset.get_annotations(Target.LOGO) for d in subsets)))
     else:
         if len(subsets) == 0:
-            real = list(dataset.get_annotations(Target.SYMB))
+            an = list(dataset.get_annotations(Target.GRAPH))
         else:
-            real = list(chain(*(dataset.get_annotations(Target.SYMB) for d in subsets)))
+            an = list(chain(*(dataset.get_annotations(Target.GRAPH) for d in subsets)))
 
-    random.shuffle(real)
-    split_point = round(len(real) * percentage / 100)
+    random.shuffle(an)
+    split_point = round(len(an) * percentage / 100)
 
-    for t in real[:split_point]:
+    for t in an[:split_point]:
         t.anot['set'] = 'train'
         t.save()
 
-    for t in real[split_point:]:
+    for t in an[split_point:]:
         t.anot['set'] = 'test'
         t.save()
 
     click.echo("Dataset split into train ({} files) and test ({} files)".format(
-               split_point, len(real) - split_point))
+               split_point, len(an) - split_point))
 
 
 def count(l):
@@ -266,23 +266,23 @@ def info(obj):
     click.echo(config["description"])
     click.secho('Tag schema: {}\n'.format(', '.join(config["tag_schema"])), bold=True)
 
-    real = list(dataset.get_annotations(Target.TRAN))
-    num_real = count(real)
-    click.echo('Real transcriptions: {}'.format(style(num_real > 0, num_real)))
+    logos = list(dataset.get_annotations(Target.LOGO))
+    num_logos = count(logos)
+    click.echo('Logograms: {}'.format(style(num_logos > 0, num_logos)))
     click.echo('Subsets: {}'.format(
-        ', '.join(s['name'] for s in dataset.get_subsets(Target.TRAN))))
-    num_annot = sum(len(t.anot['symbols']) > 0 for t in real)
+        ', '.join(s['name'] for s in dataset.get_subsets(Target.LOGO))))
+    num_annot = sum(len(t.anot['graphemes']) > 0 for t in logos)
     click.echo('Annotated: {}/{}'.format(
-        style(num_annot == num_real, num_annot), num_real))
+        style(num_annot == num_logos, num_annot), num_logos))
 
-    symbols = list(dataset.get_annotations(Target.SYMB))
-    num_sym = count(symbols)
-    click.echo('\nIndividual symbols: {}'.format(style(num_sym > 0, num_sym)))
+    graphemes = list(dataset.get_annotations(Target.GRAPH))
+    num_graph = count(graphemes)
+    click.echo('\nGraphemes: {}'.format(style(num_graph > 0, num_graph)))
     click.echo('Subsets: {}'.format(
-        ', '.join(s['name'] for s in dataset.get_subsets(Target.SYMB))))
-    num_annot = sum(len(s.anot['tags']) > 0 for s in symbols)
+        ', '.join(s['name'] for s in dataset.get_subsets(Target.GRAPH))))
+    num_annot = sum(len(s.anot['tags']) > 0 for s in graphemes)
     click.echo('Annotated: {}/{}'.format(
-        style(num_annot == num_sym, num_annot), num_sym))
+        style(num_annot == num_graph, num_annot), num_graph))
 
     dn_binary = (dataset.config.get('darknet', {}).get('path'))
     click.echo('\nDarknet {} properly configured in config.toml'.format(

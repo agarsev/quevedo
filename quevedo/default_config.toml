@@ -8,15 +8,15 @@ tag_schema = [ "tag" ]
 # For a multi-tag schema, use:
 # tag_schema = [ "tag1", "tag2" ]
 
-# Meta tags affect the whole transcription, rather than individual symbols. The
-# first one will be used as title for the transcription in the web listing.
+# Meta tags affect the whole annotation, rather than individual graphemes. The
+# first one will be used as title for the annotation in the web listing.
 meta_tags = [ "filename", "meaning" ]
 
 annotation_help = """
-Write here any help for annotators, like lists of symbols or other
+Write here any help for annotators, like lists of graphemes or other
 instructions. For example:
 
-Make boxes slightly larger than the symbols, not too tight.
+Make boxes slightly larger than the graphemes, not too tight.
 """
 
 [darknet]
@@ -29,13 +29,13 @@ default = true # Experiment to use if not specified
 task = "detect"
 tag = "tag" # Choose the tag name from tag_schema to train and test
 # subsets = [ "default" ] # If not specified, all subsets will be used
-subject = "focus on symbol type learning and recognition"
+subject = "Focus on grapheme type learning and recognition"
 
 [experiments.classify]
 task = "classify"
 tag = "tag"
 subsets = [ "default" ]
-subject = "Classify symbols"
+subject = "Classify graphemes"
 
 # Add more experiments like so:
 # [experiment.other]
@@ -58,21 +58,21 @@ secret_key = "ce8c9cd0316faac773645648ac827ff6"
 # password = ""
 
 [generate]
-# Configuration for the artificial transcription generation
+# Configuration for the artificial logogram generation
 count = 500
 width_range = [ 200, 300 ]
 height_range = [ 200, 300 ]
-tag = "tag" # Tag to guide symbol placement
+tag = "tag" # Tag to guide grapheme placement
 
 [[generate.params]]
-match = 'one' # Match symbols tagged with class "one"
-mode = 'one' # Only put one of these symbols
+match = 'one' # Match graphemes tagged with class "one"
+mode = 'one' # Only put one of these graphemes
 freq = 0.4 # How often to add one of these
 rotate = false
 
 [[generate.params]]
-match = '.*' # Match any symbol (it's a regex)
-mode = 'many' # Add potentially many of these symbols
+match = '.*' # Match any grapheme (it's a regex)
+mode = 'many' # Add potentially many of these graphemes
 max = 3 # How many to potentially add
-prob = 0.6 # Probability for a single symbol to appear (times max = expected number)
+prob = 0.6 # Probability for a single grapheme to appear (times max = expected number)
 rotate = true

@@ -8,7 +8,7 @@ h2 {
     margin-bottom: 1ex;
 }
 
-.MetaEditor, .SymbolList {
+.MetaEditor, .GraphemeList {
     display: flex;
     align-items: start;
     justify-content: space-around;
@@ -35,39 +35,39 @@ h2 {
     width: 100%;
 }
 
-.SymbolList div:nth-child(2) {
+.GraphemeList div:nth-child(2) {
     flex: 1;
     display: inline-block;
 }
 
-.SymbolList table {
+.GraphemeList table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.SymbolList td {
+.GraphemeList td {
     padding: 2px;
 }
 
-.SymbolList tbody th {
+.GraphemeList tbody th {
     text-align: right;
     padding-right: 1em;
 }
 
-.SymbolEntry.editing {
+.GraphemeEntry.editing {
     background-color: #aaf;
 }
 
-.SymbolEntry td:nth-child(1),
-.SymbolEntry td:nth-last-child(1) {
+.GraphemeEntry td:nth-child(1),
+.GraphemeEntry td:nth-last-child(1) {
     width: 0;
 }
 
-.SymbolEntry td:first-child{
+.GraphemeEntry td:first-child{
     padding-left: 2vw;
 }
 
-.SymbolEntry input[type="text"] { width: 100%; }
+.GraphemeEntry input[type="text"] { width: 100%; }
 
 .Annotation {
     display: inline-block;

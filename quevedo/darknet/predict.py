@@ -72,7 +72,7 @@ def init_darknet(dataset, experiment):
 
 
 def predict(image_path, experiment):
-    '''Get symbols in an image using the trained neural network (which must have
+    '''Get graphemes in an image using the trained neural network (which must have
     been loaded using init_darknet)'''
 
     if experiment.config['task'] == 'detect':

@@ -4,10 +4,10 @@ const html = htm.bind(preact.h);
 
 import Text from './i18n.js';
 
-export function SymbolEditor ({ id, tags, columns }) {
+export function GraphemeEditor ({ id, tags, columns }) {
     return html`
-        <h2>${Text['symbols']}</h2>
-        <div class="SymbolList">
+        <h2>${Text['graphemes']}</h2>
+        <div class="GraphemeList">
             <div class="Annotation">
                 <img src="img/${id.full}.png" />
             </div>

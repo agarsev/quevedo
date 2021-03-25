@@ -18,7 +18,7 @@ translation = {
 
 if __name__ == '__main__':
     ds = Dataset(sys.argv[1])
-    for t in ds.get_annotations(Target.TRAN):
+    for t in ds.get_annotations(Target.LOGO):
         meta: dict = t.anot.get('meta')
         for orig, trad in translation.items():
             if orig in meta:

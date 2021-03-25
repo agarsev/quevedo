@@ -5,12 +5,12 @@ import json
 from pathlib import Path
 from shutil import copyfile
 
-Target = Flag('AnnotationTarget', 'TRAN SYMB')
+Target = Flag('AnnotationTarget', 'LOGO GRAPH')
 
 
 class Annotation:
-    '''Class representing a single annotation of either a transcription of a
-    sign or signs in the dataset or an isolated symbol.'''
+    '''Class representing a single annotation of either a logogram of a
+    sign or signs in the dataset or an isolated grapheme.'''
 
     def __init__(self, path, target: Target):
         path = Path(path)
@@ -22,9 +22,9 @@ class Annotation:
 
     def _init_json(self, meta={}, **more):
         d = {"set": "train", "meta": meta}
-        if self.target == Target.TRAN:
-            d['symbols'] = []
-        elif self.target == Target.SYMB:
+        if self.target == Target.LOGO:
+            d['graphemes'] = []
+        elif self.target == Target.GRAPH:
             d['tags'] = []
         d.update(**more)
         self.anot = d

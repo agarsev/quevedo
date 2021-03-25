@@ -2,8 +2,8 @@
 
 import Text from './i18n.js';
 import { useChangeStack, useList } from './common_state.js';
-import { TranscriptionEditor } from './tran.js';
-import { SymbolEditor } from './symb.js';
+import { LogogramEditor } from './logo.js';
+import { GraphemeEditor } from './graph.js';
 
 const html = htm.bind(preact.h);
 const { useState, useRef } = preactHooks;
@@ -22,8 +22,8 @@ function App ({ title, target, id, annotation_help, links, anot,
         _setMeta({ ...meta, [k]: v });
     };
 
-    if (target == 'real') {
-        var symbols = useList(anot.symbols, changes)
+    if (target == 'logo') {
+        var graphemes = useList(anot.graphemes, changes)
     } else {
         var tags = useList(anot.tags, changes);
     }
@@ -40,8 +40,8 @@ function App ({ title, target, id, annotation_help, links, anot,
     const saveChanges = () => {
         changes.setSaving();
         setMessage(Text['saving']);
-        if (target == 'real') {
-            var body = { meta, symbols: symbols.list }
+        if (target == 'logo') {
+            var body = { meta, graphemes: graphemes.list }
         } else {
             var body = { meta, tags: tags.list }
         }
@@ -58,7 +58,7 @@ function App ({ title, target, id, annotation_help, links, anot,
     };
 
     const autoAnnotate = experiment => {
-        if (symbols.list.length > 0 && 
+        if (graphemes.list.length > 0 && 
             !confirm(Text['confirm_generate'])) {
             return;
         }
@@ -69,13 +69,13 @@ function App ({ title, target, id, annotation_help, links, anot,
             } else throw r;
         }).then(data => {
             console.log(data);
-            let new_symbols = data.symbols.map(({ box, name }) => {
+            let new_graphemes = data.graphemes.map(({ box, name }) => {
                 let tags = [];
                 tags[data.tag_index] = name;
                 return { box, tags };
             });
             // sort left-to-right (roughly) and top-to-bottom (strict)
-            new_symbols.sort((a, b) => {
+            new_graphemes.sort((a, b) => {
                 let left_a = a.box[0]-a.box[2]/2;
                 let left_b = b.box[0]-b.box[2]/2;
                 if (Math.abs(left_b-left_a)<0.09) {
@@ -84,7 +84,7 @@ function App ({ title, target, id, annotation_help, links, anot,
                     return top_a - top_b;
                 } else return left_a - left_b;
             });
-            symbols.set(new_symbols);
+            graphemes.set(new_graphemes);
         }).catch(setError);
     };
 
@@ -93,9 +93,9 @@ function App ({ title, target, id, annotation_help, links, anot,
             message, show_save: changes.dirty>0, autoAnnotate,
             exp_list, changes }} />
         <${MetaEditor} ...${{meta_tags, meta, setMeta}} />
-        ${target=='real'?
-            html`<${TranscriptionEditor} ...${{id, symbols, columns}} />`
-            :html`<${SymbolEditor} ...${{id, tags, columns}} />`}
+        ${target=='logo'?
+            html`<${LogogramEditor} ...${{id, graphemes, columns}} />`
+            :html`<${GraphemeEditor} ...${{id, tags, columns}} />`}
         <pre>${annotation_help}</pre>
     `;
 }

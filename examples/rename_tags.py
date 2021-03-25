@@ -18,8 +18,8 @@ translation = {
 
 if __name__ == '__main__':
     ds = Dataset(sys.argv[1])
-    for t in ds.get_annotations(Target.TRAN):
-        for s in t.anot.get('symbols', []):
+    for t in ds.get_annotations(Target.LOGO):
+        for s in t.anot.get('graphemes', []):
             original = s['tags'][0]
             if original in translation:
                 s['tags'][0] = translation[original]

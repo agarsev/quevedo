@@ -16,7 +16,7 @@ languages = [str(fn.stem) for fn in
 @click.option('-l', '--language', help="Language for the UI (default from config file)",
               type=click.Choice(languages, case_sensitive=False))
 def launcher(obj, host, port, browser, mount_path, language):
-    ''' Run a web application for managing and annotating the transcriptions in
+    ''' Run a web application for managing and annotating the logograms in
     the dataset.
     '''
     from quevedo.web import app

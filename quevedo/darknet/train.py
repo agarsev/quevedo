@@ -12,11 +12,7 @@ def prepare(obj):
     dataset and experiment.
 
     Important: after moving (changing the path) of the dataset, this command
-    *must* be called again before any additional training or predicting.
-
-    The transcriptions in the `real` directory must have been tagged. If enabled
-    for this experiment, transcriptions in the `generated` directory will also
-    be used.'''
+    *must* be called again before any additional training or predicting.'''
 
     dataset = obj['dataset']
     experiment = dataset.get_experiment(obj['experiment'])
@@ -30,7 +26,7 @@ def prepare(obj):
 def train(obj):
     ''' Trains a neural network to recognize the SW in this dataset.
 
-    Uses the transcriptions and configuration created, and calls the darknet
+    Uses the annotations and configuration created, and calls the darknet
     binary with the appropriate information.'''
 
     dataset = obj['dataset']

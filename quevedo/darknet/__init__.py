@@ -10,7 +10,7 @@ from quevedo.darknet.test import test
               required=True, help="Image to predict")
 @click.pass_obj
 def predict_image(obj, image):
-    '''Get predicted symbols for an image using the trained neural network.'''
+    '''Get predicted graphemes for an image using the trained neural network.'''
     from quevedo.darknet.predict import init_darknet, predict
     dataset = obj['dataset']
     experiment = dataset.get_experiment(obj['experiment'])

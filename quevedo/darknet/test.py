@@ -42,7 +42,7 @@ def iou(a, b):
 
 
 def similarity(a, b):
-    '''Similarity of symbols.'''
+    '''Similarity of graphemes.'''
     return iou(a['box'], b['box']) if (a['name'] == b['name']) else 0
 
 
@@ -68,7 +68,7 @@ def test(obj, do_print, csv):
     experiment = dataset.get_experiment(obj['experiment'])
     init_darknet(dataset, experiment)
 
-    all_symbols = set()
+    all_graphemes = set()
     true_positives = dict()
     false_positives = dict()
     false_negatives = dict()
@@ -78,13 +78,13 @@ def test(obj, do_print, csv):
     for an in experiment.get_annotations('test'):
         predictions = predict(an.image, experiment)
         if task == 'detect':
-            for sym in an.anot['symbols']:
-                tag = experiment.get_tag(sym['tags'])
-                real = {'box': sym['box'], 'name': tag}
-                if tag not in all_symbols:
-                    all_symbols.add(tag)
+            for g in an.anot['graphemes']:
+                tag = experiment.get_tag(g['tags'])
+                logo = {'box': g['box'], 'name': tag}
+                if tag not in all_graphemes:
+                    all_graphemes.add(tag)
                 if len(predictions) > 0:
-                    similarities = sorted(((similarity(p, real), i) for (i, p) in
+                    similarities = sorted(((similarity(p, logo), i) for (i, p) in
                                           enumerate(predictions)), reverse=True)
                     (sim, idx) = similarities[0]
                     if sim > 0.7:
@@ -99,8 +99,8 @@ def test(obj, do_print, csv):
         else:  # classify
             best = predictions[0]
             true_tag = experiment.get_tag(an.anot['tags'])
-            if true_tag not in all_symbols:
-                all_symbols.add(true_tag)
+            if true_tag not in all_graphemes:
+                all_graphemes.add(true_tag)
             # TODO thresholds should be configuration, in detect too
             if best['confidence'] < 0.5:  # no prediction
                 if true_tag != '':
@@ -112,7 +112,7 @@ def test(obj, do_print, csv):
                     incr(false_positives, best['tag'])
 
     results = {}
-    for name in sorted(all_symbols):
+    for name in sorted(all_graphemes):
         tp = true_positives.get(name, 0)
         fp = false_positives.get(name, 0)
         fn = false_negatives.get(name, 0)
@@ -127,7 +127,7 @@ def test(obj, do_print, csv):
     if do_print:
         header = "class      precision  recall f-score"
         click.echo("{}\n{}".format(header, "-" * len(header)))
-        for name in sorted(all_symbols):
+        for name in sorted(all_graphemes):
             r = results[name]
             click.echo("{:10s} {:9.2f} {:7.2f} {:7.2f}".format(name,
                     r['prec'], r['rec'], r['f']))
@@ -136,7 +136,7 @@ def test(obj, do_print, csv):
         file_path = experiment.path / 'results.csv'
         with open(file_path, 'w') as f:
             print("class;precision;recall;f-score", file=f)
-            for name in sorted(all_symbols):
+            for name in sorted(all_graphemes):
                 r = results[name]
                 print("{};{};{};{}".format(name, r['prec'], r['rec'],
                        r['f']), file=f)

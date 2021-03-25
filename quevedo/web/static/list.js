@@ -2,7 +2,7 @@
 
 import Text from '../i18n.js';
 
-const MAX_TRANS_TITLE = 20;
+const MAX_ANNO_TITLE = 20;
 
 const html = htm.bind(preact.h);
 const { useState, useRef } = preactHooks;
@@ -41,21 +41,21 @@ function App ({ title, path, description, columns, dir_name, target,
         <pre><b>(${path})</b></pre>
         <pre><b>${Text['columns']}: ${columns.join(', ')}</b></pre>
         <pre>${description}</pre>
-        <${in_dir?TransList:DirList} list=${list} list2=${list2}
+        <${in_dir?AnnoList:DirList} list=${list} list2=${list2}
             upload=${upload} />
     `;
 }
 
 function DirList ({ list, list2 }) {
     return html`<>
-        <h2>${Text['list_tran']}</h2>
+        <h2>${Text['list_logo']}</h2>
         <ul class="List">
-            ${list.map(t => html`<${DirEntry} target='real' ...${t} />`)}
+            ${list.map(t => html`<${DirEntry} target='logo' ...${t} />`)}
             <li class="extra-space"></li>
         </ul>
-        <h2>${Text['list_symb']}</h2>
+        <h2>${Text['list_graph']}</h2>
         <ul class="List">
-            ${list2.map(t => html`<${DirEntry} target='symbols' ...${t} />`)}
+            ${list2.map(t => html`<${DirEntry} target='graph' ...${t} />`)}
             <li class="extra-space"></li>
         </ul>
     `;
@@ -68,11 +68,11 @@ function DirEntry ({ name, count, target }) {
     </li>`;
 }
 
-function TransList ({ list, upload }) {
+function AnnoList ({ list, upload }) {
     return html`<ul class="List">
         <${UpEntry} />
         <${NewEntry} upload=${upload} />
-        ${list.map(t => html`<${TransEntry} ...${t} />`)}
+        ${list.map(t => html`<${AnnoEntry} ...${t} />`)}
         <li class="extra-space"></li>
     </ul>`;
 }
@@ -104,14 +104,14 @@ function NewEntry ({ upload }) {
     </li>`;
 }
 
-function TransEntry ({ id, title, set, annotated }) {
+function AnnoEntry ({ id, title, set, annotated }) {
     const { target, dir_name } = window.quevedo_data;
     const dir = `${target}/${dir_name}`;
     const edit_link = `edit/${dir}/${id}`;
-    title = title.length > MAX_TRANS_TITLE?
-        title.substring(0, MAX_TRANS_TITLE-1)+'…':
+    title = title.length > MAX_ANNO_TITLE?
+        title.substring(0, MAX_ANNO_TITLE-1)+'…':
         title;
-    return html`<li class="Entry TransEntry">
+    return html`<li class="Entry LogoEntry">
         <h2>${title} <span class="set">(${set})</span></h2>
         <img src="img/${dir}/${id}.png" onclick=${() => window.location=edit_link}/>
         <p>

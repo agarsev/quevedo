@@ -5,13 +5,13 @@ from os import getcwd
 import time
 
 from quevedo import darknet, web, dataset as ds
-from quevedo.extract_symbols import extract_symbols
+from quevedo.extract_graphemes import extract_graphemes
 from quevedo.generate import generate
 
 
 @click.group(commands={
     'split': ds.train_test_split, 'config': ds.config_edit,
-    'extract_symbols': extract_symbols, 'generate': generate,
+    'extract': extract_graphemes, 'generate': generate,
     'prepare': darknet.train.prepare, 'train': darknet.train.train,
     'test': darknet.test, 'predict': darknet.predict_image,
     'info': ds.info, 'create': ds.create, 'add_images': ds.add_images,

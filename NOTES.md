@@ -3,9 +3,10 @@
 
 # -- NEXT --
 
-- [ ] Rename symbol to grapheme
+- [X] Rename symbol to grapheme, transcription to logogram
+- [X] logo_path -> logogram_path
 
-## Test new transcription / grapheme arch
+## Test new logogram / grapheme arch
 
 Do these tests while creating a new dataset that can be used to work on
 experiments in the next iteration.
@@ -32,7 +33,7 @@ experiment integration into pipeline.
     examples maybe) that uses rotation tab to realign graphemes according to
     rotation tag.
 - [ ] train and test CNN (new arch, with preproc)
-- [ ] fix use experiment from web: select classify or detect depending on tran
+- [ ] fix use experiment from web: select classify or detect depending on logo
     or graheme edition, and select tag to fill automatically
 
 ## Pipeline
@@ -51,9 +52,9 @@ Github issues are less 便利 than this file when you go solo 🤷.
 
 ## Bugs and improvements
 
-- [ ] IMPORTANT Add license file, and license information for the dependencies.
+- [ ] **IMPORTANT** Add license file, and license information for the dependencies.
     This must be shown in the web somehow too.
-- [ ] Rewrite README.md with latest info.
+- [ ] **IMPORTANT** Rewrite README.md with latest info.
 - [ ] When the create command is aborted, if -D was given remove the directory
     so it can be done again.
 - [ ] Experiments should not be "checked" if not to be used. E.g when creating a
@@ -62,8 +63,9 @@ Github issues are less 便利 than this file when you go solo 🤷.
     schema is wrong. maybe.
 - [ ] Use https://docs.python.org/3/library/collections.html#collections.Counter
     in test
-- [ ] If there are no folders under "real", the web interface should offer the
-    default one even if the directory is not physically there.
+- [ ] If there are no annotation folders, the web interface should offer the
+    default one even if the directory is not physically there. Or maybe allow
+    creating subsets in the web interface.
 
 ## Features
 

@@ -29,11 +29,11 @@ class Experiment:
             raise SystemExit("Tag '{}' for experiment '{}' does not exist"
                              " in the dataset".format(self.config['tag'], name))
 
-    def get_tag(self, symbol_tags):
+    def get_tag(self, grapheme_tags):
         '''Get the actual tag for this experiment from the list of annotated
-        tags of a symbol.'''
+        tags of a grapheme.'''
         try:
-            return symbol_tags[self._tag_index]
+            return grapheme_tags[self._tag_index]
         except IndexError:
             return None
 
@@ -63,9 +63,9 @@ class Experiment:
         task = self.config['task']
         subsets = self.config.get('subsets')
         if task == 'classify':
-            target = Target.SYMB
+            target = Target.GRAPH
         else:
-            target = Target.TRAN
+            target = Target.LOGO
         if subsets is None:
             annotations = self.dataset.get_annotations(target)
         else:
@@ -87,20 +87,20 @@ class Experiment:
                 rmtree(train_path)
                 train_path.mkdir()
 
-        # Collect all symbol names/classes (1st pass)
-        symbols = set()
+        # Collect all graphemes names/classes (1st pass)
+        graphemes = set()
         for t in annotations:
             if task == 'detect':
-                symbols |= set(self.get_tag(s['tags'])
-                               for s in t.anot['symbols'])
+                graphemes |= set(self.get_tag(s['tags'])
+                               for s in t.anot['graphemes'])
             elif task == 'classify':
-                symbols.add(self.get_tag(t.anot['tags']))
-        # (we need two passes to get a sorted, and thus predictable, symbol list)
-        symbols = sorted(symbols)
-        num_classes = len(symbols)
+                graphemes.add(self.get_tag(t.anot['tags']))
+        # (we need two passes to get a sorted, and thus predictable, grapheme list)
+        graphemes = sorted(graphemes)
+        num_classes = len(graphemes)
 
         names_file = self.path / 'obj.names'
-        names_file.write_text("\n".join(symbols) + "\n")
+        names_file.write_text("\n".join(graphemes) + "\n")
 
         # (2nd pass)
         train_file = self.path / 'train.txt'
@@ -110,11 +110,11 @@ class Experiment:
             if task == 'detect':
                 # Write darknet/yolo bounding box files
                 t._txt.write_text("".join("{} {} {} {} {}\n".format(
-                    symbols.index(self.get_tag(s['tags'])), *s['box'])
-                    for s in t.anot['symbols']))
+                    graphemes.index(self.get_tag(s['tags'])), *s['box'])
+                    for s in t.anot['graphemes']))
                 train_fd.write("{}\n".format(t.image.resolve()))
             elif task == 'classify':
-                # Symlink real annotation with correct name
+                # Symlink annotation with correct name
                 num = num + 1
                 link_name = (train_path / "{}_{}.png".format(
                     self.get_tag(t.anot['tags']), num)).resolve()

@@ -22,17 +22,17 @@ app_data = {}
 
 
 def target_to_string(t):
-    return 'real' if t == Target.TRAN else 'symb'
+    return 'logo' if t == Target.LOGO else 'graph'
 
 
 def string_to_target(t):
-    return Target.TRAN if t == 'real' else Target.SYMB
+    return Target.LOGO if t == 'logo' else Target.GRAPH
 
 
 def annotation_info(a: Annotation):
     title_tag = app_data['meta_tags'][0]
     anot = a.anot
-    if a.target == Target.SYMB:
+    if a.target == Target.GRAPH:
         tags = anot['tags']
         if len(tags) > 0:
             annotated = True
@@ -41,7 +41,7 @@ def annotation_info(a: Annotation):
             annotated = False
             title = '?'
     else:
-        annotated = len(anot.get('symbols', [])),
+        annotated = len(anot.get('graphemes', [])),
         title = anot['meta'].get(title_tag, '')
     return {
         'id': a.id, 'annotated': annotated,
@@ -50,7 +50,7 @@ def annotation_info(a: Annotation):
     }
 
 
-def get_transcription_info(dir, id):
+def get_annotation_info(dir, id):
     anot_file = app_data['data_dir'] / '{}/{}.json'.format(dir, id)
     anot = json.loads(anot_file.read_text())
     return {'dir': dir, 'id': str(id), **annotation_info(anot)}
@@ -114,7 +114,7 @@ def edit_post(target, dir, idx):
 
 @app.route('/api/new/<target>/<dir>', methods=["POST"])
 @authenticated
-def new_tran(target, dir):
+def new_annotation(target, dir):
     ds = app_data['dataset']
     new_t = ds.new_single(string_to_target(target), dir)
     new_t.create_from(binary_data=request.data)
@@ -143,7 +143,7 @@ def get_auto_annotations(dir, idx):
 
     img = (app_data['data_dir'] / '{}/{}.png'.format(dir, idx)).resolve()
     return {
-        'symbols': predict(img, experiment),
+        'graphemes': predict(img, experiment),
         'tag_index': experiment._tag_index
     }
 
@@ -181,8 +181,8 @@ def index(target, dir):
     }
 
     if dir is None:
-        data['list'] = ds.get_subsets(Target.TRAN)
-        data['list2'] = ds.get_subsets(Target.SYMB)
+        data['list'] = ds.get_subsets(Target.LOGO)
+        data['list2'] = ds.get_subsets(Target.GRAPH)
         data['description'] = ds.config['description']
     else:
         data['target'] = target

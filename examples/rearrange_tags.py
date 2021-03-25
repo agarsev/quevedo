@@ -13,7 +13,7 @@ from quevedo.annotation import Target
 
 if __name__ == '__main__':
     ds = Dataset(sys.argv[1])
-    for t in ds.get_annotations(Target.TRAN, sys.argv[2]):
-        for s in t.anot.get('symbols', []):
+    for t in ds.get_annotations(Target.LOGO, sys.argv[2]):
+        for s in t.anot.get('graphemes', []):
             s['tags'] = [''] + s['tags']
         t.save()
