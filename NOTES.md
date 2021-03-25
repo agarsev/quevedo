@@ -11,6 +11,7 @@
 Do these tests while creating a new dataset that can be used to work on
 experiments in the next iteration.
 
+- [X] create dataset
 - [ ] add images
 - [ ] train test split
 - [ ] extract
@@ -55,12 +56,13 @@ Github issues are less 便利 than this file when you go solo 🤷.
 - [ ] **IMPORTANT** Add license file, and license information for the dependencies.
     This must be shown in the web somehow too.
 - [ ] **IMPORTANT** Rewrite README.md with latest info.
-- [ ] When the create command is aborted, if -D was given remove the directory
-    so it can be done again.
-- [ ] Experiments should not be "checked" if not to be used. E.g when creating a
+- [X] When the create command is aborted, if -D was given remove the directory
+    so it can be done again. REJECTED
+- [X] Experiments should not be "checked" if not to be used. E.g when creating a
     dataset, you might change the tag schema, and then start adding images, but
     not adjust the experiment yet. It shouldn't then complain that the tag
-    schema is wrong. maybe.
+    schema is wrong. maybe. What we do is start with no tag specified, then the
+    first one is used. Uncomment and change to use a different one.
 - [ ] Use https://docs.python.org/3/library/collections.html#collections.Counter
     in test
 - [ ] If there are no annotation folders, the web interface should offer the

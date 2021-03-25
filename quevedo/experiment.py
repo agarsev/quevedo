@@ -23,11 +23,14 @@ class Experiment:
         self.path = dataset.path / 'experiments' / name
         self.path.mkdir(exist_ok=True)
 
-        try:
-            self._tag_index = dataset.config['tag_schema'].index(self.config['tag'])
-        except ValueError:
-            raise SystemExit("Tag '{}' for experiment '{}' does not exist"
-                             " in the dataset".format(self.config['tag'], name))
+        if 'tag' not in self.config:
+            self._tag_index = 0
+        else:
+            try:
+                self._tag_index = dataset.config['tag_schema'].index(self.config['tag'])
+            except ValueError:
+                raise SystemExit("Tag '{}' for experiment '{}' does not exist"
+                                 " in the dataset".format(self.config['tag'], name))
 
     def get_tag(self, grapheme_tags):
         '''Get the actual tag for this experiment from the list of annotated
