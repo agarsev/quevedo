@@ -22,7 +22,9 @@ function App ({ title, target, id, annotation_help, links, anot,
         _setMeta({ ...meta, [k]: v });
     };
 
-    if (target == 'logo') {
+    const is_logo = target == 'logograms';
+
+    if (is_logo) {
         var graphemes = useList(anot.graphemes, changes)
     } else {
         var tags = useList(anot.tags, changes);
@@ -40,7 +42,7 @@ function App ({ title, target, id, annotation_help, links, anot,
     const saveChanges = () => {
         changes.setSaving();
         setMessage(Text['saving']);
-        if (target == 'logo') {
+        if (is_logo) {
             var body = { meta, graphemes: graphemes.list }
         } else {
             var body = { meta, tags: tags.list }
@@ -93,7 +95,7 @@ function App ({ title, target, id, annotation_help, links, anot,
             message, show_save: changes.dirty>0, autoAnnotate,
             exp_list, changes }} />
         <${MetaEditor} ...${{meta_tags, meta, setMeta}} />
-        ${target=='logo'?
+        ${is_logo?
             html`<${LogogramEditor} ...${{id, graphemes, columns}} />`
             :html`<${GraphemeEditor} ...${{id, tags, columns}} />`}
         <pre>${annotation_help}</pre>

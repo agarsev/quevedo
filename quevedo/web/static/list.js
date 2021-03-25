@@ -50,12 +50,12 @@ function DirList ({ list, list2 }) {
     return html`<>
         <h2>${Text['list_logo']}</h2>
         <ul class="List">
-            ${list.map(t => html`<${DirEntry} target='logo' ...${t} />`)}
+            ${list.map(t => html`<${DirEntry} target='logograms' ...${t} />`)}
             <li class="extra-space"></li>
         </ul>
         <h2>${Text['list_graph']}</h2>
         <ul class="List">
-            ${list2.map(t => html`<${DirEntry} target='graph' ...${t} />`)}
+            ${list2.map(t => html`<${DirEntry} target='graphemes' ...${t} />`)}
             <li class="extra-space"></li>
         </ul>
     `;

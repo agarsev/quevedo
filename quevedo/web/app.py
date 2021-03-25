@@ -21,12 +21,8 @@ app_data = {}
 # {{{ ---- Dataset loading and utils
 
 
-def target_to_string(t):
-    return 'logo' if t == Target.LOGO else 'graph'
-
-
 def string_to_target(t):
-    return Target.LOGO if t == 'logo' else Target.GRAPH
+    return Target.LOGO if t == 'logograms' else Target.GRAPH
 
 
 def annotation_info(a: Annotation):
