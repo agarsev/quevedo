@@ -1,6 +1,6 @@
 // 2020-12-02 Antonio F. G. Sevilla <afgs@ucm.es>
 
-import Text from '../i18n.js';
+import Text from './i18n.js';
 
 const MAX_ANNO_TITLE = 20;
 
@@ -112,7 +112,7 @@ function AnnoEntry ({ id, title, set, annotated }) {
         title.substring(0, MAX_ANNO_TITLE-1)+'…':
         title;
     return html`<li class="Entry LogoEntry">
-        <h2>${title} <span class="set">(${set})</span></h2>
+        <h2>${id} — ${title} <span class="set">(${set})</span></h2>
         <img src="img/${dir}/${id}.png" onclick=${() => window.location=edit_link}/>
         <p>
             <a href="${edit_link}">📝</a>

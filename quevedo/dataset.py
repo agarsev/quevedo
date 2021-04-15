@@ -227,12 +227,12 @@ def train_test_split(obj, subsets, target, percentage, seed):
         if len(subsets) == 0:
             an = list(dataset.get_annotations(Target.LOGO))
         else:
-            an = list(chain(*(dataset.get_annotations(Target.LOGO) for d in subsets)))
+            an = list(chain(*(dataset.get_annotations(Target.LOGO, d) for d in subsets)))
     else:
         if len(subsets) == 0:
             an = list(dataset.get_annotations(Target.GRAPH))
         else:
-            an = list(chain(*(dataset.get_annotations(Target.GRAPH) for d in subsets)))
+            an = list(chain(*(dataset.get_annotations(Target.GRAPH, d) for d in subsets)))
 
     random.shuffle(an)
     split_point = round(len(an) * percentage / 100)

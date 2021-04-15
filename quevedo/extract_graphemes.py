@@ -38,10 +38,10 @@ def extract_graphemes(obj, dir_from, dir_to, existing):
 
     number = max((int(f.stem) for f in graph_d.glob('*.png')), default=0) + 1
     for t in dataset.get_annotations(Target.LOGO, subset=dir_from):
-        number = number + 1
         logogram = Image.open(t.image)
         width, height = logogram.size
         for g in t.anot['graphemes']:
+            number = number + 1
             w = float(g['box'][2]) * width
             h = float(g['box'][3]) * height
             l = float(g['box'][0]) * width - (w / 2)

@@ -1,10 +1,16 @@
 - Remember: images need to be 3 channel
 - To add languages for the web, copy and edit a file in `/quevedo/web/static/i18n`
+- For classify, if a tag is missing, the grapheme is ignored (this is
+    intentional, but maybe there should be a warning somewhere)
 
 # -- NEXT --
 
 - [X] Rename symbol to grapheme, transcription to logogram
 - [X] logo_path -> logogram_path
+- [X] Order of elements in list is wrong (alphabetic instead of number-based)
+- [X] Show number of each element in element list eg: 1: traducción
+- [ ] Estadísticas del corpus (freq. etiquetas, count, etc.)
+- [ ] Unique identifiers instead of labels for CNN (yolo might need this too)
 
 ## Test new logogram / grapheme arch
 
@@ -13,12 +19,13 @@ experiments in the next iteration.
 
 - [X] create dataset
 - [X] add images
-- [ ] annotate graphemes in the web app
-- [ ] train test split
-- [ ] extract
+- [X] annotate graphemes (one set) in the web app
+    - [X] make git repo for data/visse
+- [X] train test split
+- [X] extract
+- [ ] train and test CNN (pre-experiment refactor)
 - [ ] generate, check only train used
 - [ ] train and test YOLO (pre-experiment refactor)
-- [ ] train and test CNN (pre-experiment refactor)
  
 ## Refactor Experiments
 
@@ -39,13 +46,14 @@ experiment integration into pipeline.
 
 ## Pipeline
 
+For now, just a single script which calls everything might be best.
+
 Steps/Experiments should work with lists. For each element in the list, they
 produce an element (CNN, preproc) or a list (YOLO, multirotate). A step can
 flatten sublists (e.g. keep all detections from YOLO) or convert them into
 single elements (e.g. use softmax to keep the best prediction from CNN), or just
 pass-through (preprocessing). The final step takes the list and converts it into
 json or something that can be output.
-
 
 # -- BACKLOG --
 
@@ -73,12 +81,15 @@ Github issues are less 便利 than this file when you go solo 🤷.
 
 - [ ] Auto-save changes in the web interface if enabled in the config file
     (nowadays people aren't so used to clicking save)
+- [ ] Remove "saved" message when doing changes (inconsistent)
 - [ ] Allow deleting entries in web (just move the last to the hole). Maybe
     add `delete` in cli too?
 - [ ] Allow restarting training with latest weights if weights directory exists.
+- [ ] Filter/search annotations in listing according to some tag(s).
 - [ ] RW permissions for users in web. Also user groups.
 - [ ] In test, compute a confusion matrix (at least for classify) for deeper
     inspection
+- [ ] Autosuggest values for tagging.
 - [ ] Add a configurable preprocessing module that applies common image
     enhancement to data, for example increasing contrast, reducing noise,
     whatever. This should be enabled/disabled in config. Maybe there can be a flag in
@@ -87,11 +98,20 @@ Github issues are less 便利 than this file when you go solo 🤷.
     there have already been added and therefore processed). 
 - [ ] Mobile interface for the web app. Maybe integrate with camera/scan app,
     make quevedo a target for "sharing" (uploading) images.
+- [ ] Annotated/not annotated status based on a custom checkbox, useful for
+    revision (or right now, most annotated but need to redo, need to know where
+    I am. and the number based is useless in multi tag)
 
 ## Documentation
 
 - [ ] Do this whenever the latest refactor is over 🤷
 - [ ] Big section in documentation about config file
+
+## Experiments
+
+- [ ] Incremental annotation
+- [ ] Try moving additional data to coarse (YOLO) (eg rot, fill)
+- [ ] Remember to record train/test split seeds for reproducibility
 
 ## Maybe
 

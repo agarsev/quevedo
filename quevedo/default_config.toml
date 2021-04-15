@@ -22,7 +22,7 @@ Make boxes slightly larger than the graphemes, not too tight.
 [darknet]
 path = "darknet/darknet" 
 library = "darknet/libdarknet.so"
-options = [ "-dont_show" ]
+options = [ "-dont_show", "-mjpeg_port", "8090" ]
 
 [experiments.detect]
 default = true # Experiment to use if not specified

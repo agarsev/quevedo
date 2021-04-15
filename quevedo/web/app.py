@@ -186,7 +186,7 @@ def index(target, dir):
         annots = ds.get_annotations(string_to_target(target), dir)
         data['list'] = sorted((annotation_info(an)
                               for an in annots),
-                              key=lambda i: i['id'])
+                              key=lambda i: int(i['id']))
         readme = ds.path / target / dir / 'README.md'
         if readme.exists():
             data['description'] = readme.read_text()

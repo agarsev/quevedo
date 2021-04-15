@@ -72,7 +72,8 @@ class Experiment:
         if subsets is None:
             annotations = self.dataset.get_annotations(target)
         else:
-            annotations = (self.dataset.get_annotations(target, s) for s in subsets)
+            annotations = chain(*(self.dataset.get_annotations(target, s)
+                                  for s in subsets))
         return [a for a in annotations if a.anot.get('set') == set]
 
     def prepare(self):
@@ -97,7 +98,9 @@ class Experiment:
                 graphemes |= set(self.get_tag(s['tags'])
                                for s in t.anot['graphemes'])
             elif task == 'classify':
-                graphemes.add(self.get_tag(t.anot['tags']))
+                tag = self.get_tag(t.anot['tags'])
+                if tag is not None:
+                    graphemes.add(tag)
         # (we need two passes to get a sorted, and thus predictable, grapheme list)
         graphemes = sorted(graphemes)
         num_classes = len(graphemes)
@@ -117,10 +120,12 @@ class Experiment:
                     for s in t.anot['graphemes']))
                 train_fd.write("{}\n".format(t.image.resolve()))
             elif task == 'classify':
+                tag = self.get_tag(t.anot['tags'])
+                if tag is None:
+                    continue
                 # Symlink annotation with correct name
                 num = num + 1
-                link_name = (train_path / "{}_{}.png".format(
-                    self.get_tag(t.anot['tags']), num)).resolve()
+                link_name = (train_path / "{}_{}.png".format(tag, num)).resolve()
                 symlink(t.image.resolve(), link_name)
                 train_fd.write("{}\n".format(link_name))
         train_fd.close()
