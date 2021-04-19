@@ -172,10 +172,9 @@ class Experiment:
                 num_steps_2=int(num_max_batches * 90 / 100))
             (self.path / 'darknet.cfg').write_text(net_config)
         if task == 'classify':
-            num_max_batches = num_classes * 2000
             template = Template((Path(__file__).parent / 'darknet/alexnet.cfg').read_text())
             net_config = template.substitute(
                 num_classes=num_classes,
-                num_max_batches=num_classes * 500,  # maybe?
-                num_connected=num_classes * 10)  # Read somewhere how to choose these params
+                num_max_batches=num_classes * 50,  # maybe?
+                num_connected=num_classes * 10)  # TODO: Read somewhere how to choose these params
             (self.path / 'darknet.cfg').write_text(net_config)

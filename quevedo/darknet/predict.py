@@ -1,5 +1,6 @@
 # 2020-05-04 Antonio F. G. Sevilla <afgs@ucm.es>
 
+import json
 import os
 from PIL import Image
 import sys
@@ -48,10 +49,12 @@ class DarknetShutup(object):
         os.close(self.stdout_save)
 
 
+tag_map = None
+
 def init_darknet(dataset, experiment):
     '''Loads the trained neural network. Must be called before predict.'''
 
-    global perform_detect, perform_classify
+    global perform_detect, perform_classify, tag_map
 
     if not (experiment.path / 'darknet.cfg').exists():
         raise SystemExit("Neural network has not been trained")
@@ -62,6 +65,9 @@ def init_darknet(dataset, experiment):
 
     if not weights.exists():
         raise SystemExit("Neural network has not been trained")
+
+    tag_map = json.loads((experiment.path / 'tag_map.json').read_text())
+    tag_map = {v: k for k, v in tag_map.items()}
 
     with DarknetShutup():
         perform_detect, perform_classify = init(
@@ -78,12 +84,12 @@ def predict(image_path, experiment):
     if experiment.config['task'] == 'detect':
         width, height = Image.open(image_path).size
         return [{
-            'name': s,
+            'name': tag_map[s],
             'confidence': c,
             'box': make_bbox(width, height, *b)
         } for (s, c, b) in perform_detect(cstr(image_path))]
     elif experiment.config['task'] == 'classify':
         return [{
-            'tag': tag.decode('utf8'),
+            'tag': tag_map[tag.decode('utf8')],
             'confidence': conf
         } for (tag, conf) in perform_classify(cstr(image_path))]

@@ -9,8 +9,7 @@
 - [X] logo_path -> logogram_path
 - [X] Order of elements in list is wrong (alphabetic instead of number-based)
 - [X] Show number of each element in element list eg: 1: traducción
-- [ ] Estadísticas del corpus (freq. etiquetas, count, etc.)
-- [ ] Unique identifiers instead of labels for CNN (yolo might need this too)
+- [X] Unique identifiers instead of labels for CNN (yolo might need this too)
 
 ## Test new logogram / grapheme arch
 
@@ -23,9 +22,9 @@ experiments in the next iteration.
     - [X] make git repo for data/visse
 - [X] train test split
 - [X] extract
-- [ ] train and test CNN (pre-experiment refactor)
-- [ ] generate, check only train used
-- [ ] train and test YOLO (pre-experiment refactor)
+- [X] train and test CNN (pre-experiment refactor)
+- [X] generate, check only train used
+- [X] train and test YOLO (pre-experiment refactor)
  
 ## Refactor Experiments
 
