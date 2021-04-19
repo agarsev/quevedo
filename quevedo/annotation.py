@@ -18,7 +18,6 @@ class Annotation:
         self.target = target
         self._json = path.with_suffix('.json')
         self.image = path.with_suffix('.png')
-        self._txt = path.with_suffix('.txt')
 
     def _init_json(self, meta={}, **more):
         d = {"set": "train", "meta": meta}

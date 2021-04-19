@@ -1,6 +1,7 @@
 # 2020-10-08 Antonio F. G. Sevilla <afgs@ucm.es>
 
 from itertools import chain
+import json
 from os import symlink
 from pathlib import Path
 from shutil import rmtree
@@ -84,50 +85,65 @@ class Experiment:
         annotations = self.get_annotations('train')
 
         train_path = self.path / 'train'
-        if task == 'classify':
-            try:
-                train_path.mkdir()
-            except FileExistsError:
-                rmtree(train_path)
-                train_path.mkdir()
+        try:
+            train_path.mkdir()
+        except FileExistsError:
+            rmtree(train_path)
+            train_path.mkdir()
 
-        # Collect all graphemes names/classes (1st pass)
-        graphemes = set()
+        # Collect all tags
+        all_tags = set()
         for t in annotations:
             if task == 'detect':
-                graphemes |= set(self.get_tag(s['tags'])
+                all_tags |= set(self.get_tag(s['tags'])
                                for s in t.anot['graphemes'])
             elif task == 'classify':
                 tag = self.get_tag(t.anot['tags'])
                 if tag is not None:
-                    graphemes.add(tag)
-        # (we need two passes to get a sorted, and thus predictable, grapheme list)
-        graphemes = sorted(graphemes)
-        num_classes = len(graphemes)
+                    all_tags.add(tag)
+        # We need a deterministic set of tags to re-use the nnet, so we sort
+        # them.
+        all_tags = sorted(all_tags)
+
+        # We build a map from our tags to arbitrary labels for darknet not to
+        # complain.
+        tag_map = {}
+        num_classes = 0
+        for tag in all_tags:
+            num_classes = num_classes + 1
+            tag_map[tag] = 'C{:04d}'.format(num_classes)
+
+        (self.path / 'tag_map.json').write_text(json.dumps(tag_map))
 
         names_file = self.path / 'obj.names'
-        names_file.write_text("\n".join(graphemes) + "\n")
+        names_file.write_text("\n".join(tag_map.values()) + "\n")
 
-        # (2nd pass)
+        # Create links to the images in the train folder, with class in the name
+        # in classification and an additional txt file with bounding boxes for
+        # detection
         train_file = self.path / 'train.txt'
         train_fd = open(train_file, 'w')
         num = 0
         for t in annotations:
+            link_name = None
             if task == 'detect':
-                # Write darknet/yolo bounding box files
-                t._txt.write_text("".join("{} {} {} {} {}\n".format(
-                    graphemes.index(self.get_tag(s['tags'])), *s['box'])
-                    for s in t.anot['graphemes']))
-                train_fd.write("{}\n".format(t.image.resolve()))
-            elif task == 'classify':
+                num = num + 1
+                link_name = (train_path / "{}.png".format(num)).resolve()
+                link_name.with_suffix(".txt").write_text(
+                    "".join("{} {} {} {} {}\n".format(
+                        # Original and arbitrary tags share index
+                        all_tags.index(self.get_tag(s['tags'])),
+                        *s['box'])
+                        for s in t.anot['graphemes']))
+            else:  # if task == 'classify':
                 tag = self.get_tag(t.anot['tags'])
                 if tag is None:
                     continue
-                # Symlink annotation with correct name
                 num = num + 1
-                link_name = (train_path / "{}_{}.png".format(tag, num)).resolve()
-                symlink(t.image.resolve(), link_name)
-                train_fd.write("{}\n".format(link_name))
+                link_name = (train_path / "{}_{}.png".format(
+                    tag_map[tag], num)).resolve()
+            symlink(t.image.resolve(), link_name)
+            train_fd.write("{}\n".format(link_name))
         train_fd.close()
 
         # In this directory, the weights of the trained network will be stored
