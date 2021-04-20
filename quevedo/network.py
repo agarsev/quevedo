@@ -10,18 +10,19 @@ from string import Template
 from quevedo.annotation import Target
 
 
-class Experiment:
-    ''' Class representing an experiment part of a dataset.'''
+class Network:
+    ''' Class representing a neural net to train and predict logograms or
+    graphemes.'''
 
     def __init__(self, dataset, name):
         self.name = name
         self.dataset = dataset
         try:
-            self.config = dataset.config['experiments'][name]
+            self.config = dataset.config['network'][name]
         except ValueError:
-            raise SystemExit("No such experiment: {}".format(name))
+            raise SystemExit("No such network: {}".format(name))
 
-        self.path = dataset.path / 'experiments' / name
+        self.path = dataset.path / 'networks' / name
         self.path.mkdir(exist_ok=True)
 
         if 'tag' not in self.config:
@@ -30,26 +31,26 @@ class Experiment:
             try:
                 self._tag_index = dataset.config['tag_schema'].index(self.config['tag'])
             except ValueError:
-                raise SystemExit("Tag '{}' for experiment '{}' does not exist"
+                raise SystemExit("Tag '{}' (chosen for network '{}') does not exist"
                                  " in the dataset".format(self.config['tag'], name))
 
     def get_tag(self, grapheme_tags):
-        '''Get the actual tag for this experiment from the list of annotated
-        tags of a grapheme.'''
+        '''Get the tag to use for this network from the list of annotated tags of a
+        grapheme.'''
         try:
             return grapheme_tags[self._tag_index]
         except IndexError:
             return None
 
     def is_prepared(self):
-        '''Checks whether the experiment's neural network has been trained and
-        can be used to predict.'''
+        '''Checks whether the neural network configuration files have been
+        made.'''
         darknet = self.path / 'darknet.cfg'
         return darknet.exists()
 
     def is_trained(self):
-        '''Checks whether the experiment's neural network has been trained and
-        can be used to predict.'''
+        '''Checks whether the neural network has been trained and can be used to
+        predict.'''
         weights = self.path / 'darknet_final.weights'
         return weights.exists()
 
@@ -60,7 +61,7 @@ class Experiment:
         elif task == 'classify':
             return 'classifier'
         else:
-            raise SystemExit("Unsupported task for experiment {}: {}".format(
+            raise SystemExit("Unsupported task for network {}: {}".format(
                 self.name, task))
 
     def get_annotations(self, set='train'):
@@ -78,8 +79,7 @@ class Experiment:
         return [a for a in annotations if a.anot.get('set') == set]
 
     def prepare(self):
-        ''' Creates the files needed for training and testing darknet on this dataset and
-        experiment.'''
+        ''' Creates the files needed for training and testing darknet.'''
 
         task = self.config['task']
         annotations = self.get_annotations('train')

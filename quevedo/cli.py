@@ -19,14 +19,16 @@ from quevedo.generate import generate
 }, chain=True, invoke_without_command=True)
 @click.option('-D', '--dataset', type=click.Path(), default=getcwd(),
               help="Path to the dataset to use, by default use current directory")
-@click.option('-E', '--experiment', help="Experimental configuration to use")
+@click.option('-N', '--network', help="Neural network configuration to use")
 @click.pass_context
-def cli(ctx, dataset, experiment):
-    '''Command line application for managing a SW deep learning dataset.'''
+def cli(ctx, dataset, network):
+    '''Command line application for managing a dataset of instances from a
+    complex writing system, for example SignWriting, including annotation and
+    deep learning.'''
     dataset = ds.Dataset(dataset)
     ctx.obj = {
         'dataset': dataset,
-        'experiment': experiment
+        'network': network
     }
     if ctx.invoked_subcommand is None:
         ctx.invoke(ds.info)

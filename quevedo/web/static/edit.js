@@ -12,7 +12,7 @@ const { useState, useRef } = preactHooks;
 preact.render(html`<${App} ...${window.quevedo_data} />`, document.body);
 
 function App ({ title, target, id, annotation_help, links, anot,
-    columns, exp_list, meta_tags }) {
+    columns, net_list, meta_tags }) {
 
     const changes = useChangeStack();
 
@@ -59,12 +59,12 @@ function App ({ title, target, id, annotation_help, links, anot,
         }).catch(setError);
     };
 
-    const autoAnnotate = experiment => {
+    const autoAnnotate = network => {
         if (graphemes.list.length > 0 && 
             !confirm(Text['confirm_generate'])) {
             return;
         }
-        fetch(`api/auto_annotate/${id.full}${experiment?`?exp=${experiment}`:''}`)
+        fetch(`api/predict/${id.full}${network?`?network=${network}`:''}`)
         .then(r => {
             if (r.ok) {
                 return r.json();
@@ -93,7 +93,7 @@ function App ({ title, target, id, annotation_help, links, anot,
     return html`
         <${Header} ...${{title, id, links, saveChanges,
             message, show_save: changes.dirty>0, autoAnnotate,
-            exp_list, changes }} />
+            net_list, changes }} />
         <${MetaEditor} ...${{meta_tags, meta, setMeta}} />
         ${is_logo?
             html`<${LogogramEditor} ...${{id, graphemes, columns}} />`
@@ -103,9 +103,9 @@ function App ({ title, target, id, annotation_help, links, anot,
 }
 
 function Header ({ title, id, links, saveChanges, message, show_save,
-    exp_list, autoAnnotate, changes }) {
+    net_list, autoAnnotate, changes }) {
 
-    const exp_select = useRef({ value: null });
+    const net_select = useRef({ value: null });
 
     return html`<header>
         <a href="">${title}</a> » 
@@ -116,10 +116,10 @@ function Header ({ title, id, links, saveChanges, message, show_save,
         ${show_save?html`<button tabIndex=2
             onclick=${saveChanges} >💾</button>`:null}
         <span class="message_text">${message}</span>
-        ${exp_list.length<2?null:html`<select ref=${exp_select}>
-            ${exp_list.map(e=>html`<option value=${e}>${e}</option>`)}
+        ${net_list.length<2?null:html`<select ref=${net_select}>
+            ${net_list.map(e=>html`<option value=${e}>${e}</option>`)}
         </select>`}
-        <button onclick=${() => autoAnnotate(exp_select.current.value)}>⚙️</button>
+        <button onclick=${() => autoAnnotate(net_select.current.value)}>⚙️</button>
     </header>`;
 }
 

@@ -13,6 +13,6 @@ def predict_image(obj, image):
     '''Get predicted graphemes for an image using the trained neural network.'''
     from quevedo.darknet.predict import init_darknet, predict
     dataset = obj['dataset']
-    experiment = dataset.get_experiment(obj['experiment'])
-    init_darknet(dataset, experiment)
-    print(predict(image, experiment))
+    network = dataset.get_network(obj['network'])
+    init_darknet(dataset, network)
+    print(predict(image, network))

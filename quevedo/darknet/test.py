@@ -55,7 +55,7 @@ def incr(dic, name):
 @click.option('--print/--no-print', '-p', 'do_print', default=True,
               help='Show results in the command line')
 @click.option('--csv/--no-csv', default=True,
-              help='Print results into a `results.csv` file in the experiment directory')
+              help='Print results into a `results.csv` file in the network directory')
 def test(obj, do_print, csv):
     '''Compute evaluation metrics for a trained neural network.
 
@@ -65,21 +65,21 @@ def test(obj, do_print, csv):
     from quevedo.darknet.predict import init_darknet, predict
 
     dataset = obj['dataset']
-    experiment = dataset.get_experiment(obj['experiment'])
-    init_darknet(dataset, experiment)
+    network = dataset.get_network(obj['network'])
+    init_darknet(dataset, network)
 
     all_graphemes = set()
     true_positives = dict()
     false_positives = dict()
     false_negatives = dict()
 
-    task = experiment.config['task']
+    task = network.config['task']
 
-    for an in experiment.get_annotations('test'):
-        predictions = predict(an.image, experiment)
+    for an in network.get_annotations('test'):
+        predictions = predict(an.image, network)
         if task == 'detect':
             for g in an.anot['graphemes']:
-                tag = experiment.get_tag(g['tags'])
+                tag = network.get_tag(g['tags'])
                 logo = {'box': g['box'], 'name': tag}
                 if tag not in all_graphemes:
                     all_graphemes.add(tag)
@@ -98,7 +98,7 @@ def test(obj, do_print, csv):
 
         else:  # classify
             best = predictions[0]
-            true_tag = experiment.get_tag(an.anot['tags'])
+            true_tag = network.get_tag(an.anot['tags'])
             if true_tag not in all_graphemes:
                 all_graphemes.add(true_tag)
             # TODO thresholds should be configuration, in detect too
@@ -133,7 +133,7 @@ def test(obj, do_print, csv):
                     r['prec'], r['rec'], r['f']))
 
     if csv:
-        file_path = experiment.path / 'results.csv'
+        file_path = network.path / 'results.csv'
         with open(file_path, 'w') as f:
             print("class;precision;recall;f-score", file=f)
             for name in sorted(all_graphemes):

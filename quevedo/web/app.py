@@ -58,8 +58,8 @@ def load_dataset(dataset, language):
     app_data['meta_tags'] = dataset.config['meta_tags']
     resolved = dataset.path.resolve()
     app_data['path'] = resolved
-    app_data['exp_list'] = [e.name for e in dataset.list_experiments() if
-                            e.is_trained()]
+    app_data['net_list'] = [n.name for n in dataset.list_networks() if
+                            n.is_trained()]
     app_data['config'] = dataset.config['web']
     app.secret_key = app_data['config']['secret_key']
 
@@ -118,30 +118,30 @@ def new_annotation(target, dir):
 
 
 predict = None  # Do not load neural network until requested
-last_experiment = None
+last_network = None
 
 
-@app.route('/api/auto_annotate/<target>/<dir>/<idx>')
+@app.route('/api/predict/<target>/<dir>/<idx>')
 @authenticated
-def get_auto_annotations(target, dir, idx):
+def get_predict(target, dir, idx):
     ds = app_data['dataset']
-    experiment = ds.get_experiment(request.args.get('exp', None))
+    network = ds.get_network(request.args.get('network', None))
 
-    global predict, last_experiment
-    if predict is None or last_experiment.name != experiment.name:
+    global predict, last_network
+    if predict is None or last_network.name != network.name:
         from quevedo.darknet.predict import init_darknet, predict as true_predict
         try:
-            init_darknet(ds, experiment)
+            init_darknet(ds, network)
             predict = true_predict
-            last_experiment = experiment
+            last_network = network
         except SystemExit as e:
             return str(e), 400
 
     an = app_data['dataset'].get_single(string_to_target(target),
                                         dir, idx)
     return {
-        'graphemes': predict(an.image, experiment),
-        'tag_index': experiment._tag_index
+        'graphemes': predict(an.image, network),
+        'tag_index': network._tag_index
     }
 
 
@@ -231,7 +231,7 @@ def edit(target, dir, idx):
             'next': next_link,
         },
         'annotation_help': ds.config['annotation_help'],
-        'exp_list': app_data['exp_list'],
+        'net_list': app_data['net_list'],
         'meta_tags': app_data['meta_tags'],
         'columns': ds.config['tag_schema'],
         'anot': a.anot,

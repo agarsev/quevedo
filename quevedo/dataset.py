@@ -9,7 +9,7 @@ from string import Template
 from subprocess import run
 import toml
 
-from quevedo.experiment import Experiment
+from quevedo.network import Network
 from quevedo.annotation import Annotation, Target
 
 
@@ -32,7 +32,7 @@ class Dataset:
         self.path = p
         (self.logogram_path).mkdir(parents=True)
         (self.grapheme_path).mkdir()
-        (self.path / 'experiments').mkdir()
+        (self.path / 'networks').mkdir()
 
     def run_darknet(self, *args):
         darknet = self.config.get('darknet')
@@ -40,14 +40,14 @@ class Dataset:
             raise SystemExit("Darknet not configured for this dataset, configure it first")
         run([darknet['path'], *args, *darknet['options']])
 
-    def list_experiments(self):
-        return [Experiment(self, e) for e in self.config['experiments'].keys()]
+    def list_networks(self):
+        return [Network(self, n) for n in self.config['network'].keys()]
 
-    def get_experiment(self, name):
+    def get_network(self, name):
         if name is None:
-            return next(e for e in self.list_experiments() if e.config['default'])
+            return next(n for n in self.list_networks() if n.config['default'])
         else:
-            return Experiment(self, name)
+            return Network(self, name)
 
     def get_single(self, target: Target, subset, id):
         if target == Target.LOGO:
@@ -288,23 +288,23 @@ def info(obj):
     click.echo('\nDarknet {} properly configured in config.toml'.format(
         style(dn_binary is not None and Path(dn_binary).exists(), 'is', 'is not')))
 
-    exps = dataset.list_experiments()
-    if len(exps) > 1:
-        click.echo('\nExperiments:')
-        for e in exps:
-            click.echo('- {}: {}'.format(e.name, e.config['subject']))
+    nets = dataset.list_networks()
+    if len(nets) > 1:
+        click.echo('\nNetworks:')
+        for n in nets:
+            click.echo('- {}: {}'.format(n.name, n.config['subject']))
 
-    experiment = dataset.get_experiment(obj['experiment'])
+    net = dataset.get_network(obj['network'])
 
-    header = "Experiment: '{}'".format(experiment.name)
+    header = "Network: '{}'".format(net.name)
     click.secho("\n{}\n{}".format(header, '▔' * len(header)), bold=True)
-    click.echo("{}\n".format(experiment.config['subject']))
+    click.echo("{}\n".format(net.config['subject']))
 
-    click.echo('Dataset {} ready for training'.format(style(
-        experiment.is_prepared(), 'is', "is not")))
+    click.echo('The network {} ready for training'.format(style(
+        net.is_prepared(), 'is', "is not")))
 
-    click.echo('Neural network {}'.format(style(
-        experiment.is_trained(), 'has been trained', "hasn't been trained")))
+    click.echo('The network {}'.format(style(
+        net.is_trained(), 'has been trained', "hasn't been trained")))
 
     click.echo('')
 

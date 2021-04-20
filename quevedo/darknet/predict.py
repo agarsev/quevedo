@@ -52,26 +52,26 @@ class DarknetShutup(object):
 tag_map = None
 
 
-def init_darknet(dataset, experiment):
+def init_darknet(dataset, network):
     '''Loads the trained neural network. Must be called before predict.'''
 
     global perform_detect, perform_classify, tag_map
 
-    if not (experiment.path / 'darknet.cfg').exists():
+    if not (network.path / 'darknet.cfg').exists():
         raise SystemExit("Neural network has not been trained")
 
-    darknet_data = (experiment.path / 'darknet.data').resolve()
-    darknet_cfg = (experiment.path / 'darknet.cfg').resolve()
-    weights = (experiment.path / 'darknet_final.weights').resolve()
+    darknet_data = (network.path / 'darknet.data').resolve()
+    darknet_cfg = (network.path / 'darknet.cfg').resolve()
+    weights = (network.path / 'darknet_final.weights').resolve()
 
     if not weights.exists():
         raise SystemExit("Neural network has not been trained")
 
-    tag_map = json.loads((experiment.path / 'tag_map.json').read_text())
+    tag_map = json.loads((network.path / 'tag_map.json').read_text())
     tag_map = {v: k for k, v in tag_map.items()}
 
     oldcwd = os.getcwd()
-    os.chdir(experiment.path)
+    os.chdir(network.path)
 
     with DarknetShutup():
         perform_detect, perform_classify = init(
@@ -83,18 +83,18 @@ def init_darknet(dataset, experiment):
     os.chdir(oldcwd)
 
 
-def predict(image_path, experiment):
+def predict(image_path, network):
     '''Get graphemes in an image using the trained neural network (which must have
     been loaded using init_darknet)'''
 
-    if experiment.config['task'] == 'detect':
+    if network.config['task'] == 'detect':
         width, height = Image.open(image_path).size
         return [{
             'name': tag_map[s],
             'confidence': c,
             'box': make_bbox(width, height, *b)
         } for (s, c, b) in perform_detect(cstr(image_path))]
-    elif experiment.config['task'] == 'classify':
+    elif network.config['task'] == 'classify':
         return [{
             'tag': tag_map[tag.decode('utf8')],
             'confidence': conf

@@ -24,21 +24,21 @@ path = "darknet/darknet"
 library = "darknet/libdarknet.so"
 options = [ "-dont_show", "-mjpeg_port", "8090" ]
 
-[experiments.detect]
-default = true # Experiment to use if not specified
+[network.detect]
+default = true # Network to use if not specified
 task = "detect"
-# tag = "tag" # Uncomment and choose a tag name from tag_schema to use for this experiment
+# tag = "tag" # Uncomment and choose a tag name from tag_schema to use
 # subsets = [ "default" ] # If not specified, all subsets will be used
 subject = "Focus on grapheme type learning and recognition"
 
-[experiments.classify]
+[network.classify]
 task = "classify"
 # tag = "tag"
 subsets = [ "default" ]
 subject = "Classify graphemes"
 
-# Add more experiments like so:
-# [experiment.other]
+# Add more networks like so:
+# [network.other]
 # task = "detect" or "classify"
 # tag = "tag"
 # subject = "human readable description"

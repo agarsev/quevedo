@@ -5,37 +5,16 @@
 
 # -- NEXT --
 
-- [X] Rename symbol to grapheme, transcription to logogram
-- [X] logo_path -> logogram_path
-- [X] Order of elements in list is wrong (alphabetic instead of number-based)
-- [X] Show number of each element in element list eg: 1: traducción
-- [X] Unique identifiers instead of labels for CNN (yolo might need this too)
-
-## Test new logogram / grapheme arch
-
-Do these tests while creating a new dataset that can be used to work on
-experiments in the next iteration.
-
-- [X] create dataset
-- [X] add images
-- [X] annotate graphemes (one set) in the web app
-    - [X] make git repo for data/visse
-- [X] train test split
-- [X] extract
-- [X] train and test CNN (pre-experiment refactor)
-- [X] generate, check only train used
-- [X] train and test YOLO (pre-experiment refactor)
+- [ ] Refactor experiments (next section)
+- [ ] Substitute cli flags -l/-g + -n set for -l set / -g set (less typing, more
+    intuitive, more coherent with -f/-t in generate/extract, maybe change or
+    allow there too)
  
 ## Refactor Experiments
 
-I have removed the embedded steps in the experiments (train test split,
-generation). Later we can put these again into some kind of chain/pipeline that
-can include "experiments" (probably should rename) and other things (like
-train test split, generation, and new preprocessing). See next iteration for
-experiment integration into pipeline.
-
-- [ ] Think of better name for experiments, and implement a pipeline arch.
-- [ ] Experiment config relative path to their directory so can be ported (works
+- [X] Rename experiment -> network
+- [ ] Load darknet inside network class so more than one can be used
+- [ ] Network config relative path to their directory so can be ported (works
     for test, check for train)
 - [ ] Predict load image from RAM (PIL image)
 - [ ] train and test YOLO (new arch) 
@@ -45,17 +24,6 @@ experiment integration into pipeline.
 - [ ] train and test CNN (new arch, with preproc)
 - [ ] fix use experiment from web: select classify or detect depending on logo
     or graheme edition, and select tag to fill automatically
-
-## Pipeline
-
-For now, just a single script which calls everything might be best.
-
-Steps/Experiments should work with lists. For each element in the list, they
-produce an element (CNN, preproc) or a list (YOLO, multirotate). A step can
-flatten sublists (e.g. keep all detections from YOLO) or convert them into
-single elements (e.g. use softmax to keep the best prediction from CNN), or just
-pass-through (preprocessing). The final step takes the list and converts it into
-json or something that can be output.
 
 # -- BACKLOG --
 
@@ -106,7 +74,9 @@ Github issues are less 便利 than this file when you go solo 🤷.
 
 ## Documentation
 
-- [ ] Do this whenever the latest refactor is over 🤷
+Do this whenever the latest refactor is over 🤷
+
+- [ ] Update Readme
 - [ ] Big section in documentation about config file
 
 ## Experiments
