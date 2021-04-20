@@ -35,6 +35,9 @@ train test split, generation, and new preprocessing). See next iteration for
 experiment integration into pipeline.
 
 - [ ] Think of better name for experiments, and implement a pipeline arch.
+- [ ] Experiment config relative path to their directory so can be ported (works
+    for test, check for train)
+- [ ] Predict load image from RAM (PIL image)
 - [ ] train and test YOLO (new arch) 
 - [ ] Add preproc option for experiments/pipelines, create rotator script (in
     examples maybe) that uses rotation tab to realign graphemes according to

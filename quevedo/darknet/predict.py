@@ -51,6 +51,7 @@ class DarknetShutup(object):
 
 tag_map = None
 
+
 def init_darknet(dataset, experiment):
     '''Loads the trained neural network. Must be called before predict.'''
 
@@ -69,12 +70,17 @@ def init_darknet(dataset, experiment):
     tag_map = json.loads((experiment.path / 'tag_map.json').read_text())
     tag_map = {v: k for k, v in tag_map.items()}
 
+    oldcwd = os.getcwd()
+    os.chdir(experiment.path)
+
     with DarknetShutup():
         perform_detect, perform_classify = init(
             libraryPath=cstr(dataset.config['darknet']['library']),
             configPath=cstr(darknet_cfg),
             weightPath=cstr(weights),
             metaPath=cstr(darknet_data))
+
+    os.chdir(oldcwd)
 
 
 def predict(image_path, experiment):

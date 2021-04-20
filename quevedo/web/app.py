@@ -121,9 +121,9 @@ predict = None  # Do not load neural network until requested
 last_experiment = None
 
 
-@app.route('/api/auto_annotate/<dir>/<idx>')
+@app.route('/api/auto_annotate/<target>/<dir>/<idx>')
 @authenticated
-def get_auto_annotations(dir, idx):
+def get_auto_annotations(target, dir, idx):
     ds = app_data['dataset']
     experiment = ds.get_experiment(request.args.get('exp', None))
 
@@ -137,9 +137,10 @@ def get_auto_annotations(dir, idx):
         except SystemExit as e:
             return str(e), 400
 
-    img = (app_data['data_dir'] / '{}/{}.png'.format(dir, idx)).resolve()
+    an = app_data['dataset'].get_single(string_to_target(target),
+                                        dir, idx)
     return {
-        'graphemes': predict(img, experiment),
+        'graphemes': predict(an.image, experiment),
         'tag_index': experiment._tag_index
     }
 
