@@ -1,7 +1,6 @@
 # 2020-04-10 Antonio F. G. Sevilla <afgs@ucm.es>
 
 import click
-import quevedo.darknet.train
 from quevedo.darknet.test import test
 
 

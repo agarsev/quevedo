@@ -1,8 +1,19 @@
-# 2020-05-04 Antonio F. G. Sevilla <afgs@ucm.es>
+# 2021-04-21 Antonio F. G. Sevilla <afgs@ucm.es>
 
 import click
-from os import replace
-from shutil import rmtree
+
+from .detect import DetectNet
+from .classify import ClassifyNet
+
+
+def create_network(dataset, name):
+    config = dataset.config['network'][name]
+    if config['task'] == 'detect':
+        return DetectNet(dataset, name)
+    elif config['task'] == 'classify':
+        return ClassifyNet(dataset, name)
+    raise ValueError('Unknown task {} for network {}'.format(
+        config['task'], name))
 
 
 @click.command()
@@ -15,8 +26,8 @@ def prepare(obj):
 
     dataset = obj['dataset']
     network = dataset.get_network(obj['network'])
-    network.prepare()
 
+    network.prepare()
     click.echo("Dataset ready for training")
 
 
@@ -31,17 +42,8 @@ def train(obj):
     dataset = obj['dataset']
     network = dataset.get_network(obj['network'])
 
-    if not (network.path / 'darknet.cfg').exists():
-        raise SystemExit("Please run pre-train command first")
+    if not network.is_prepared():
+        raise SystemExit("Please run prepare command first")
 
-    weight_d = network.path / 'weights'
-    weight_d.mkdir(exist_ok=True)
-
-    darknet_data = (network.path / 'darknet.data').resolve()
-    darknet_cfg = (network.path / 'darknet.cfg').resolve()
-    dataset.run_darknet(network.get_network_type(),
-                        'train', darknet_data, darknet_cfg)
-
-    replace(str(weight_d / 'darknet_final.weights'),
-            str(network.path / 'darknet_final.weights'))
-    rmtree(str(weight_d))
+    network.train()
+    click.echo("Neural network {} trained".format(network.name))

@@ -9,7 +9,7 @@ from string import Template
 from subprocess import run
 import toml
 
-from quevedo.network import Network
+from quevedo.network import create_network
 from quevedo.annotation import Annotation, Target
 
 
@@ -41,13 +41,13 @@ class Dataset:
         run([darknet['path'], *args, *darknet['options']])
 
     def list_networks(self):
-        return [Network(self, n) for n in self.config['network'].keys()]
+        return [create_network(self, n) for n in self.config['network'].keys()]
 
     def get_network(self, name):
         if name is None:
             return next(n for n in self.list_networks() if n.config['default'])
         else:
-            return Network(self, name)
+            return create_network(self, name)
 
     def get_single(self, target: Target, subset, id):
         if target == Target.LOGO:

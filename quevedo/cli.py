@@ -2,17 +2,17 @@
 
 import click
 from os import getcwd
-import time
 
 from quevedo import darknet, web, dataset as ds
 from quevedo.extract_graphemes import extract_graphemes
 from quevedo.generate import generate
+from quevedo.network import prepare, train
 
 
 @click.group(commands={
     'split': ds.train_test_split, 'config': ds.config_edit,
     'extract': extract_graphemes, 'generate': generate,
-    'prepare': darknet.train.prepare, 'train': darknet.train.train,
+    'prepare': prepare, 'train': train,
     'test': darknet.test, 'predict': darknet.predict_image,
     'info': ds.info, 'create': ds.create, 'add_images': ds.add_images,
     'web': web.launcher

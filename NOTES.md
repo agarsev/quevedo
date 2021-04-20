@@ -1,7 +1,6 @@
 - Remember: images need to be 3 channel
 - To add languages for the web, copy and edit a file in `/quevedo/web/static/i18n`
-- For classify, if a tag is missing, the grapheme is ignored (this is
-    intentional, but maybe there should be a warning somewhere)
+- When training, if a files corresponding tag is missing, the file is ignored
 
 # -- NEXT --
 
@@ -9,21 +8,26 @@
 - [ ] Substitute cli flags -l/-g + -n set for -l set / -g set (less typing, more
     intuitive, more coherent with -f/-t in generate/extract, maybe change or
     allow there too)
+- [ ] Add postprocessing to networks too (eg. tags that can be filled from
+    rules, maybe some error correction)
  
 ## Refactor Experiments
 
 - [X] Rename experiment -> network
+- [X] Make Network class, subclassed by Detector and Classifier, add factory
 - [ ] Load darknet inside network class so more than one can be used
 - [ ] Network config relative path to their directory so can be ported (works
     for test, check for train)
-- [ ] Predict load image from RAM (PIL image)
 - [ ] train and test YOLO (new arch) 
-- [ ] Add preproc option for experiments/pipelines, create rotator script (in
-    examples maybe) that uses rotation tab to realign graphemes according to
-    rotation tag.
+- [ ] Add preproc option for networks. This preproc should return tag name (for
+    processed/mixed tags) and can modify the train file (eg. rotate). It can't
+    be a link, then, should be a copy. For our SW dataset, create script that
+    rotates according to ROT tag and combines SHAPE and FILL.
 - [ ] train and test CNN (new arch, with preproc)
 - [ ] fix use experiment from web: select classify or detect depending on logo
-    or graheme edition, and select tag to fill automatically
+    or graheme edition, select tag to fill automatically, extract graphemes for
+    classification, apply pre processing...
+- [ ] Predict load image from RAM (PIL image)
 
 # -- BACKLOG --
 
@@ -74,9 +78,7 @@ Github issues are less 便利 than this file when you go solo 🤷.
 
 ## Documentation
 
-Do this whenever the latest refactor is over 🤷
-
-- [ ] Update Readme
+- [ ] Document whenever the latest refactor is over 🤷
 - [ ] Big section in documentation about config file
 
 ## Experiments
