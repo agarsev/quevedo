@@ -20,17 +20,18 @@ class DetectNet(Network):
         tag_set.update(set(self.get_tag(s['tags'])
                            for s in annotation.anot['graphemes']))
 
-    def prepare_annotations(self, annotation, num, tag, train_file, tag_set):
+    def prepare_annotation(self, annotation, num, tag_set):
         # For YOLO, we write an adjacent txt file with the bounding boxes and
         # the class (its index)
-        link_name = (self.train_path / "{}.png".format(num)).resolve()
-        link_name.with_suffix(".txt").write_text(
+        link_name = "{}.png".format(num)
+        (self.train_path / link_name).with_suffix(".txt").write_text(
             "".join("{} {} {} {} {}\n".format(
-                tag_set.index(tag),
+                tag_set.index(self.get_tag(s['tags'])),
                 *s['box']) for s in annotation.anot['graphemes']))
+        return link_name
 
     def get_net_config(self, num_classes):
-        num_max_batches = num_classes * 2000
+        num_max_batches = num_classes * 200 # 2000, 200 only for testing
         template = Template((Path(__file__).parent.parent /
                              'darknet/yolo.cfg').read_text())
         return template.substitute(

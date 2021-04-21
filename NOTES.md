@@ -16,7 +16,7 @@
 - [X] Rename experiment -> network
 - [X] Make Network class, subclassed by Detector and Classifier, add factory
 - [ ] Load darknet inside network class so more than one can be used
-- [ ] Network config relative path to their directory so can be ported (works
+- [X] Network config relative path to their directory so can be ported (works
     for test, check for train)
 - [ ] train and test YOLO (new arch) 
 - [ ] Add preproc option for networks. This preproc should return tag name (for

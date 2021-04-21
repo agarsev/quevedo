@@ -21,11 +21,13 @@ class ClassifyNet(Network):
         if tag is not None:
             tag_set.add(tag)
 
-    def prepare_annotation(self, annotation, num, tag, train_file, tag_set):
+    def prepare_annotation(self, annotation, num, tag_set):
         # For CNN, no need to write a label file, just put the label in the
         # filename
-        return self.train_path / "{}_{}.png".format(
-            self.tag_map[tag], num)
+        tag = self.get_tag(annotation.anot['tags'])
+        if tag is None:
+            return None
+        return "{}_{}.png".format(self.tag_map[tag], num)
 
     def get_net_config(self, num_classes):
         # TODO: Read somewhere how to choose these params

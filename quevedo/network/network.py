@@ -2,7 +2,8 @@
 
 from itertools import chain
 import json
-from os import symlink, replace
+import os
+from pathlib import Path
 from shutil import rmtree
 
 
@@ -19,7 +20,7 @@ class Network:
             raise SystemExit("No such network: {}".format(name))
 
         self.path = dataset.path / 'networks' / name
-        self.path.mkdir(exist_ok=True)
+        self.path.mkdir(exist_ok=True, parents=True)
 
         if 'tag' not in self.config:
             self._tag_index = 0
@@ -64,7 +65,7 @@ class Network:
         collecting all tags prior to training).'''
         raise NotImplementedError
 
-    def prepare_annotations(self, annotation, num, tag, train_file, tag_set):
+    def prepare_annotation(self, annotation, num, tag_set):
         '''Prepare the files needed to train this annotation. Return the name
         that the final file (link or copy) should have.'''
         raise NotImplementedError
@@ -108,26 +109,19 @@ class Network:
         # in classification and an additional txt file with bounding boxes for
         # detection
         with open(self.path / 'train.txt', 'w') as train_file:
-            num = 0
+            num = 1
             for t in annotations:
-                tag = self.get_tag(t.anot['tags'])
-                if tag is None:
+                link_name = self.prepare_annotation(t, num, all_tags)
+                if link_name is None:
                     continue
                 num = num + 1
-                link_name = self.prepare_annotation(t, num, tag, train_file,
-                                                    all_tags)
-                symlink(t.image.resolve(), link_name)
-                train_file.write("{}\n".format(link_name))
-
-        # In this directory, the weights of the trained network will be stored
-        weight_d = self.path / 'weights'
+                os.symlink(t.image.resolve(), self.train_path / link_name)
+                train_file.write("train/{}\n".format(link_name))
 
         # Write meta-configuration information in the darknet data file
         (self.path / 'darknet.data').write_text(("classes = {}\n"
-            "train = {}\n{} = {}\nbackup = {}\n").format(
-                num_classes, train_file.resolve(),
-                self.names_file_name,
-                names_file.resolve(), weight_d.resolve()))
+            "train = train.txt\n{} = obj.names\nbackup = weights\n").format(
+                num_classes, self.names_file_name))
 
         # See the cfg template files provided from upstream
         (self.path / 'darknet.cfg').write_text(
@@ -136,13 +130,17 @@ class Network:
     def train(self):
         '''Trains the neural network. When finished, removes partial weights and
         keeps only the last.'''
-        weight_d = self.path / 'weights'
+        oldcwd = os.getcwd()
+        os.chdir(self.path)
+
+        weight_d = Path('weights')
         weight_d.mkdir(exist_ok=True)
 
-        darknet_data = (self.path / 'darknet.data').resolve()
-        darknet_cfg = (self.path / 'darknet.cfg').resolve()
-        self.dataset.run_darknet(self.network_type, 'train', darknet_data, darknet_cfg)
+        self.dataset.run_darknet(self.network_type, 'train',
+                'darknet.data', 'darknet.cfg')
 
-        replace(str(weight_d / 'darknet_final.weights'),
-                str(self.path / 'darknet_final.weights'))
+        os.replace(str(weight_d / 'darknet_final.weights'),
+                str('darknet_final.weights'))
         rmtree(str(weight_d))
+
+        os.chdir(oldcwd)
