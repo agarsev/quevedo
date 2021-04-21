@@ -3,17 +3,16 @@
 import click
 from os import getcwd
 
-from quevedo import darknet, web, dataset as ds
+from quevedo import darknet, web, network, dataset as ds
 from quevedo.extract_graphemes import extract_graphemes
 from quevedo.generate import generate
-from quevedo.network import prepare, train, predict_image
 
 
 @click.group(commands={
     'split': ds.train_test_split, 'config': ds.config_edit,
     'extract': extract_graphemes, 'generate': generate,
-    'prepare': prepare, 'train': train, 'predict': predict_image,
-    'test': darknet.test,
+    'prepare': network.prepare, 'train': network.train,
+    'predict': network.predict_image, 'test': network.test,
     'info': ds.info, 'create': ds.create, 'add_images': ds.add_images,
     'web': web.launcher
 }, chain=True, invoke_without_command=True)

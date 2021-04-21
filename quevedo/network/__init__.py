@@ -4,6 +4,7 @@ import click
 
 from .detect import DetectNet
 from .classify import ClassifyNet
+from .test import test
 
 
 def create_network(dataset, name):

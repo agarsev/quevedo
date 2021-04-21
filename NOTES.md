@@ -17,15 +17,16 @@
 - [X] Make Network class, subclassed by Detector and Classifier, add factory
 - [X] Network config relative path to their directory so can be ported (works
     for test, check for train)
-- [o] Load darknet inside network class so more than one can be used
+- [X] Load darknet inside network class so more than one can be used
     - [X] train
-    - [ ] test
-- [ ] train and test YOLO (new arch) 
+    - [X] test
+- [X] train and test CNN 
+- [ ] train and test YOLO
 - [ ] Add preproc option for networks. This preproc should return tag name (for
     processed/mixed tags) and can modify the train file (eg. rotate). It can't
     be a link, then, should be a copy. For our SW dataset, create script that
     rotates according to ROT tag and combines SHAPE and FILL.
-- [ ] train and test CNN (new arch, with preproc)
+- [ ] train and test CNN (with preproc)
 - [ ] fix use experiment from web: select classify or detect depending on logo
     or graheme edition, select tag to fill automatically, extract graphemes for
     classification, apply pre processing...
@@ -40,14 +41,7 @@ Github issues are less 便利 than this file when you go solo 🤷.
 - [ ] **IMPORTANT** Add license file, and license information for the dependencies.
     This must be shown in the web somehow too.
 - [ ] **IMPORTANT** Rewrite README.md with latest info.
-- [X] When the create command is aborted, if -D was given remove the directory
-    so it can be done again. REJECTED
-- [X] Experiments should not be "checked" if not to be used. E.g when creating a
-    dataset, you might change the tag schema, and then start adding images, but
-    not adjust the experiment yet. It shouldn't then complain that the tag
-    schema is wrong. maybe. What we do is start with no tag specified, then the
-    first one is used. Uncomment and change to use a different one.
-- [ ] Use https://docs.python.org/3/library/collections.html#collections.Counter
+- [X] Use https://docs.python.org/3/library/collections.html#collections.Counter
     in test
 - [ ] If there are no annotation folders, the web interface should offer the
     default one even if the directory is not physically there. Or maybe allow

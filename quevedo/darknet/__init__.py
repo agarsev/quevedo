@@ -3,7 +3,6 @@
 import os
 import sys
 
-from .test import test
 from .library import DarknetNetwork
 
 

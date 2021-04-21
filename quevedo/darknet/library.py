@@ -228,10 +228,10 @@ class DarknetNetwork():
             out = predict_image(net, im)
             res = []
             for i in range(meta.classes):
-                if altNames is None:
+                if self.altNames is None:
                     nameTag = meta.names[i]
                 else:
-                    nameTag = altNames[i]
+                    nameTag = self.altNames[i]
                 res.append((nameTag, out[i]))
             res = sorted(res, key=lambda x: -x[1])
             return res
@@ -279,10 +279,10 @@ class DarknetNetwork():
                     if debug: print("Class-ranging on "+str(i)+" of "+str(meta.classes)+"= "+str(dets[j].prob[i]))
                     if dets[j].prob[i] > 0:
                         b = dets[j].bbox
-                        if altNames is None:
+                        if self.altNames is None:
                             nameTag = meta.names[i]
                         else:
-                            nameTag = altNames[i]
+                            nameTag = self.altNames[i]
                         if debug:
                             print("Got bbox", b)
                             print(nameTag)
@@ -310,7 +310,7 @@ class DarknetNetwork():
                 if os.path.exists(result):
                     with open(result) as namesFH:
                         namesList = namesFH.read().strip().split("\n")
-                        altNames = [x.strip() for x in namesList]
+                        self.altNames = [x.strip() for x in namesList]
             except TypeError:
                 pass
 

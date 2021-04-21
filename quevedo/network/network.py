@@ -21,6 +21,7 @@ class Network:
 
         self.path = dataset.path / 'networks' / name
         self.path.mkdir(exist_ok=True, parents=True)
+        self._darknet = None
 
         if 'tag' not in self.config:
             self._tag_index = 0
@@ -149,6 +150,9 @@ class Network:
         '''Loads the weights for the trained neural network so it can be used to
         predict.'''
 
+        if self._darknet is not None:  # Already loaded
+            return
+
         if not (self.path / 'darknet.cfg').exists():
             raise SystemExit("Neural network has not been trained")
 
@@ -174,4 +178,9 @@ class Network:
 
     def predict(self, image_path):
         '''Use the trained neural network to predict results from an image.'''
+        raise NotImplementedError
+
+    def test(self, annotation, stats):
+        '''Use the network to get the prediction for a real annotation, compare
+        results and update stats.'''
         raise NotImplementedError

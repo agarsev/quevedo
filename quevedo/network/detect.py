@@ -63,3 +63,66 @@ class DetectNet(Network):
             'confidence': c,
             'box': make_bbox(width, height, *b)
         } for (s, c, b) in self._darknet.detect(image_path)]
+
+    def test(self, annotation, stats):
+        predictions = self.predict(annotation.image)
+        for g in annotation.anot['graphemes']:
+            tag = self.get_tag(g['tags'])
+            logo = {'box': g['box'], 'name': tag}
+            stats.add(tag)
+            if len(predictions) > 0:
+                similarities = sorted(((box_similarity(p, logo), i) for (i, p) in
+                                      enumerate(predictions)), reverse=True)
+                (sim, idx) = similarities[0]
+                if sim > 0.7:
+                    predictions.pop(idx)
+                    stats.true_positives[tag] += 1
+                    continue
+            stats.false_negatives[tag] += 1
+        # Unassigned predictions are false positives
+        for pred in predictions:
+            stats.false_positives[pred['name']] += 1
+
+
+# Utilities for YOLO
+
+def safe_divide(a, b):
+    if a == 0:
+        return 0
+    elif b == 0:
+        return 1
+    else:
+        return a / b
+
+
+def box(xc, yc, w, h):
+    return {
+        'l': float(xc) - float(w) / 2,
+        'r': float(xc) + float(w) / 2,
+        'b': float(yc) - float(h) / 2,
+        't': float(yc) + float(h) / 2,
+        'w': float(w),
+        'h': float(h)
+    }
+
+
+def box_similarity(a, b):
+    '''Similarity of grapheme boxes.'''
+    return iou(a['box'], b['box']) if (a['name'] == b['name']) else 0
+
+
+def iou(a, b):
+    '''Intersection over union for boxes in x, y, w, h format'''
+    a = box(*a)
+    b = box(*b)
+    # Intersection
+    il = max(a['l'], b['l'])
+    ir = min(a['r'], b['r'])
+    ix = ir - il if ir > il else 0
+    ib = max(a['b'], b['b'])
+    it = min(a['t'], b['t'])
+    iy = it - ib if it > ib else 0
+    i = ix * iy
+    # Sum (union = sum - inters)
+    s = a['w'] * a['h'] + b['w'] * b['h']
+    return safe_divide(i, (s - i))

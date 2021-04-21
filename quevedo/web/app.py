@@ -117,30 +117,15 @@ def new_annotation(target, dir):
     return {'id': new_t.id}
 
 
-predict = None  # Do not load neural network until requested
-last_network = None
-
-
 @app.route('/api/predict/<target>/<dir>/<idx>')
 @authenticated
 def get_predict(target, dir, idx):
     ds = app_data['dataset']
     network = ds.get_network(request.args.get('network', None))
 
-    global predict, last_network
-    if predict is None or last_network.name != network.name:
-        from quevedo.darknet.predict import init_darknet, predict as true_predict
-        try:
-            init_darknet(ds, network)
-            predict = true_predict
-            last_network = network
-        except SystemExit as e:
-            return str(e), 400
-
-    an = app_data['dataset'].get_single(string_to_target(target),
-                                        dir, idx)
+    an = ds.get_single(string_to_target(target), dir, idx)
     return {
-        'graphemes': predict(an.image, network),
+        'graphemes': network.predict(an.image),
         'tag_index': network._tag_index
     }
 
