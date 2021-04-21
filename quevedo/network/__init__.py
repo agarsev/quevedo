@@ -46,4 +46,21 @@ def train(obj):
         raise SystemExit("Please run prepare command first")
 
     network.train()
-    click.echo("Neural network {} trained".format(network.name))
+    click.echo("Neural network '{}' trained".format(network.name))
+
+
+@click.command()
+@click.option('--image', '-i', type=click.Path(exists=True),
+              required=True, help="Image to predict")
+@click.pass_obj
+def predict_image(obj, image):
+    '''Get predictions for an image using the trained neural network.'''
+
+    dataset = obj['dataset']
+    network = dataset.get_network(obj['network'])
+
+    if not network.is_trained():
+        raise SystemExit("Please train the neural network first")
+
+    predictions = network.predict(image)
+    print(predictions)

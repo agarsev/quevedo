@@ -140,7 +140,38 @@ class Network:
                 'darknet.data', 'darknet.cfg')
 
         os.replace(str(weight_d / 'darknet_final.weights'),
-                str('darknet_final.weights'))
+                'darknet_final.weights')
         rmtree(str(weight_d))
 
         os.chdir(oldcwd)
+
+    def load(self):
+        '''Loads the weights for the trained neural network so it can be used to
+        predict.'''
+
+        if not (self.path / 'darknet.cfg').exists():
+            raise SystemExit("Neural network has not been trained")
+
+        if not (self.path / 'darknet_final.weights').exists():
+            raise SystemExit("Neural network has not been trained")
+
+        tag_map = json.loads((self.path / 'tag_map.json').read_text())
+        self.tag_map = {v: k for k, v in tag_map.items()}
+
+        oldcwd = os.getcwd()
+        os.chdir(self.path)
+
+        from quevedo.darknet import DarknetShutup, DarknetNetwork
+
+        with DarknetShutup():
+            self._darknet = DarknetNetwork(
+                libraryPath=self.dataset.config['darknet']['library'],
+                configPath='darknet.cfg',
+                weightPath='darknet_final.weights',
+                metaPath='darknet.data')
+
+        os.chdir(oldcwd)
+
+    def predict(self, image_path):
+        '''Use the trained neural network to predict results from an image.'''
+        raise NotImplementedError

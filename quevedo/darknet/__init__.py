@@ -1,17 +1,28 @@
 # 2020-04-10 Antonio F. G. Sevilla <afgs@ucm.es>
 
-import click
-from quevedo.darknet.test import test
+import os
+import sys
+
+from .test import test
+from .library import DarknetNetwork
 
 
-@click.command()
-@click.option('--image', '-i', type=click.Path(exists=True),
-              required=True, help="Image to predict")
-@click.pass_obj
-def predict_image(obj, image):
-    '''Get predicted graphemes for an image using the trained neural network.'''
-    from quevedo.darknet.predict import init_darknet, predict
-    dataset = obj['dataset']
-    network = dataset.get_network(obj['network'])
-    init_darknet(dataset, network)
-    print(predict(image, network))
+# Only way to suppress usual darknet output as much as possible
+class DarknetShutup(object):
+
+    def __enter__(self):
+        self.stderr_fileno = sys.stderr.fileno()
+        self.stderr_save = os.dup(self.stderr_fileno)
+        self.stdout_fileno = sys.stdout.fileno()
+        self.stdout_save = os.dup(self.stdout_fileno)
+        self.devnull = open(os.devnull, 'w')
+        devnull_fn = self.devnull.fileno()
+        os.dup2(devnull_fn, self.stderr_fileno)
+        os.dup2(devnull_fn, self.stdout_fileno)
+
+    def __exit__(self, type, value, traceback):
+        self.devnull.close()
+        os.dup2(self.stderr_save, self.stderr_fileno)
+        os.dup2(self.stdout_save, self.stdout_fileno)
+        os.close(self.stderr_save)
+        os.close(self.stdout_save)

@@ -1,6 +1,7 @@
 # 2021-04-21 Antonio F. G. Sevilla <afgs@ucm.es>
 
 from pathlib import Path
+from PIL import Image
 from string import Template
 
 from .network import Network
@@ -40,3 +41,25 @@ class DetectNet(Network):
             num_max_batches=num_max_batches,
             num_steps_1=int(num_max_batches * 80 / 100),
             num_steps_2=int(num_max_batches * 90 / 100))
+
+    def predict(self, image_path):
+
+        if self._darknet is None:
+            self.load()
+
+        def clamp(val, minim, maxim):
+            return min(maxim, max(minim, val))
+
+        def make_bbox(im_width, im_height, x, y, w, h):
+            x = clamp(x / im_width, 0, 1)
+            y = clamp(y / im_height, 0, 1)
+            w = clamp(w / im_width, 0, 1)
+            h = clamp(h / im_height, 0, 1)
+            return [x, y, w, h]
+
+        width, height = Image.open(image_path).size
+        return [{
+            'name': self.tag_map[s],
+            'confidence': c,
+            'box': make_bbox(width, height, *b)
+        } for (s, c, b) in self._darknet.detect(image_path)]

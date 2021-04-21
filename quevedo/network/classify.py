@@ -37,3 +37,13 @@ class ClassifyNet(Network):
             num_classes=num_classes,
             num_max_batches=num_classes * 50,  # maybe?
             num_connected=num_classes * 10)
+
+    def predict(self, image_path):
+
+        if self._darknet is None:
+            self.load()
+
+        return [{
+            'tag': self.tag_map[tag.decode('utf8')],
+            'confidence': conf
+        } for (tag, conf) in self._darknet.classify(image_path)]
