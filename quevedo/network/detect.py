@@ -1,5 +1,6 @@
 # 2021-04-21 Antonio F. G. Sevilla <afgs@ucm.es>
 
+import json
 from pathlib import Path
 from PIL import Image
 from string import Template
@@ -18,8 +19,12 @@ class DetectNet(Network):
         self.network_type = 'detector'
 
     def update_tag_set(self, tag_set, annotation):
-        tag_set.update(set(self.get_tag(s['tags'])
-                           for s in annotation.anot['graphemes']))
+        try:
+            tag_set.update(set(self.get_tag(s['tags'])
+                               for s in annotation.anot['graphemes']))
+        except KeyError:
+            raise KeyError("Error getting annotations for logogram {} ({})".format(
+                annotation.id, json.dumps(annotation.anot)))
 
     def prepare_annotation(self, annotation, num, tag_set):
         # For YOLO, we write an adjacent txt file with the bounding boxes and
@@ -32,7 +37,7 @@ class DetectNet(Network):
         return link_name
 
     def get_net_config(self, num_classes):
-        num_max_batches = num_classes * 200 # 2000, 200 only for testing
+        num_max_batches = num_classes * 400  # 2000, 400 only for testing
         template = Template((Path(__file__).parent.parent /
                              'darknet/yolo.cfg').read_text())
         return template.substitute(

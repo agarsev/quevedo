@@ -1,6 +1,6 @@
 - Remember: images need to be 3 channel
 - To add languages for the web, copy and edit a file in `/quevedo/web/static/i18n`
-- When training, if a files corresponding tag is missing, the file is ignored
+- When training, if a file's corresponding tag is missing, the file is ignored
 
 # -- NEXT --
 
@@ -8,8 +8,10 @@
 - [ ] Substitute cli flags -l/-g + -n set for -l set / -g set (less typing, more
     intuitive, more coherent with -f/-t in generate/extract, maybe change or
     allow there too)
-- [ ] Add postprocessing to networks too (eg. tags that can be filled from
-    rules, maybe some error correction)
+- [ ] Try and see if we can get 'predict' to load image from RAM (PIL image)
+    instead of fs.
+- [ ] Whole pipeline script detection + classification -> can be called from
+    web, how?
  
 ## Refactor Experiments
 
@@ -21,16 +23,15 @@
     - [X] train
     - [X] test
 - [X] train and test CNN 
-- [ ] train and test YOLO
-- [ ] Add preproc option for networks. This preproc should return tag name (for
-    processed/mixed tags) and can modify the train file (eg. rotate). It can't
-    be a link, then, should be a copy. For our SW dataset, create script that
-    rotates according to ROT tag and combines SHAPE and FILL.
-- [ ] train and test CNN (with preproc)
-- [ ] fix use experiment from web: select classify or detect depending on logo
-    or graheme edition, select tag to fill automatically, extract graphemes for
-    classification, apply pre processing...
-- [ ] Predict load image from RAM (PIL image)
+- [X] train and test YOLO
+- [ ] create script for grapheme processing. Call it after extract. For our SW dataset, create script that
+    rotates according to ROT tag.
+- [ ] allow tag combinations for pipelines (get_tag not only index, but can
+    concat eg)
+- [ ] train and test CNN 
+- [ ] fix use experiment from web
+    - [ ] for logograms, offer detection nets, for graphemes, classifiers
+    - [ ] fix how to interpret results with combined tags
 
 # -- BACKLOG --
 
