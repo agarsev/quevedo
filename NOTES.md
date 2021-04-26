@@ -5,6 +5,7 @@
 # -- NEXT --
 
 - [ ] Refactor experiments (next section)
+- [ ] Add Quevedo notice to default_config.toml
 - [ ] Substitute cli flags -l/-g + -n set for -l set / -g set (less typing, more
     intuitive, more coherent with -f/-t in generate/extract, maybe change or
     allow there too)
@@ -28,9 +29,8 @@
 - [X] train and test YOLO
 - [X] create script for grapheme processing. Call it after extract. For our SW dataset, create script that
     rotates according to ROT tag.
-- [ ] allow tag combinations for pipelines (get_tag not only index, but can
-    concat eg)
-- [ ] train and test CNN 
+- [X] allow tag combinations for pipelines (get_tag not only index, but can concat eg)
+- [ ] train and test CNN
 - [ ] fix use experiment from web
     - [ ] for logograms, offer detection nets, for graphemes, classifiers
     - [ ] fix how to interpret results with combined tags
@@ -52,23 +52,23 @@ Github issues are less 便利 than this file when you go solo 🤷.
 
 ## Features
 
+- [ ] Allow restarting training with latest weights if weights directory exists,
+    or maybe recover gracefully from Ctrl+C when training, to allow interrupt
+    before overfitting etc. Or both.
+- [ ] Allow annotation filtering for networks based on tags (eg different
+    classify networks for different coarse-grain tags)
+- [ ] In split command, add a "k-set" to offset split index, which combined
+    with the seed can allow for cross-validation
 - [ ] Auto-save changes in the web interface if enabled in the config file
     (nowadays people aren't so used to clicking save)
 - [ ] Remove "saved" message when doing changes (inconsistent)
 - [ ] Allow deleting entries in web (just move the last to the hole). Maybe
     add `delete` in cli too?
-- [ ] Allow restarting training with latest weights if weights directory exists.
 - [ ] Filter/search annotations in listing according to some tag(s).
 - [ ] RW permissions for users in web. Also user groups.
 - [ ] In test, compute a confusion matrix (at least for classify) for deeper
     inspection
 - [ ] Autosuggest values for tagging.
-- [ ] Add a configurable preprocessing module that applies common image
-    enhancement to data, for example increasing contrast, reducing noise,
-    whatever. This should be enabled/disabled in config. Maybe there can be a flag in
-    `add_images` that decides whether to process added images. This preprocessing
-    should be used when predicting new instances (also when testing, but images
-    there have already been added and therefore processed). 
 - [ ] Mobile interface for the web app. Maybe integrate with camera/scan app,
     make quevedo a target for "sharing" (uploading) images.
 - [ ] Annotated/not annotated status based on a custom checkbox, useful for

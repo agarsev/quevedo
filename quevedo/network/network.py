@@ -23,21 +23,19 @@ class Network:
         self._darknet = None
 
         if 'tag' not in self.config:
-            self._tag_index = 0
+            self.get_tag = lambda tags: get_tag_by_index(tags, 0)
         else:
+            tag = self.config['tag']
+            tag_schema = dataset.config['tag_schema']
             try:
-                self._tag_index = dataset.config['tag_schema'].index(self.config['tag'])
+                if isinstance(tag, str):
+                        i = tag_schema.index(tag)
+                        self.get_tag = lambda tags, i=i: get_tag_by_index(tags, i)
+                else:
+                    i = [tag_schema.index(t) for t in self.config['tag']]
+                    self.get_tag = lambda tags, i=i: get_multitag(tags, i)
             except ValueError:
-                raise SystemExit("Tag '{}' (chosen for network '{}') does not exist"
-                                 " in the dataset".format(self.config['tag'], name))
-
-    def get_tag(self, grapheme_tags):
-        '''Get the tag to use for this network from the list of annotated tags of a
-        grapheme.'''
-        try:
-            return grapheme_tags[self._tag_index]
-        except IndexError:
-            return None
+                raise SystemExit("Tag value '{}' (for network '{}') invalid".format(tag, name))
 
     def is_prepared(self):
         '''Checks whether the neural network configuration files have been
@@ -179,3 +177,17 @@ class Network:
         '''Use the network to get the prediction for a real annotation, compare
         results and update stats.'''
         raise NotImplementedError
+
+
+def get_tag_by_index(tags, index):
+    try:
+        return tags[index]
+    except IndexError:
+        return None
+
+
+def get_multitag(tags, indices):
+    try:
+        return '_'.join(tags[i] for i in indices)
+    except (IndexError, TypeError):
+        return None
