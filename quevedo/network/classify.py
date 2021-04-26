@@ -49,9 +49,11 @@ class ClassifyNet(Network):
         } for (tag, conf) in self._darknet.classify(image_path)]
 
     def test(self, annotation, stats):
+        true_tag = self.get_tag(annotation.anot['tags'])
+        if true_tag is None:
+            return
         predictions = self.predict(annotation.image)
         best = predictions[0]
-        true_tag = self.get_tag(annotation.anot['tags'])
         stats.add(true_tag)
         # TODO thresholds should be configuration, in detect too
         if best['confidence'] < 0.5:  # no prediction

@@ -8,8 +8,7 @@
 - [ ] Add Quevedo notice to default_config.toml
 - [ ] Substitute cli flags -l/-g + -n set for -l set / -g set (less typing, more
     intuitive, more coherent with -f/-t in generate/extract, maybe change or
-    allow there too)
-- [ ] Test changed:
+    allow there too) and test changed:
     - [ ] split
 - [ ] Try and see if we can get 'predict' to load image from RAM (PIL image)
     instead of fs.
@@ -30,7 +29,7 @@
 - [X] create script for grapheme processing. Call it after extract. For our SW dataset, create script that
     rotates according to ROT tag.
 - [X] allow tag combinations for pipelines (get_tag not only index, but can concat eg)
-- [ ] train and test CNN
+- [X] train and test CNN
 - [ ] fix use experiment from web
     - [ ] for logograms, offer detection nets, for graphemes, classifiers
     - [ ] fix how to interpret results with combined tags

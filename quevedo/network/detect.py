@@ -73,8 +73,10 @@ class DetectNet(Network):
         predictions = self.predict(annotation.image)
         for g in annotation.anot['graphemes']:
             tag = self.get_tag(g['tags'])
-            logo = {'box': g['box'], 'name': tag}
+            if tag is None:
+                continue
             stats.add(tag)
+            logo = {'box': g['box'], 'name': tag}
             if len(predictions) > 0:
                 similarities = sorted(((box_similarity(p, logo), i) for (i, p) in
                                       enumerate(predictions)), reverse=True)

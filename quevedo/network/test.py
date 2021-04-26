@@ -24,10 +24,16 @@ class Stats():
     def get_results(self):
         '''Get a dictionary of computed statistics.'''
         results = {}
+        total_tp = 0
+        total_fp = 0
+        total_fn = 0
         for name in sorted(self.all_tags):
             tp = self.true_positives[name]
+            total_tp += tp
             fp = self.false_positives[name]
+            total_fp += fp
             fn = self.false_negatives[name]
+            total_fn += fn
             prec = safe_divide(tp, tp + fp)
             rec = safe_divide(tp, tp + fn)
             results[name] = {
@@ -35,6 +41,13 @@ class Stats():
                 'rec': rec,
                 'f': safe_divide(2 * prec * rec, prec + rec),
             }
+        prec = safe_divide(total_tp, total_tp + total_fp)
+        rec = safe_divide(total_tp, total_tp + total_fn)
+        results['overall'] = {
+            'prec': prec,
+            'rec': rec,
+            'f': safe_divide(2 * prec * rec, prec + rec),
+        }
         return results
 
 
