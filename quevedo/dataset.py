@@ -70,8 +70,8 @@ class Dataset:
 
     def get_annotations(self, target: Target, subset=None):
         '''Returns a generator that yields all annotations, those of a given
-        target, or only those in a given subset and target.'''
-        if subset is None:
+        target, or only those in a given subset (or subsets) and target.'''
+        if subset is None or len(subset) == 0:
             if Target.LOGO in target:
                 ret = (Annotation(file, Target.LOGO) for file in
                        self.logogram_path.glob('**/*.png'))
@@ -84,7 +84,7 @@ class Dataset:
                        self.grapheme_path.glob('**/*.png'))
             else:
                 raise ValueError('A target needs to be specified')
-        else:
+        elif isinstance(subset, str):
             if target == Target.LOGO:
                 return (Annotation(file, target=Target.LOGO) for file in
                         (self.logogram_path / subset).glob('*.png'))
@@ -93,6 +93,8 @@ class Dataset:
                         (self.grapheme_path / subset).glob('*.png'))
             else:
                 raise ValueError('If a subset is specified, a single target is needed')
+        else:
+            return chain(*(self.get_annotations(target, d) for d in subset))
 
     def get_subsets(self, target: Target):
         '''Gets information about the subsets in a given target.'''
@@ -224,15 +226,9 @@ def train_test_split(obj, subsets, target, percentage, seed):
     random.seed(seed)
 
     if target == 'logo':
-        if len(subsets) == 0:
-            an = list(dataset.get_annotations(Target.LOGO))
-        else:
-            an = list(chain(*(dataset.get_annotations(Target.LOGO, d) for d in subsets)))
+        an = list(dataset.get_annotations(Target.LOGO, subsets))
     else:
-        if len(subsets) == 0:
-            an = list(dataset.get_annotations(Target.GRAPH))
-        else:
-            an = list(chain(*(dataset.get_annotations(Target.GRAPH, d) for d in subsets)))
+        an = list(dataset.get_annotations(Target.GRAPH, subsets))
 
     random.shuffle(an)
     split_point = round(len(an) * percentage / 100)

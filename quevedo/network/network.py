@@ -1,6 +1,5 @@
 # 2020-10-08 Antonio F. G. Sevilla <afgs@ucm.es>
 
-from itertools import chain
 import json
 import os
 from pathlib import Path
@@ -54,11 +53,7 @@ class Network:
 
     def get_annotations(self, set='train'):
         subsets = self.config.get('subsets')
-        if subsets is None:
-            annotations = self.dataset.get_annotations(self.target)
-        else:
-            annotations = chain(*(self.dataset.get_annotations(self.target, s)
-                                  for s in subsets))
+        annotations = self.dataset.get_annotations(self.target, subsets)
         return [a for a in annotations if a.anot.get('set') == set]
 
     def update_tag_set(self, tag_set, annotation):

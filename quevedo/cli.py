@@ -6,6 +6,7 @@ from os import getcwd
 from quevedo import darknet, web, network, dataset as ds
 from quevedo.extract_graphemes import extract_graphemes
 from quevedo.generate import generate
+from quevedo.run_script import run_script
 
 
 @click.group(commands={
@@ -14,7 +15,7 @@ from quevedo.generate import generate
     'prepare': network.prepare, 'train': network.train,
     'predict': network.predict_image, 'test': network.test,
     'info': ds.info, 'create': ds.create, 'add_images': ds.add_images,
-    'web': web.launcher
+    'web': web.launcher, 'run_script': run_script,
 }, chain=True, invoke_without_command=True)
 @click.option('-D', '--dataset', type=click.Path(), default=getcwd(),
               help="Path to the dataset to use, by default use current directory")

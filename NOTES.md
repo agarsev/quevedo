@@ -8,6 +8,8 @@
 - [ ] Substitute cli flags -l/-g + -n set for -l set / -g set (less typing, more
     intuitive, more coherent with -f/-t in generate/extract, maybe change or
     allow there too)
+- [ ] Test changed:
+    - [ ] split
 - [ ] Try and see if we can get 'predict' to load image from RAM (PIL image)
     instead of fs.
 - [ ] Whole pipeline script detection + classification -> can be called from
@@ -24,7 +26,7 @@
     - [X] test
 - [X] train and test CNN 
 - [X] train and test YOLO
-- [ ] create script for grapheme processing. Call it after extract. For our SW dataset, create script that
+- [X] create script for grapheme processing. Call it after extract. For our SW dataset, create script that
     rotates according to ROT tag.
 - [ ] allow tag combinations for pipelines (get_tag not only index, but can
     concat eg)
