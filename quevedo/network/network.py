@@ -24,16 +24,19 @@ class Network:
 
         if 'tag' not in self.config:
             self.get_tag = lambda tags: get_tag_by_index(tags, 0)
+            self.prediction_to_tag = lambda tags, tag: update_tag(tags, 0, tag)
         else:
             tag = self.config['tag']
             tag_schema = dataset.config['tag_schema']
             try:
                 if isinstance(tag, str):
-                        i = tag_schema.index(tag)
-                        self.get_tag = lambda tags, i=i: get_tag_by_index(tags, i)
+                    i = tag_schema.index(tag)
+                    self.get_tag = lambda tags, i=i: get_tag_by_index(tags, i)
+                    self.prediction_to_tag = lambda tags, tag, i=i: update_tag(tags, i, tag)
                 else:
                     i = [tag_schema.index(t) for t in self.config['tag']]
                     self.get_tag = lambda tags, i=i: get_multitag(tags, i)
+                    self.prediction_to_tag = lambda tags, tag, i=i: update_multitag(tags, i, tag)
             except ValueError:
                 raise SystemExit("Tag value '{}' (for network '{}') invalid".format(tag, name))
 
@@ -178,6 +181,11 @@ class Network:
         results and update stats.'''
         raise NotImplementedError
 
+    def auto_annotate(self, annotation):
+        '''Use the network to annotate a real instance, possibly already
+        partially annotated.'''
+        raise NotImplementedError
+
 
 def get_tag_by_index(tags, index):
     try:
@@ -186,8 +194,20 @@ def get_tag_by_index(tags, index):
         return None
 
 
+def update_tag(tags, index, new_tag):
+    if index < len(tags):
+        tags[index] = new_tag
+    else:
+        tags.insert(index, new_tag)
+
+
 def get_multitag(tags, indices):
     try:
         return '_'.join(tags[i] for i in indices)
     except (IndexError, TypeError):
         return None
+
+
+def update_multitag(tags, indices, result):
+    for i, tag in enumerate(result.split('_')):
+        update_tag(tags, indices[i], tag)

@@ -64,3 +64,7 @@ class ClassifyNet(Network):
                 stats.true_positives[true_tag] += 1
             else:
                 stats.false_positives[best['tag']] += 1
+
+    def auto_annotate(self, a):
+        preds = self.predict(a.image)
+        self.prediction_to_tag(a.anot['tags'], preds[0]['tag'])

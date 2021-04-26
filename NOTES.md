@@ -4,16 +4,18 @@
 
 # -- NEXT --
 
-- [ ] Refactor experiments (next section)
+- [X] Refactor experiments (next section)
 - [ ] Add Quevedo notice to default_config.toml
 - [ ] Substitute cli flags -l/-g + -n set for -l set / -g set (less typing, more
     intuitive, more coherent with -f/-t in generate/extract, maybe change or
     allow there too) and test changed:
     - [ ] split
+- [ ] Whole pipeline script detection + classification -> can be called from
+    web, how? Maybe scripts in the dataset scripts folder, if start with
+    grapheme/logogram or some convention, can be called from web on the current
+    annotation.
 - [ ] Try and see if we can get 'predict' to load image from RAM (PIL image)
     instead of fs.
-- [ ] Whole pipeline script detection + classification -> can be called from
-    web, how?
  
 ## Refactor Experiments
 
@@ -30,9 +32,9 @@
     rotates according to ROT tag.
 - [X] allow tag combinations for pipelines (get_tag not only index, but can concat eg)
 - [X] train and test CNN
-- [ ] fix use experiment from web
-    - [ ] for logograms, offer detection nets, for graphemes, classifiers
-    - [ ] fix how to interpret results with combined tags
+- [X] fix use experiment from web
+    - [X] for logograms, offer detection nets, for graphemes, classifiers
+    - [X] fix how to interpret results with combined tags
 
 # -- BACKLOG --
 
@@ -43,8 +45,6 @@ Github issues are less 便利 than this file when you go solo 🤷.
 - [ ] **IMPORTANT** Add license file, and license information for the dependencies.
     This must be shown in the web somehow too.
 - [ ] **IMPORTANT** Rewrite README.md with latest info.
-- [X] Use https://docs.python.org/3/library/collections.html#collections.Counter
-    in test
 - [ ] If there are no annotation folders, the web interface should offer the
     default one even if the directory is not physically there. Or maybe allow
     creating subsets in the web interface.

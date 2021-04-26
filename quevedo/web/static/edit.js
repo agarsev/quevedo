@@ -60,33 +60,31 @@ function App ({ title, target, id, annotation_help, links, anot,
     };
 
     const autoAnnotate = network => {
-        if (graphemes.list.length > 0 && 
+        if ((is_logo?graphemes:tags).list.length > 0 && 
             !confirm(Text['confirm_generate'])) {
             return;
         }
-        fetch(`api/predict/${id.full}${network?`?network=${network}`:''}`)
+        fetch(`api/auto_annotate/${id.full}${network?`?network=${network}`:''}`)
         .then(r => {
             if (r.ok) {
                 return r.json();
             } else throw r;
         }).then(data => {
-            console.log(data);
-            let new_graphemes = data.graphemes.map(({ box, name }) => {
-                let tags = [];
-                tags[data.tag_index] = name;
-                return { box, tags };
-            });
-            // sort left-to-right (roughly) and top-to-bottom (strict)
-            new_graphemes.sort((a, b) => {
-                let left_a = a.box[0]-a.box[2]/2;
-                let left_b = b.box[0]-b.box[2]/2;
-                if (Math.abs(left_b-left_a)<0.09) {
-                    let top_a = a.box[1]-a.box[3]/2;
-                    let top_b = b.box[1]-b.box[3]/2;
-                    return top_a - top_b;
-                } else return left_a - left_b;
-            });
-            graphemes.set(new_graphemes);
+            if (is_logo) {
+                // sort graphemes left-to-right (roughly) and top-to-bottom (strict)
+                data.graphemes.sort((a, b) => {
+                    let left_a = a.box[0]-a.box[2]/2;
+                    let left_b = b.box[0]-b.box[2]/2;
+                    if (Math.abs(left_b-left_a)<0.09) {
+                        let top_a = a.box[1]-a.box[3]/2;
+                        let top_b = b.box[1]-b.box[3]/2;
+                        return top_a - top_b;
+                    } else return left_a - left_b;
+                });
+                graphemes.set(data.graphemes);
+            } else {
+                tags.set(data.tags);
+            }
         }).catch(setError);
     };
 
@@ -116,7 +114,7 @@ function Header ({ title, id, links, saveChanges, message, show_save,
         ${show_save?html`<button tabIndex=2
             onclick=${saveChanges} >💾</button>`:null}
         <span class="message_text">${message}</span>
-        ${net_list.length<2?null:html`<select ref=${net_select}>
+        ${net_list.length<1?null:html`<select ref=${net_select}>
             ${net_list.map(e=>html`<option value=${e}>${e}</option>`)}
         </select>`}
         <button onclick=${() => autoAnnotate(net_select.current.value)}>⚙️</button>

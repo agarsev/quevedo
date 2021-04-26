@@ -90,6 +90,14 @@ class DetectNet(Network):
         for pred in predictions:
             stats.false_positives[pred['name']] += 1
 
+    def auto_annotate(self, a):
+        graphemes = []
+        for pred in self.predict(a.image):
+            g = {'box': pred['box'], 'tags': []}
+            self.prediction_to_tag(g['tags'], pred['name'])
+            graphemes.append(g)
+        a.anot['graphemes'] = graphemes
+
 
 # Utilities for YOLO
 

@@ -58,8 +58,6 @@ def load_dataset(dataset, language):
     app_data['meta_tags'] = dataset.config['meta_tags']
     resolved = dataset.path.resolve()
     app_data['path'] = resolved
-    app_data['net_list'] = [n.name for n in dataset.list_networks() if
-                            n.is_trained()]
     app_data['config'] = dataset.config['web']
     app.secret_key = app_data['config']['secret_key']
 
@@ -117,17 +115,14 @@ def new_annotation(target, dir):
     return {'id': new_t.id}
 
 
-@app.route('/api/predict/<target>/<dir>/<idx>')
+@app.route('/api/auto_annotate/<target>/<dir>/<idx>')
 @authenticated
-def get_predict(target, dir, idx):
+def auto_annotate(target, dir, idx):
     ds = app_data['dataset']
     network = ds.get_network(request.args.get('network', None))
-
     an = ds.get_single(string_to_target(target), dir, idx)
-    return {
-        'graphemes': network.predict(an.image),
-        'tag_index': network._tag_index
-    }
+    network.auto_annotate(an)
+    return an.anot
 
 
 @app.route('/api/login', methods=["POST"])
@@ -190,6 +185,7 @@ def edit(target, dir, idx):
     ds = app_data['dataset']
     full_dir = '{}/{}'.format(target, dir)
     full_id = '{}/{}/{}'.format(target, dir, idx)
+    target_ = string_to_target(target)
     idn = int(idx)
 
     if idn > 1:
@@ -201,7 +197,9 @@ def edit(target, dir, idx):
     if not (ds.path / full_dir / str(next_link)).with_suffix('.png').exists():
         next_link = 1
 
-    a = ds.get_single(string_to_target(target), dir, idx)
+    a = ds.get_single(target_, dir, idx)
+    net_list = [n.name for n in ds.list_networks() if
+                n.target == target_ and n.is_trained()]
 
     data = {
         'title': ds.config['title'],
@@ -216,7 +214,7 @@ def edit(target, dir, idx):
             'next': next_link,
         },
         'annotation_help': ds.config['annotation_help'],
-        'net_list': app_data['net_list'],
+        'net_list': net_list,
         'meta_tags': app_data['meta_tags'],
         'columns': ds.config['tag_schema'],
         'anot': a.anot,
