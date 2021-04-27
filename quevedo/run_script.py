@@ -19,12 +19,12 @@ def module_from_file(module_name, file_path):
 @click.command()
 @click.option('--scriptname', '-s', required=True,
               help="Name of the script to run")
-@click.option('--graphemes', '-g', multiple=True,
+@click.option('--grapheme-set', '-g', multiple=True,
               help="Process graphemes from these sets")
-@click.option('--logograms', '-l', multiple=True,
+@click.option('--logogram-set', '-l', multiple=True,
               help="Process graphemes from these sets")
 @click.pass_obj
-def run_script(obj, scriptname, graphemes, logograms):
+def run_script(obj, scriptname, grapheme_set, logogram_set):
     '''Run a data processing script on dataset objects. The script should be in
     the 'scripts' directory of the dataset, and have a "process" method.'''
 
@@ -36,19 +36,18 @@ def run_script(obj, scriptname, graphemes, logograms):
 
     number = 0
 
-    if len(graphemes) > 0:
-        if len(logograms) > 0:
-            raise SystemExit("Only logograms or graphemes can be processed.")
+    if len(grapheme_set) > 0:
+        if len(logogram_set) > 0:
+            raise click.UsageError("Only logograms or graphemes can be processed.")
 
-        for a in ds.get_annotations(Target.GRAPH, graphemes):
+        for a in ds.get_annotations(Target.GRAPH, grapheme_set):
             number = number + 1
             script.process(a)
-    elif len(logograms) > 0:
-        for a in ds.get_annotations(Target.LOGO, logograms):
+    elif len(logogram_set) > 0:
+        for a in ds.get_annotations(Target.LOGO, logogram_set):
             number = number + 1
             script.process(a)
-
     else:
-        raise SystemExit("Either logograms or graphemes must be provided.")
+        raise click.UsageError("Either logogram or grapheme sets must be chosen.")
 
     click.echo("Ran '{}' on {} annotations".format(scriptname, number))

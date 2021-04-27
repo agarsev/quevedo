@@ -7,10 +7,12 @@
 - [X] Refactor experiments (next section)
 - [X] Add Quevedo notice to default_config.toml
 - [X] Allow test on train set
-- [ ] Substitute cli flags -l/-g + -n set for -l set / -g set (less typing, more
+- [X] Substitute cli flags -l/-g + -n set for -l set / -g set (less typing, more
     intuitive, more coherent with -f/-t in generate/extract, maybe change or
     allow there too) and test changed:
-    - [ ] split
+    - [X] split
+    - [X] add_images
+    - [X] run_script
 - [ ] Whole pipeline script detection + classification -> can be called from
     web, how? Maybe scripts in the dataset scripts folder, if start with
     grapheme/logogram or some convention, can be called from web on the current

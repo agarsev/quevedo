@@ -155,26 +155,26 @@ def style(condition, right, wrong=None):
 @click.pass_obj
 @click.option('--image_dir', '-i', multiple=True, type=click.Path(exists=True),
               required=True, help="Directory from which to import images")
-@click.option('--name', '-n', default='default',
-              help="Name for the subset of the dataset where to import the images")
-@click.option('--graph', '-g', 'target', flag_value='graph',
-              help="Import the images as graphemes rather than full logograms.")
-@click.option('--logo', '-l', 'target', flag_value='logo', default=True,
-              help="Import the images as logograms (the default)")
+@click.option('--grapheme-set', '-g', help="Import the images to this grapheme set.")
+@click.option('--logogram-set', '-l', help="Import the images to this logogram set.")
 @click.option('-m', '--merge', 'existing', flag_value='m',
               help='''Merge new images with existing ones, if any.''')
 @click.option('-r', '--replace', 'existing', flag_value='r',
               help='''Replace old images with new ones, if any.''')
-def add_images(obj, image_dir, name, target, existing):
+def add_images(obj, image_dir, grapheme_set, logogram_set, existing):
     ''' Import images from directories to a dataset.'''
     dataset = obj['dataset']
 
-    if target == 'graph':
-        dest = dataset.grapheme_path / name
+    if grapheme_set is not None:
+        if logogram_set is not None:
+            raise click.UsageError("Please choose either a logogram or a grapheme set name")
+        dest = dataset.grapheme_path / grapheme_set
         target = Target.GRAPH
-    else:
-        dest = dataset.logogram_path / name
+    elif logogram_set is not None:
+        dest = dataset.logogram_path / logogram_set
         target = Target.LOGO
+    else:
+        raise click.UsageError("Please choose either a logogram or a grapheme set name")
 
     try:
         dest.mkdir()
@@ -206,15 +206,12 @@ def add_images(obj, image_dir, name, target, existing):
 
 
 @click.command()
-@click.option('--names', '-n', 'subsets', multiple=True, help="Subsets to split.")
-@click.option('--graph', '-g', 'target', flag_value='graph',
-              help="Split graphemes")
-@click.option('--logo', '-l', 'target', flag_value='logo', default=True,
-              help="Split logograms (the default)")
+@click.option('--grapheme-set', '-g', multiple=True, help="Grapheme set(s) to split.")
+@click.option('--logogram-set', '-l', multiple=True, help="Logogram set(s) to split.")
 @click.option('--percentage', '-p', type=click.IntRange(0, 100), default=60)
 @click.option('--seed', type=click.INT, help='A seed for the random split algorithm.')
 @click.pass_obj
-def train_test_split(obj, subsets, target, percentage, seed):
+def train_test_split(obj, grapheme_set, logogram_set, percentage, seed):
     '''Split annotation files in the given subsets into two sets, one for
     training and one for test, in the given subsets. This split will not be done
     physically but rather as a mark on the annotation file.
@@ -225,10 +222,15 @@ def train_test_split(obj, subsets, target, percentage, seed):
 
     random.seed(seed)
 
-    if target == 'logo':
-        an = list(dataset.get_annotations(Target.LOGO, subsets))
+    if len(grapheme_set) > 0:
+        if len(logogram_set) > 0:
+            raise click.UsageError("Grapheme and logogram sets can't be split "
+                                   "at the same time")
+        an = list(dataset.get_annotations(Target.GRAPH, grapheme_set))
+    elif len(logogram_set) > 0:
+        an = list(dataset.get_annotations(Target.LOGO, logogram_set))
     else:
-        an = list(dataset.get_annotations(Target.GRAPH, subsets))
+        raise click.UsageError("Either grapheme or logogram sets to split are required")
 
     random.shuffle(an)
     split_point = round(len(an) * percentage / 100)
