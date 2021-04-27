@@ -35,7 +35,7 @@ class ClassifyNet(Network):
                              'darknet/alexnet.cfg').read_text())
         return template.substitute(
             num_classes=num_classes,
-            num_max_batches=num_classes * 50,  # maybe?
+            num_max_batches=num_classes * 10,  # maybe?
             num_connected=num_classes * 10)
 
     def predict(self, image_path):

@@ -1,3 +1,6 @@
+# This file is a Quevedo dataset configuration file. Find more at:
+# https://www.github.com/agarsev/quevedo
+
 title = "$title"
 
 description = """ 

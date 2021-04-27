@@ -5,7 +5,8 @@
 # -- NEXT --
 
 - [X] Refactor experiments (next section)
-- [ ] Add Quevedo notice to default_config.toml
+- [X] Add Quevedo notice to default_config.toml
+- [X] Allow test on train set
 - [ ] Substitute cli flags -l/-g + -n set for -l set / -g set (less typing, more
     intuitive, more coherent with -f/-t in generate/extract, maybe change or
     allow there too) and test changed:

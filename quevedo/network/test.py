@@ -37,6 +37,7 @@ class Stats():
             prec = safe_divide(tp, tp + fp)
             rec = safe_divide(tp, tp + fn)
             results[name] = {
+                'count': tp + fn,
                 'prec': prec,
                 'rec': rec,
                 'f': safe_divide(2 * prec * rec, prec + rec),
@@ -44,6 +45,7 @@ class Stats():
         prec = safe_divide(total_tp, total_tp + total_fp)
         rec = safe_divide(total_tp, total_tp + total_fn)
         results['overall'] = {
+            'count': total_tp + total_fn,
             'prec': prec,
             'rec': rec,
             'f': safe_divide(2 * prec * rec, prec + rec),
@@ -57,10 +59,12 @@ class Stats():
               help='Show results in the command line')
 @click.option('--csv/--no-csv', default=True,
               help='Print results into a `results.csv` file in the network directory')
-def test(obj, do_print, csv):
+@click.option('--on-train', is_flag=True, default=False,
+              help='Test the network on the train set instead of the test one')
+def test(obj, do_print, csv, on_train):
     '''Compute evaluation metrics for a trained neural network.
 
-    Only annotations marked as "test" (see train/test split) are used.
+    By default annotations marked as "test" (see train/test split) are used.
     Precision, recall and f-score are computed for each class.'''
 
     dataset = obj['dataset']
@@ -68,16 +72,17 @@ def test(obj, do_print, csv):
     network.load()
 
     stats = Stats()
-    for an in network.get_annotations('test'):
+    test_set = 'train' if on_train else 'test'
+    for an in network.get_annotations(test_set):
         network.test(an, stats)
     results = stats.get_results()
 
     if do_print:
-        header = "class      precision  recall f-score"
+        header = "class          count precision  recall f-score"
         click.echo("{}\n{}".format(header, "-" * len(header)))
         for name, r in results.items():
-            click.echo("{:10s} {:9.2f} {:7.2f} {:7.2f}".format(name,
-                    r['prec'], r['rec'], r['f']))
+            click.echo("{:15s} {:4d} {:9.2f} {:7.2f} {:7.2f}".format(name,
+                    r['count'], r['prec'], r['rec'], r['f']))
 
     if csv:
         file_path = network.path / 'results.csv'
