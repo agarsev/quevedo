@@ -203,7 +203,12 @@ def update_tag(tags, index, new_tag):
 
 def get_multitag(tags, indices):
     try:
-        return '_'.join(tags[i] for i in indices)
+        all_tags = (tags[i] if len(tags) > i else None for i in indices)
+        all_tags = [t for t in all_tags if t is not None]
+        if len(all_tags) < 1:
+            return None
+        else:
+            return '_'.join(all_tags)
     except (IndexError, TypeError):
         return None
 
