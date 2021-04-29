@@ -10,7 +10,7 @@ from subprocess import run
 import toml
 
 from quevedo.network import create_network
-from quevedo.annotation import Annotation, Target
+from quevedo.annotation import Target, Logogram, Grapheme
 
 
 class Dataset:
@@ -51,45 +51,47 @@ class Dataset:
 
     def get_single(self, target: Target, subset, id):
         if target == Target.LOGO:
-            path = self.logogram_path / subset / id
+            return Logogram(self.logogram_path / subset / id)
         elif target == Target.GRAPH:
-            path = self.grapheme_path / subset / id
+            return Grapheme(self.grapheme_path / subset / id)
         else:
             raise ValueError('A single target is needed')
-        return Annotation(path, target)
 
-    def new_single(self, target: Target, subset):
+    def new_single(self, target: Target, subset, **kwds):
         if target == Target.LOGO:
             path = self.logogram_path / subset
+            next_id = sum(1 for _ in path.glob('*.png')) + 1
+            a = Logogram(path / str(next_id)).create_from(**kwds)
         elif target == Target.GRAPH:
             path = self.grapheme_path / subset
+            next_id = sum(1 for _ in path.glob('*.png')) + 1
+            a = Grapheme(path / str(next_id)).create_from(**kwds)
         else:
             raise ValueError('A single target is needed')
-        next_id = sum(1 for _ in path.glob('*.png')) + 1
-        return Annotation(path / str(next_id), target)
+        return a
 
     def get_annotations(self, target: Target, subset=None):
         '''Returns a generator that yields all annotations, those of a given
         target, or only those in a given subset (or subsets) and target.'''
         if subset is None or len(subset) == 0:
             if Target.LOGO in target:
-                ret = (Annotation(file, Target.LOGO) for file in
+                ret = (Logogram(file) for file in
                        self.logogram_path.glob('**/*.png'))
                 if Target.GRAPH in target:
-                    ret = chain(ret, (Annotation(file, Target.GRAPH) for file in
+                    ret = chain(ret, (Grapheme(file) for file in
                        self.grapheme_path.glob('**/*.png')))
                 return ret
             elif Target.GRAPH in target:
-                return (Annotation(file, Target.GRAPH) for file in
+                return (Grapheme(file) for file in
                        self.grapheme_path.glob('**/*.png'))
             else:
                 raise ValueError('A target needs to be specified')
         elif isinstance(subset, str):
             if target == Target.LOGO:
-                return (Annotation(file, target=Target.LOGO) for file in
+                return (Logogram(file) for file in
                         (self.logogram_path / subset).glob('*.png'))
             elif Target.GRAPH in target:
-                return (Annotation(file, target=Target.GRAPH) for file in
+                return (Grapheme(file) for file in
                         (self.grapheme_path / subset).glob('*.png'))
             else:
                 raise ValueError('If a subset is specified, a single target is needed')
@@ -107,6 +109,32 @@ class Dataset:
         return [{'name': d.stem,
                  'count': sum(1 for _ in d.glob('*.png'))}
                 for d in path.glob('*') if d.is_dir()]
+
+    def create_subset(self, target: Target, name, existing='a'):
+        '''Creates the directory for a new subset. If it exists, behaviour is
+        controlled by `existing`. It can be 'a' to abort (the default), 'r' to
+        remove existing annotations, or 'm' (merge) to do nothing. Returns the
+        creeated path.'''
+        if target == Target.LOGO:
+            path = self.logogram_path / name
+        elif target == Target.GRAPH:
+            path = self.grapheme_path / name
+        else:
+            raise ValueError('A single target is needed')
+        try:
+            path.mkdir()
+        except FileExistsError:
+            if existing is None:
+                existing = click.prompt("Target directory already exists.\n"
+                    "What to do? (m)erge/(r)eplace/(a)bort", default='a')[0]
+            if existing == 'r':
+                for f in path.glob('*'):
+                    f.unlink()
+            elif existing == 'm':
+                pass
+            else:
+                raise click.Abort()
+        return path
 
     def __getattr__(self, attr):
         if attr == 'path':
@@ -168,38 +196,22 @@ def add_images(obj, image_dir, grapheme_set, logogram_set, existing):
     if grapheme_set is not None:
         if logogram_set is not None:
             raise click.UsageError("Please choose either a logogram or a grapheme set name")
-        dest = dataset.grapheme_path / grapheme_set
+        dest = grapheme_set
         target = Target.GRAPH
     elif logogram_set is not None:
-        dest = dataset.logogram_path / logogram_set
+        dest = logogram_set
         target = Target.LOGO
     else:
         raise click.UsageError("Please choose either a logogram or a grapheme set name")
 
-    try:
-        dest.mkdir()
-    except FileExistsError:
-        if existing is None:
-            existing = click.prompt('Target directory already exists.\n' +
-                'What to do? (m)erge/(r)eplace/(a)bort', default='a')[0]
-        if existing == 'r':
-            for f in dest.glob('*'):
-                f.unlink()
-        elif existing == 'm':
-            pass
-        else:
-            raise click.Abort()
+    dest_dir = dataset.create_subset(target, dest, existing)
 
-    idx = max((int(f.stem) for f in dest.glob('*.png')), default=0) + 1
     for d in image_dir:
         click.echo("Importing images from '{}' to '{}'...".format(
-            d, dest.resolve()), nl=False)
+            d, dest_dir), nl=False)
         num = 0
-        d = Path(d)
-        for img in d.glob('*.png'):
-            new_logo = Annotation(dest / str(idx), target)
-            new_logo.create_from(image_path=img)
-            idx = idx + 1
+        for img in Path(d).glob('*.png'):
+            dataset.new_single(target, dest, image_path=img)
             num = num + 1
         click.echo("imported {}".format(style(num > 0, num)))
     click.echo("\n")
@@ -236,11 +248,11 @@ def train_test_split(obj, grapheme_set, logogram_set, percentage, seed):
     split_point = round(len(an) * percentage / 100)
 
     for t in an[:split_point]:
-        t.anot['set'] = 'train'
+        t.set = 'train'
         t.save()
 
     for t in an[split_point:]:
-        t.anot['set'] = 'test'
+        t.set = 'test'
         t.save()
 
     click.echo("Dataset split into train ({} files) and test ({} files)".format(
@@ -269,7 +281,7 @@ def info(obj):
     click.echo('Logograms: {}'.format(style(num_logos > 0, num_logos)))
     click.echo('Subsets: {}'.format(
         ', '.join(s['name'] for s in dataset.get_subsets(Target.LOGO))))
-    num_annot = sum(len(t.anot['graphemes']) > 0 for t in logos)
+    num_annot = sum(len(t.graphemes) > 0 for t in logos)
     click.echo('Annotated: {}/{}'.format(
         style(num_annot == num_logos, num_annot), num_logos))
 
@@ -278,7 +290,7 @@ def info(obj):
     click.echo('\nGraphemes: {}'.format(style(num_graph > 0, num_graph)))
     click.echo('Subsets: {}'.format(
         ', '.join(s['name'] for s in dataset.get_subsets(Target.GRAPH))))
-    num_annot = sum(len(s.anot['tags']) > 0 for s in graphemes)
+    num_annot = sum(len(s.tags) > 0 for s in graphemes)
     click.echo('Annotated: {}/{}'.format(
         style(num_annot == num_graph, num_annot), num_graph))
 

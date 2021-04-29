@@ -1,7 +1,6 @@
 # 2020-04-08 Antonio F. G. Sevilla <afgs@ucm.es>
 
 import click
-import json
 from PIL import Image
 from PIL.ImageOps import invert
 import random
@@ -63,7 +62,7 @@ def put_grapheme(canvas, x, y, file_info, name, rotate=False):
     }
 
 
-def create_logogram(path, graphemes):
+def create_logogram(graphemes):
     '''Creates an image with randomly placed graphemes'''
     canvas_w = random.randint(*config['width_range'])
     canvas_h = random.randint(*config['height_range'])
@@ -108,7 +107,7 @@ def create_logogram(path, graphemes):
     graphemes = [put_grapheme(canvas, int(x), int(y), file_info, name, rotate)
                for [x, y], name, file_info, rotate
                in zip(positions, class_names, files, rotate)]
-    Annotation(path, target=Target.LOGO).create_from(pil_image=canvas, graphemes=graphemes)
+    return canvas, graphemes
 
 
 @click.command()
@@ -128,21 +127,7 @@ def generate(obj, dir_from, dir_to, existing):
     training will be used.'''
 
     dataset = obj['dataset']
-    gen_d = dataset.logogram_path / dir_to
-
-    try:
-        gen_d.mkdir()
-    except FileExistsError:
-        if existing is None:
-            existing = click.prompt('''Logogram directory already exists.
-                What to do? (m)erge/(r)eplace/(a)bort''', default='a')[0]
-        if existing == 'r':
-            for f in gen_d.glob('*'):
-                f.unlink()
-        elif existing == 'm':
-            pass
-        else:
-            click.Abort()
+    dataset.create_subset(Target.LOGO, dir_to, existing)
 
     config.update(dataset.config.get('generate', {}))
     random.seed(config['seed'])
@@ -155,13 +140,13 @@ def generate(obj, dir_from, dir_to, existing):
     # Find the different graphemes to use
     graphemes = {}
     for g in dataset.get_annotations(Target.GRAPH, subset=dir_from):
-        if g.anot['set'] != 'train':
+        if g.set != 'train':
             continue
-        tags = g.anot['tags']
+        tags = g.tags
         name = tags[tag_index]
         if name in graphemes:
             graphemes[name]['files'].append({
-                'filename': g.image.resolve(),
+                'filename': g.image_path,
                 'tags': tags,
             })
         else:
@@ -173,11 +158,12 @@ def generate(obj, dir_from, dir_to, existing):
             else:
                 raise SystemExit("Configuration not found for grapheme {}".format(name))
             s['files'] = [{
-                'filename': g.image.resolve(),
+                'filename': g.image_path,
                 'tags': tags,
             }]
             graphemes[name] = s
 
-    # Generate as many logograms as requested, numbering them incrementally
+    # Generate as many logograms as requested
     for i in range(config['count']):
-        create_logogram(gen_d / str(i + 1), graphemes)
+        img, gs = create_logogram(graphemes)
+        dataset.new_single(Target.LOGO, dir_to, pil_image=img, graphemes=gs)

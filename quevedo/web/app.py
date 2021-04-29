@@ -27,9 +27,8 @@ def string_to_target(t):
 
 def annotation_info(a: Annotation):
     title_tag = app_data['meta_tags'][0]
-    anot = a.anot
     if a.target == Target.GRAPH:
-        tags = anot['tags']
+        tags = a.tags
         if len(tags) > 0:
             annotated = True
             title = tags[0]
@@ -37,19 +36,12 @@ def annotation_info(a: Annotation):
             annotated = False
             title = '?'
     else:
-        annotated = len(anot.get('graphemes', [])),
-        title = anot['meta'].get(title_tag, '')
+        annotated = len(a.graphemes)
+        title = a.meta.get(title_tag, '')
     return {
         'id': a.id, 'annotated': annotated,
-        'set': anot.get('set', 'none'),
-        'title': title
+        'set': a.set, 'title': title
     }
-
-
-def get_annotation_info(dir, id):
-    anot_file = app_data['data_dir'] / '{}/{}.json'.format(dir, id)
-    anot = json.loads(anot_file.read_text())
-    return {'dir': dir, 'id': str(id), **annotation_info(anot)}
 
 
 def load_dataset(dataset, language):
@@ -101,7 +93,7 @@ def authenticated(func):
 def edit_post(target, dir, idx):
     ds = app_data['dataset']
     single = ds.get_single(string_to_target(target), dir, idx)
-    single.anot.update(request.get_json())
+    single.update(**request.get_json())
     single.save()
     return 'OK'
 
@@ -110,8 +102,8 @@ def edit_post(target, dir, idx):
 @authenticated
 def new_annotation(target, dir):
     ds = app_data['dataset']
-    new_t = ds.new_single(string_to_target(target), dir)
-    new_t.create_from(binary_data=request.data)
+    new_t = ds.new_single(string_to_target(target), dir,
+                          binary_data=request.data)
     return {'id': new_t.id}
 
 
@@ -122,7 +114,7 @@ def auto_annotate(target, dir, idx):
     network = ds.get_network(request.args.get('network', None))
     an = ds.get_single(string_to_target(target), dir, idx)
     network.auto_annotate(an)
-    return an.anot
+    return an.to_dict()
 
 
 @app.route('/api/login', methods=["POST"])
@@ -217,7 +209,7 @@ def edit(target, dir, idx):
         'net_list': net_list,
         'meta_tags': app_data['meta_tags'],
         'columns': ds.config['tag_schema'],
-        'anot': a.anot,
+        'anot': a.to_dict(),
     }
     return html_template.substitute(
         title='{} - {}'.format(ds.config['title'], idx),

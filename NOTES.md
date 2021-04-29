@@ -5,8 +5,13 @@
 
 # -- NEXT --
 
-- [ ] Milestone: v1
-    - [ ] Refactor annotations (less undefined json, more python class)
+- [.] Milestone: v1
+    - [X] Refactor annotations (less undefined json, more python class)
+        - [X] dataset
+        - [X] web 
+        - [X] classes
+        - [X] extract_graphemes, generate
+        - [ ] network
     - [ ] Allow annotation filtering for networks based on tags (eg different
         classify networks for different coarse-grain tags)
     - [ ] Pipeline

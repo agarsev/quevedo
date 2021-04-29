@@ -74,6 +74,10 @@ freq = 0.4 # How often to add one of these
 rotate = false
 
 [[generate.params]]
+match = 'excluded'
+mode = 'none' # Don't put any of these graphemes
+
+[[generate.params]]
 match = '.*' # Match any grapheme (it's a regex)
 mode = 'many' # Add potentially many of these graphemes
 max = 3 # How many to potentially add
