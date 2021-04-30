@@ -24,6 +24,7 @@ class Dataset:
         self.logogram_path = self._path / 'logograms'
         self.grapheme_path = self._path / 'graphemes'
         self.config_path = self._path / 'config.toml'
+        self.script_path = self._path / 'scripts'
 
     def create(self):
         p = self._path

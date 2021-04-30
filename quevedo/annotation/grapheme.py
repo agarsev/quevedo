@@ -13,7 +13,7 @@ class Grapheme(Annotation):
 
     def update(self, *, tags=None, **kwds):
         super().update(**kwds)
-        if tags:
+        if tags is not None:
             self.tags = tags
 
     def to_dict(self):

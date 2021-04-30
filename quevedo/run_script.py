@@ -30,24 +30,26 @@ def run_script(obj, scriptname, grapheme_set, logogram_set):
 
     ds: Dataset = obj['dataset']
 
-    script = module_from_file(scriptname, ds.path / 'scripts')
+    script = module_from_file(scriptname, ds.script_path)
     if script is None:
         raise SystemExit("Error loading script '{}'".format(scriptname))
-
-    number = 0
 
     if len(grapheme_set) > 0:
         if len(logogram_set) > 0:
             raise click.UsageError("Only logograms or graphemes can be processed.")
-
-        for a in ds.get_annotations(Target.GRAPH, grapheme_set):
-            number = number + 1
-            script.process(a)
+        target = Target.GRAPH
+        subset = grapheme_set
     elif len(logogram_set) > 0:
-        for a in ds.get_annotations(Target.LOGO, logogram_set):
-            number = number + 1
-            script.process(a)
+        target = Target.LOGO
+        subset = logogram_set
     else:
         raise click.UsageError("Either logogram or grapheme sets must be chosen.")
+
+    number = 0
+    for a in ds.get_annotations(target, subset):
+        number = number + 1
+        updated = script.process(a)
+        if updated:
+            a.save()
 
     click.echo("Ran '{}' on {} annotations".format(scriptname, number))

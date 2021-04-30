@@ -4,6 +4,7 @@
 from flask import Flask, request, send_from_directory, session, redirect, url_for
 from functools import wraps
 import hashlib
+from itertools import chain
 import json
 import logging
 import os
@@ -11,6 +12,7 @@ from pathlib import Path
 from string import Template
 
 from quevedo.annotation import Annotation, Target
+from quevedo.run_script import module_from_file
 
 os.environ['WERKZEUG_RUN_MAIN'] = 'true'
 app = Flask(__name__, static_url_path='')
@@ -52,6 +54,20 @@ def load_dataset(dataset, language):
     app_data['path'] = resolved
     app_data['config'] = dataset.config['web']
     app.secret_key = app_data['config']['secret_key']
+    app_data['nets'] = {
+        'graphemes': {n.name: None for n in dataset.list_networks() if
+                      n.target == Target.GRAPH and n.is_trained()},
+        'logograms': {n.name: None for n in dataset.list_networks() if
+                      n.target == Target.LOGO and n.is_trained()},
+    }
+    app_data['scripts'] = {
+        'graphemes': {'_'.join(s.stem.split('_')[1:]): None
+                      for s in dataset.script_path.glob('*.py')
+                      if s.stem.startswith('graph')},
+        'logograms': {'_'.join(s.stem.split('_')[1:]): None
+                      for s in dataset.script_path.glob('*.py') 
+                      if s.stem.startswith('logo')}
+    }
 
 
 def run(host, port, path):
@@ -107,13 +123,26 @@ def new_annotation(target, dir):
     return {'id': new_t.id}
 
 
-@app.route('/api/auto_annotate/<target>/<dir>/<idx>')
+@app.route('/api/run/<function>/<target>/<dir>/<idx>')
 @authenticated
-def auto_annotate(target, dir, idx):
+def run_net_or_script(function, target, dir, idx):
     ds = app_data['dataset']
-    network = ds.get_network(request.args.get('network', None))
     an = ds.get_single(string_to_target(target), dir, idx)
-    network.auto_annotate(an)
+    if function in app_data['nets'][target]:
+        net = app_data['nets'][target][function]
+        if net is None:
+            net = ds.get_network(function)
+            app_data['nets'][target][function] = net
+        an = ds.get_single(string_to_target(target), dir, idx)
+        net.auto_annotate(an)
+    elif function in app_data['scripts'][target]:
+        script = app_data['scripts'][target][function]
+        if script is None:
+            script = module_from_file(target[:-1]+'_'+function, ds.script_path)
+            app_data['scripts'][target][function] = script
+        script.process(an)
+    else:
+        raise ValueError("Unknown net or script '{}'".format(function))
     return an.to_dict()
 
 
@@ -190,8 +219,8 @@ def edit(target, dir, idx):
         next_link = 1
 
     a = ds.get_single(target_, dir, idx)
-    net_list = [n.name for n in ds.list_networks() if
-                n.target == target_ and n.is_trained()]
+    functions = [f for f in chain(app_data['nets'][target].keys(),
+                                  app_data['scripts'][target].keys())]
 
     data = {
         'title': ds.config['title'],
@@ -206,7 +235,7 @@ def edit(target, dir, idx):
             'next': next_link,
         },
         'annotation_help': ds.config['annotation_help'],
-        'net_list': net_list,
+        'functions': functions,
         'meta_tags': app_data['meta_tags'],
         'columns': ds.config['tag_schema'],
         'anot': a.to_dict(),

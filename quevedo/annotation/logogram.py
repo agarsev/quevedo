@@ -13,7 +13,7 @@ class Logogram(Annotation):
 
     def update(self, *, graphemes=None, **kwds):
         super().update(**kwds)
-        if graphemes:
+        if graphemes is not None:
             self.graphemes = [BoundGrapheme(self, **g) for g in graphemes]
 
     def to_dict(self):

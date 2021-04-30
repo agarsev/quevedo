@@ -20,8 +20,9 @@
 
 # -- PIPELINE --
 
-- [ ] Call scripts from web (Annotation -> Annotation) How to decide which
-    scripts can be called? Name convention? Exported function name?
+- [X] Call scripts from web (Annotation -> Annotation) Scripts whose name starts
+    with grapheme will be available for graphemes, starting with logogram for
+    logograms.
 - [ ] Script that given an annotation with detections, classifies the graphemes
     - [ ] Move functionality to extract graphemes to grapheme annotation class
     - [ ] Try and see if we can get 'predict' to load image from RAM (PIL image)
@@ -32,7 +33,8 @@
 ## -- TODO --
 
 - [ ] In test, compute a confusion matrix (at least for classify) for deeper
-    inspection
+    inspection. Better yet, optionally output predictions + ground truth to a
+    csv, stats etc. can be better computed with R later.
 - [ ] If there are no annotation folders, the web interface should offer the
     default one even if the directory is not physically there. Or maybe allow
     creating subsets in the web interface.
@@ -74,3 +76,8 @@ Maybe for next version
     I am. and the number based is useless in multi tag)
 - [ ] Improve nets. Try again with grayscale images now that we use AlexeyAB
     fork, check letterboxing, try different configs, etc.
+- [ ] When scripts modify images, don't save it automatically, but return it
+    (ie return modified_tags, modified_img) and then it is `run_script` that
+    saves the image to the appropriate path. Then, the updated image can be sent
+    to the web interface to be previewed, and if want to save it sent back to
+    the server on "save".

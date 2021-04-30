@@ -12,11 +12,15 @@ const { useState, useRef } = preactHooks;
 preact.render(html`<${App} ...${window.quevedo_data} />`, document.body);
 
 function App ({ title, target, id, annotation_help, links, anot,
-    columns, net_list, meta_tags }) {
+    columns, functions, meta_tags }) {
 
     const changes = useChangeStack();
 
     const [ meta, _setMeta ] = useState(anot.meta);
+    const setAllMeta = (nu_meta) => {
+        changes.push(() => _setMeta(meta), `UPD_META_ALL`);
+        _setMeta(nu_meta);
+    };
     const setMeta = (k, v) => {
         changes.push(() => _setMeta(meta), `UPD_META_${k}`);
         _setMeta({ ...meta, [k]: v });
@@ -59,17 +63,18 @@ function App ({ title, target, id, annotation_help, links, anot,
         }).catch(setError);
     };
 
-    const autoAnnotate = network => {
-        if ((is_logo?graphemes:tags).list.length > 0 && 
-            !confirm(Text['confirm_generate'])) {
+    const runFunction = fun_name => {
+        if (changes.dirty>0 && 
+            !confirm(Text['warning_save'])) {
             return;
         }
-        fetch(`api/auto_annotate/${id.full}${network?`?network=${network}`:''}`)
+        fetch(`api/run/${fun_name}/${id.full}`)
         .then(r => {
             if (r.ok) {
                 return r.json();
             } else throw r;
         }).then(data => {
+            setAllMeta(data.meta);
             if (is_logo) {
                 // sort graphemes left-to-right (roughly) and top-to-bottom (strict)
                 data.graphemes.sort((a, b) => {
@@ -90,8 +95,8 @@ function App ({ title, target, id, annotation_help, links, anot,
 
     return html`
         <${Header} ...${{title, id, links, saveChanges,
-            message, show_save: changes.dirty>0, autoAnnotate,
-            net_list, changes }} />
+            message, show_save: changes.dirty>0, runFunction,
+            functions, changes }} />
         <${MetaEditor} ...${{meta_tags, meta, setMeta}} />
         ${is_logo?
             html`<${LogogramEditor} ...${{id, graphemes, columns}} />`
@@ -101,9 +106,9 @@ function App ({ title, target, id, annotation_help, links, anot,
 }
 
 function Header ({ title, id, links, saveChanges, message, show_save,
-    net_list, autoAnnotate, changes }) {
+    functions, runFunction, changes }) {
 
-    const net_select = useRef({ value: null });
+    const func_select = useRef({ value: null });
 
     return html`<header>
         <a href="">${title}</a> » 
@@ -114,10 +119,10 @@ function Header ({ title, id, links, saveChanges, message, show_save,
         ${show_save?html`<button tabIndex=2
             onclick=${saveChanges} >💾</button>`:null}
         <span class="message_text">${message}</span>
-        ${net_list.length<1?null:html`<select ref=${net_select}>
-            ${net_list.map(e=>html`<option value=${e}>${e}</option>`)}
+        ${functions.length<1?null:html`<select ref=${func_select}>
+            ${functions.map(e=>html`<option value=${e}>${e}</option>`)}
         </select>`}
-        <button onclick=${() => autoAnnotate(net_select.current.value)}>⚙️</button>
+        <button onclick=${() => runFunction(func_select.current.value)}>⚙️</button>
     </header>`;
 }
 
