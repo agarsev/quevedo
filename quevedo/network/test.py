@@ -37,7 +37,7 @@ class Stats():
             prec = safe_divide(tp, tp + fp)
             rec = safe_divide(tp, tp + fn)
             results[name] = {
-                'count': tp + fn,
+                'count': tp + fp + fn,
                 'prec': prec,
                 'rec': rec,
                 'f': safe_divide(2 * prec * rec, prec + rec),
@@ -45,7 +45,7 @@ class Stats():
         prec = safe_divide(total_tp, total_tp + total_fp)
         rec = safe_divide(total_tp, total_tp + total_fn)
         results['overall'] = {
-            'count': total_tp + total_fn,
+            'count': total_tp + total_fp + total_fn,
             'prec': prec,
             'rec': rec,
             'f': safe_divide(2 * prec * rec, prec + rec),

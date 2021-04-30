@@ -55,7 +55,12 @@ class Network:
     def get_annotations(self, set='train'):
         subsets = self.config.get('subsets')
         annotations = self.dataset.get_annotations(self.target, subsets)
-        return [a for a in annotations if a.anot.get('set') == set]
+        return [a for a in annotations if a.set == set and self.filter(a)]
+
+    def filter(self, annotation):
+        '''Override to control the annotations included in training by checking
+        their tags.'''
+        return True
 
     def update_tag_set(self, tag_set, annotation):
         '''Add the relevant tag from this annotation to the tag set (used while
@@ -112,7 +117,7 @@ class Network:
                 if link_name is None:
                     continue
                 num = num + 1
-                os.symlink(t.image.resolve(), self.train_path / link_name)
+                os.symlink(t.image_path.resolve(), self.train_path / link_name)
                 train_file.write("train/{}\n".format(link_name))
 
         # Write meta-configuration information in the darknet data file

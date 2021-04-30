@@ -29,7 +29,7 @@ def prepare(obj):
     network = dataset.get_network(obj['network'])
 
     network.prepare()
-    click.echo("Dataset ready for training")
+    click.echo("Neural network '{}' ready for training".format(network.name))
 
 
 @click.command()
@@ -61,7 +61,8 @@ def predict_image(obj, image):
     network = dataset.get_network(obj['network'])
 
     if not network.is_trained():
-        raise SystemExit("Please train the neural network first")
+        raise SystemExit("Please train neural network '{}' first".format(
+            network.name))
 
     predictions = network.predict(image)
     print(predictions)

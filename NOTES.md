@@ -5,14 +5,14 @@
 
 # -- NEXT --
 
-- [.] Milestone: v1
+- [o] Milestone: v1
     - [X] Refactor annotations (less undefined json, more python class)
         - [X] dataset
         - [X] web 
         - [X] classes
         - [X] extract_graphemes, generate
-        - [ ] network
-    - [ ] Allow annotation filtering for networks based on tags (eg different
+        - [X] network
+    - [X] Allow annotation filtering for networks based on tags (eg different
         classify networks for different coarse-grain tags)
     - [ ] Pipeline
     - [ ] TODOs
@@ -31,15 +31,17 @@
  
 ## -- TODO --
 
+- [ ] In test, compute a confusion matrix (at least for classify) for deeper
+    inspection
 - [ ] If there are no annotation folders, the web interface should offer the
     default one even if the directory is not physically there. Or maybe allow
     creating subsets in the web interface.
+- [ ] Sort subsets in the web interface
 - [ ] Allow restarting training with latest weights if weights directory exists,
     or maybe recover gracefully from Ctrl+C when training, to allow interrupt
     before overfitting etc. Or both.
 - [ ] RW permissions for users in web. Also user groups.
-- [ ] In test, compute a confusion matrix (at least for classify) for deeper
-    inspection
+- [ ] Fix/rework example scripts in `examples`
 
 # -- DOCS --
 

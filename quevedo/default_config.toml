@@ -27,18 +27,24 @@ path = "darknet/darknet"
 library = "darknet/libdarknet.so"
 options = [ "-dont_show", "-mjpeg_port", "8090" ]
 
-[network.detect]
+[network.one]
 default = true # Network to use if not specified
 task = "detect"
 # tag = "tag" # Uncomment and choose a tag name from tag_schema to use
 # subsets = [ "default" ] # If not specified, all subsets will be used
 subject = "Focus on grapheme type learning and recognition"
 
-[network.classify]
+[network.two]
 task = "classify"
 # tag = "tag"
 subsets = [ "default" ]
 subject = "Classify graphemes"
+
+# A filter can be used to select the annotations to use for training this network
+# [network.two.filter]
+# criterion = "tag"  # Tag to use to decide whether to include or not each annotation
+# include = [ "value" ]  # Values for the criterion to use
+# # exclude = [ "value" ]  # Alternatively, values to exclude
 
 # Add more networks like so:
 # [network.other]

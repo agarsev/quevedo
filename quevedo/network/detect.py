@@ -12,19 +12,17 @@ from quevedo.annotation import Target
 class DetectNet(Network):
     '''A neural network for performing grapheme detection within logograms.'''
 
-    def __init__(self, *kwds):
-        super().__init__(*kwds)
-        self.target = Target.LOGO
-        self.names_file_name = 'names'  # Darknet is not very consistent
-        self.network_type = 'detector'
+    target = Target.LOGO
+    names_file_name = 'names'  # Darknet is not very consistent
+    network_type = 'detector'
 
     def update_tag_set(self, tag_set, annotation):
         try:
-            tag_set.update(set(self.get_tag(s['tags'])
-                               for s in annotation.anot['graphemes']))
+            tag_set.update(set(self.get_tag(g.tags)
+                               for g in annotation.graphemes))
         except KeyError:
             raise KeyError("Error getting annotations for logogram {} ({})".format(
-                annotation.id, json.dumps(annotation.anot)))
+                annotation.id, json.dumps(annotation.to_dict())))
 
     def prepare_annotation(self, annotation, num, tag_set):
         # For YOLO, we write an adjacent txt file with the bounding boxes and
@@ -32,8 +30,8 @@ class DetectNet(Network):
         link_name = "{}.png".format(num)
         (self.train_path / link_name).with_suffix(".txt").write_text(
             "".join("{} {} {} {} {}\n".format(
-                tag_set.index(self.get_tag(s['tags'])),
-                *s['box']) for s in annotation.anot['graphemes']))
+                tag_set.index(self.get_tag(g.tags)),
+                *g.box) for g in annotation.graphemes))
         return link_name
 
     def get_net_config(self, num_classes):
@@ -70,13 +68,13 @@ class DetectNet(Network):
         } for (s, c, b) in self._darknet.detect(image_path)]
 
     def test(self, annotation, stats):
-        predictions = self.predict(annotation.image)
-        for g in annotation.anot['graphemes']:
-            tag = self.get_tag(g['tags'])
+        predictions = self.predict(annotation.image_path)
+        for g in annotation.graphemes:
+            tag = self.get_tag(g.tags)
             if tag is None:
                 continue
             stats.add(tag)
-            logo = {'box': g['box'], 'name': tag}
+            logo = {'box': g.box, 'name': tag}
             if len(predictions) > 0:
                 similarities = sorted(((box_similarity(p, logo), i) for (i, p) in
                                       enumerate(predictions)), reverse=True)
@@ -92,11 +90,11 @@ class DetectNet(Network):
 
     def auto_annotate(self, a):
         graphemes = []
-        for pred in self.predict(a.image):
+        for pred in self.predict(a.image_path):
             g = {'box': pred['box'], 'tags': []}
             self.prediction_to_tag(g['tags'], pred['name'])
             graphemes.append(g)
-        a.anot['graphemes'] = graphemes
+        a.update(graphemes=graphemes)
 
 
 # Utilities for YOLO
