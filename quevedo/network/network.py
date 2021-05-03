@@ -200,10 +200,9 @@ def get_tag_by_index(tags, index):
 
 
 def update_tag(tags, index, new_tag):
-    if index < len(tags):
-        tags[index] = new_tag
-    else:
-        tags.insert(index, new_tag)
+    while len(tags) <= index:
+        tags.append(None)
+    tags[index] = new_tag
 
 
 def get_multitag(tags, indices):

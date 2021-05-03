@@ -5,7 +5,7 @@
 
 # -- NEXT --
 
-- [o] Milestone: v1
+- [O] Milestone: v1
     - [X] Refactor annotations (less undefined json, more python class)
         - [X] dataset
         - [X] web 
@@ -14,7 +14,7 @@
         - [X] network
     - [X] Allow annotation filtering for networks based on tags (eg different
         classify networks for different coarse-grain tags)
-    - [ ] Pipeline
+    - [X] Pipeline
     - [ ] TODOs
     - [ ] Docs
 
@@ -23,11 +23,12 @@
 - [X] Call scripts from web (Annotation -> Annotation) Scripts whose name starts
     with grapheme will be available for graphemes, starting with logogram for
     logograms.
-- [ ] Script that given an annotation with detections, classifies the graphemes
-    - [ ] Move functionality to extract graphemes to grapheme annotation class
-    - [ ] Try and see if we can get 'predict' to load image from RAM (PIL image)
+- [X] Script that given an annotation with detections, classifies the graphemes
+    - [X] Move functionality to extract graphemes to bound grapheme annotation class (in logogram)
+    - [X] Try and see if we can get 'predict' to load image from RAM (PIL image)
         instead of fs.
-- [ ] Script that uses the above script to perform detection + classification on
+    - [X] script
+- [X] Script that uses the above script to perform detection + classification on
     raw image (external/library use)
  
 ## -- TODO --

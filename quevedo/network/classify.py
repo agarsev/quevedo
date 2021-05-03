@@ -53,13 +53,13 @@ class ClassifyNet(Network):
             num_max_batches=num_classes * 10,  # maybe?
             num_connected=num_classes * 10)
 
-    def predict(self, image_path):
+    def predict(self, image):
         if self._darknet is None:
             self.load()
         return [{
             'tag': self.tag_map[tag.decode('utf8')],
             'confidence': conf
-        } for (tag, conf) in self._darknet.classify(image_path)]
+        } for (tag, conf) in self._darknet.classify(image)]
 
     def test(self, annotation, stats):
         true_tag = self.get_tag(annotation.tags)
@@ -79,5 +79,5 @@ class ClassifyNet(Network):
                 stats.false_positives[best['tag']] += 1
 
     def auto_annotate(self, a):
-        preds = self.predict(a.image_page)
+        preds = self.predict(a.image)
         self.prediction_to_tag(a.tags, preds[0]['tag'])

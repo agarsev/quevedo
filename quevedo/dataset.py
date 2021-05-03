@@ -10,7 +10,7 @@ from subprocess import run
 import toml
 
 from quevedo.network import create_network
-from quevedo.annotation import Target, Logogram, Grapheme
+from quevedo.annotation import Annotation, Target, Logogram, Grapheme
 
 
 class Dataset:

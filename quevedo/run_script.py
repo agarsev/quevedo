@@ -48,7 +48,7 @@ def run_script(obj, scriptname, grapheme_set, logogram_set):
     number = 0
     for a in ds.get_annotations(target, subset):
         number = number + 1
-        updated = script.process(a)
+        updated = script.process(a, ds)
         if updated:
             a.save()
 

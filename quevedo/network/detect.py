@@ -45,10 +45,13 @@ class DetectNet(Network):
             num_steps_1=int(num_max_batches * 80 / 100),
             num_steps_2=int(num_max_batches * 90 / 100))
 
-    def predict(self, image_path):
+    def predict(self, image):
 
         if self._darknet is None:
             self.load()
+
+        if not isinstance(image, Image.Image):
+            image = Image.open(image)
 
         def clamp(val, minim, maxim):
             return min(maxim, max(minim, val))
@@ -60,12 +63,13 @@ class DetectNet(Network):
             h = clamp(h / im_height, 0, 1)
             return [x, y, w, h]
 
-        width, height = Image.open(image_path).size
+        width, height = image.size
+
         return [{
             'name': self.tag_map[s],
             'confidence': c,
             'box': make_bbox(width, height, *b)
-        } for (s, c, b) in self._darknet.detect(image_path)]
+        } for (s, c, b) in self._darknet.detect(image)]
 
     def test(self, annotation, stats):
         predictions = self.predict(annotation.image_path)
@@ -90,7 +94,7 @@ class DetectNet(Network):
 
     def auto_annotate(self, a):
         graphemes = []
-        for pred in self.predict(a.image_path):
+        for pred in self.predict(a.image):
             g = {'box': pred['box'], 'tags': []}
             self.prediction_to_tag(g['tags'], pred['name'])
             graphemes.append(g)

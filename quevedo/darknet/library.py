@@ -17,8 +17,47 @@ Modified Antonio F. G. Sevilla <afgs@ucm.es> 2020-07-09, 2021-04-21
 """
 
 from ctypes import *
+from contextlib import contextmanager
 import math
 import os
+import PIL
+import sys
+
+
+# Adapted from @jfs
+# https://stackoverflow.com/questions/5081657/how-do-i-prevent-a-c-shared-library-to-print-on-stdout-in-python
+@contextmanager
+def DarknetShutup():
+    '''
+    import os
+
+    with stdout_redirected(to=filename):
+        print("from Python")
+        os.system("echo non-Python applications are also supported")
+    '''
+    fdo = sys.stdout.fileno()
+    fde = sys.stderr.fileno()
+
+    old_stdout = os.fdopen(os.dup(fdo), 'w')
+    old_stderr = os.fdopen(os.dup(fde), 'w')
+
+    with open(os.devnull, 'w') as file:
+        sys.stdout.close()  # + implicit flush()
+        sys.stderr.close()  # + implicit flush()
+        os.dup2(file.fileno(), fdo)  # fdo writes to 'to' file
+        os.dup2(file.fileno(), fde)  # fde writes to 'to' file
+        sys.stdout = os.fdopen(fdo, 'w')  # Python writes to fdo
+        sys.stderr = os.fdopen(fde, 'w')  # Python writes to fde
+
+    try:
+        yield  # allow code to be run with the redirected stdout
+    finally:
+        sys.stdout.close()  # + implicit flush()
+        sys.stderr.close()  # + implicit flush()
+        os.dup2(old_stdout.fileno(), fdo)  # fdo writes to 'to' file
+        os.dup2(old_stderr.fileno(), fde)  # fde writes to 'to' file
+        sys.stdout = os.fdopen(fdo, 'w')  # Python writes to fdo
+        sys.stderr = os.fdopen(fde, 'w')  # Python writes to fde
 
 
 def cstr(s):
@@ -223,8 +262,25 @@ class DarknetNetwork():
                                            c_float, c_float, POINTER(c_int), c_int, c_int]
         network_predict_batch.restype = POINTER(DETNUMPAIR)
 
+        def make_c_image(image):
+            # Darknet wants the pixel data by plane/channel instead of by pixel.
+            # Since our images are b&w, we just get the r channel and repeat it
+            # 3 times. TODO: THIS IS A HACK AND SHOULD BE FIXED AND DONE PROPERLY
+            w, h = image.size
+            img = lib.make_image(w, h, 3)
+            data = [c_float(pixel[0]/255.0) for pixel in image.getdata()]
+            data = data + data + data
+            img.data = c_array(c_float, data)
+            return img
+
         def classify(net, meta, image):
-            im = load_image(image, 0, 0)
+            should_free = False
+            if isinstance(image, PIL.Image.Image):
+                im = make_c_image(image)
+            else:
+                im = load_image(cstr(image), 0, 0)
+                should_free = True
+
             out = predict_image(net, im)
             res = []
             for i in range(meta.classes):
@@ -233,6 +289,10 @@ class DarknetNetwork():
                 else:
                     nameTag = self.altNames[i]
                 res.append((nameTag, out[i]))
+
+            if should_free:
+                free_image(im)
+
             res = sorted(res, key=lambda x: -x[1])
             return res
 
@@ -242,12 +302,21 @@ class DarknetNetwork():
             """
             Performs the meat of the detection
             """
-            #pylint: disable= C0321
-            im = load_image(image, 0, 0)
-            if debug: print("Loaded image")
+            should_free = False
+            if isinstance(image, PIL.Image.Image):
+                im = make_c_image(image)
+            else:
+                #pylint: disable= C0321
+                im = load_image(cstr(image), 0, 0)
+                for byte in im.data:
+                    print(byte)
+                should_free = True
+                if debug: print("Loaded image")
+
             ret = detect_image(net, meta, im, thresh, hier_thresh, nms, debug)
-            free_image(im)
-            if debug: print("freed image")
+            if should_free:
+                free_image(im)
+                if debug: print("freed image")
             return ret
 
         self._detect = detect
@@ -314,13 +383,15 @@ class DarknetNetwork():
             except TypeError:
                 pass
 
-    def detect(self, imagePath=None, thresh= 0.25):
+    def detect(self, image, thresh= 0.25):
         """
         Returns list of tuples like
             ('obj_label', confidence, (bounding_box_x_px, bounding_box_y_px, bounding_box_width_px, bounding_box_height_px))
             The X and Y coordinates are from the center of the bounding box. Subtract half the width or height to get the lower corner.
         """
-        return self._detect(self.netMain, self.metaMain, cstr(imagePath), thresh)
+        with DarknetShutup():
+            return self._detect(self.netMain, self.metaMain, image, thresh)
 
-    def classify(self, imagePath=None):
-        return self._classify(self.netMain, self.metaMain, cstr(imagePath))
+    def classify(self, image):
+        with DarknetShutup():
+            return self._classify(self.netMain, self.metaMain, image)
