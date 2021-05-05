@@ -18,8 +18,8 @@
     - [o] TODOs
         - [X] Sort subsets in `ds.get_subsets`
         - [X] Allow creating subsets in the web interface.
-        - [ ] RW permissions for users in web. Also user groups.
-        - [ ] Check ids in extract_graphemes
+        - [X] RW permissions for users in web.
+        - [ ] Check possible bugs in ids in extract_graphemes
         - [ ] In test, compute a confusion matrix (at least for classify) for deeper
             inspection. Better yet, optionally output predictions + ground truth to a
             csv, stats etc. can be better computed with R later.
@@ -55,9 +55,8 @@ Maybe for next version
 - [ ] Autosuggest values for tagging.
 - [ ] Mobile interface for the web app. Maybe integrate with camera/scan app,
     make quevedo a target for "sharing" (uploading) images.
-- [ ] Annotated/not annotated status based on a custom checkbox, useful for
-    revision (or right now, most annotated but need to redo, need to know where
-    I am. and the number based is useless in multi tag)
+- [ ] Instead of a "check" for annotated/not annotated, custom "flags" in
+    config.toml that are checkboxes in meta and can be toggled in web interface.
 - [ ] Improve nets. Try again with grayscale images now that we use AlexeyAB
     fork, check letterboxing, try different configs, etc.
 - [ ] When scripts modify images, don't save it automatically, but return it
@@ -65,3 +64,4 @@ Maybe for next version
     saves the image to the appropriate path. Then, the updated image can be sent
     to the web interface to be previewed, and if want to save it sent back to
     the server on "save".
+- [ ] Web user groups.

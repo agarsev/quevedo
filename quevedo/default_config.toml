@@ -60,11 +60,19 @@ public = true # Set to false to require login
 #   python -c 'from secrets import token_hex; print(token_hex(16))'
 secret_key = "ce8c9cd0316faac773645648ac827ff6"
 
-# Uncomment and modify to add users
-# Hash the password with:
-#   python -c 'import hashlib; print(hashlib.new("sha1", "thepassword".encode("utf8")).hexdigest());'
 # [web.users.annotator]
+# # Uncomment and modify to add users
+# # Hash the password with:
+# #     python -c 'import hashlib; print(hashlib.new("sha1", "thepassword".encode("utf8")).hexdigest());'
 # password = ""
+# read = "ALL" # Can read all subsets
+# read = [ "public" ] # Can read all subsets that contain the string 'public'
+# write = "NONE" # Can't write (modify) any subsets
+# write = [ "set1$", "set2$" ] # Can write to set1 and set2, both logogram or
+#                              # graphemes (they are regexes)
+#
+# [web.users.user2]
+# ...
 
 [generate]
 # Configuration for the artificial logogram generation

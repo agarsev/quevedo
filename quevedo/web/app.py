@@ -9,6 +9,7 @@ import json
 import logging
 import os
 from pathlib import Path
+import re
 from string import Template
 
 from quevedo.annotation import Annotation, Target
@@ -101,12 +102,45 @@ def authenticated(func):
     return check_auth
 
 
+def can_do(path, action, compiled_action):
+    u = session.get('user')
+    if u is None:
+        return True
+    try:
+        perms = u[compiled_action]
+    except KeyError:
+        perms = u.get(action, [])
+        if len(perms) == 0:
+            perms = 'NONE'
+        elif perms != 'ALL' and perms != 'NONE':
+            perms = [re.compile(r) for r in perms]
+        u[compiled_action] = perms
+    if perms == 'ALL':
+        return True
+    if perms == 'NONE':
+        return False
+    for p in perms:
+        if p.search(path):
+            return True
+    return False
+
+
+def can_write(target, dir):
+    return can_do('{}/{}'.format(target, dir), 'write', 'write_')
+
+
+def can_read(target, dir):
+    return can_do('{}/{}'.format(target, dir), 'read', 'read_')
+
+
 # }}}
 # {{{ ---- API
 
 @app.route('/api/save/<target>/<dir>/<idx>', methods=["POST"])
 @authenticated
 def edit_post(target, dir, idx):
+    if not can_write(target, dir):
+        return "Unauthorized", 403
     ds = app_data['dataset']
     single = ds.get_single(string_to_target(target), dir, idx)
     single.update(**request.get_json())
@@ -117,6 +151,8 @@ def edit_post(target, dir, idx):
 @app.route('/api/new/<target>/<dir>', methods=["POST"])
 @authenticated
 def new_annotation(target, dir):
+    if not can_write(target, dir):
+        return "Unauthorized", 403
     ds = app_data['dataset']
     new_t = ds.new_single(string_to_target(target), dir,
                           binary_data=request.data)
@@ -126,6 +162,8 @@ def new_annotation(target, dir):
 @app.route('/api/new/<target>/<dir>', methods=["GET"])
 @authenticated
 def new_dir(target, dir):
+    if not can_write(target, dir):
+        return "Unauthorized", 403
     ds = app_data['dataset']
     ds.create_subset(string_to_target(target), dir)
     return 'OK'
@@ -187,9 +225,14 @@ def index(target, dir):
     }
 
     if dir is None:
-        data['list'] = ds.get_subsets(Target.LOGO)
-        data['list2'] = ds.get_subsets(Target.GRAPH)
+        data['list'] = list(filter(lambda d: can_read('logograms', d['name']),
+                                   ds.get_subsets(Target.LOGO)))
+
+        data['list2'] = list(filter(lambda d: can_read('graphemes', d['name']),
+                                    ds.get_subsets(Target.GRAPH)))
         data['description'] = ds.config['description']
+    elif not can_read(target, dir):
+        return "Unauthorized", 403
     else:
         data['target'] = target
         data['dir_name'] = dir
@@ -211,6 +254,8 @@ def index(target, dir):
 @app.route('/edit/<target>/<dir>/<idx>')
 @authenticated
 def edit(target, dir, idx):
+    if not can_read(target, dir):
+        return "Unauthorized", 403
     ds = app_data['dataset']
     full_dir = '{}/{}'.format(target, dir)
     full_id = '{}/{}/{}'.format(target, dir, idx)
