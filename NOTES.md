@@ -15,36 +15,19 @@
     - [X] Allow annotation filtering for networks based on tags (eg different
         classify networks for different coarse-grain tags)
     - [X] Pipeline
-    - [ ] TODOs
+    - [o] TODOs
+        - [X] Sort subsets in `ds.get_subsets`
+        - [X] Allow creating subsets in the web interface.
+        - [ ] RW permissions for users in web. Also user groups.
+        - [ ] Check ids in extract_graphemes
+        - [ ] In test, compute a confusion matrix (at least for classify) for deeper
+            inspection. Better yet, optionally output predictions + ground truth to a
+            csv, stats etc. can be better computed with R later.
+        - [ ] Allow restarting training with latest weights if weights directory exists,
+            or maybe recover gracefully from Ctrl+C when training, to allow interrupt
+            before overfitting etc. Or both.
+        - [ ] Fix/rework example scripts in `examples`
     - [ ] Docs
-
-# -- PIPELINE --
-
-- [X] Call scripts from web (Annotation -> Annotation) Scripts whose name starts
-    with grapheme will be available for graphemes, starting with logogram for
-    logograms.
-- [X] Script that given an annotation with detections, classifies the graphemes
-    - [X] Move functionality to extract graphemes to bound grapheme annotation class (in logogram)
-    - [X] Try and see if we can get 'predict' to load image from RAM (PIL image)
-        instead of fs.
-    - [X] script
-- [X] Script that uses the above script to perform detection + classification on
-    raw image (external/library use)
- 
-## -- TODO --
-
-- [ ] In test, compute a confusion matrix (at least for classify) for deeper
-    inspection. Better yet, optionally output predictions + ground truth to a
-    csv, stats etc. can be better computed with R later.
-- [ ] If there are no annotation folders, the web interface should offer the
-    default one even if the directory is not physically there. Or maybe allow
-    creating subsets in the web interface.
-- [ ] Sort subsets in the web interface
-- [ ] Allow restarting training with latest weights if weights directory exists,
-    or maybe recover gracefully from Ctrl+C when training, to allow interrupt
-    before overfitting etc. Or both.
-- [ ] RW permissions for users in web. Also user groups.
-- [ ] Fix/rework example scripts in `examples`
 
 # -- DOCS --
 

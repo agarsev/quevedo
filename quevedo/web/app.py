@@ -123,6 +123,14 @@ def new_annotation(target, dir):
     return {'id': new_t.id}
 
 
+@app.route('/api/new/<target>/<dir>', methods=["GET"])
+@authenticated
+def new_dir(target, dir):
+    ds = app_data['dataset']
+    ds.create_subset(string_to_target(target), dir)
+    return 'OK'
+
+
 @app.route('/api/run/<function>/<target>/<dir>/<idx>')
 @authenticated
 def run_net_or_script(function, target, dir, idx):

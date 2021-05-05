@@ -13,6 +13,8 @@ export default {
     columns: 'Columns', // Tag schema info
     back: 'Back to list', // Link back to home view
     new_entry: 'Upload new', // Entry to add a new annotation
+    new_subset: 'Create new', // Entry to add a new subset
+    name_for_subset: 'Name of the new subset',
     list_logo: 'Logograms',
     list_graph: 'Graphemes',
     // EDIT.js

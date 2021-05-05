@@ -107,9 +107,10 @@ class Dataset:
             path = self.grapheme_path
         else:
             raise ValueError('A single target is needed')
-        return [{'name': d.stem,
-                 'count': sum(1 for _ in d.glob('*.png'))}
-                for d in path.glob('*') if d.is_dir()]
+        return sorted(({'name': d.stem,
+                        'count': sum(1 for _ in d.glob('*.png'))}
+                       for d in path.glob('*') if d.is_dir()),
+                      key=lambda s: s['name'])
 
     def create_subset(self, target: Target, name, existing='a'):
         '''Creates the directory for a new subset. If it exists, behaviour is

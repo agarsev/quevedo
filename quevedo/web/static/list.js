@@ -21,7 +21,7 @@ function App ({ title, path, description, columns, dir_name, target,
             setMessage(`${Text['error']}: ${resp.statusText}`);
         }
     }
-    const upload = file => {
+    const upload = in_dir ? file => {
         fetch(`api/new/${target}/${dir_name}`, {
             method: 'POST',
             body: file
@@ -31,6 +31,10 @@ function App ({ title, path, description, columns, dir_name, target,
         }).then(({ id }) => {
             window.location = `edit/${target}/${dir_name}/${id}`;
         }).catch(setError);
+    } : (target, dir_name) => {
+        fetch(`api/new/${target}/${dir_name}`)
+            .then(() => window.location = `list/${target}/${dir_name}`)
+            .catch(setError);
     };
 
     return html`
@@ -46,16 +50,18 @@ function App ({ title, path, description, columns, dir_name, target,
     `;
 }
 
-function DirList ({ list, list2 }) {
+function DirList ({ list, list2, upload }) {
     return html`<>
         <h2>${Text['list_logo']}</h2>
         <ul class="List">
             ${list.map(t => html`<${DirEntry} target='logograms' ...${t} />`)}
+            <${NewDir} upload=${dirname => upload('logograms', dirname)} />
             <li class="extra-space"></li>
         </ul>
         <h2>${Text['list_graph']}</h2>
         <ul class="List">
             ${list2.map(t => html`<${DirEntry} target='graphemes' ...${t} />`)}
+            <${NewDir} upload=${dirname => upload('graphemes', dirname)} />
             <li class="extra-space"></li>
         </ul>
     `;
@@ -68,11 +74,18 @@ function DirEntry ({ name, count, target }) {
     </li>`;
 }
 
+function NewDir ({ upload }) {
+    return html`<li class="Entry DirEntry">
+        <h2>${Text['new_subset']}</h2>
+        <a href="#" onclick=${() => upload(prompt(Text['name_for_subset']))}>📤</a>
+    </li>`;
+}
+
 function AnnoList ({ list, upload }) {
     return html`<ul class="List">
         <${UpEntry} />
-        <${NewEntry} upload=${upload} />
         ${list.map(t => html`<${AnnoEntry} ...${t} />`)}
+        <${NewEntry} upload=${upload} />
         <li class="extra-space"></li>
     </ul>`;
 }
