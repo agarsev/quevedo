@@ -3,7 +3,8 @@
 import click
 from os import getcwd
 
-from quevedo import darknet, web, network, dataset as ds
+from quevedo import darknet, web, dataset as ds
+import quevedo.network.cli as network
 from quevedo.extract_graphemes import extract_graphemes
 from quevedo.generate import generate
 from quevedo.run_script import run_script

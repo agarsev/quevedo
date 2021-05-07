@@ -5,20 +5,18 @@
 
 # -- NEXT --
 
-- [O] Milestone: v1
+- [X] Milestone: v1
     - [X] Refactor annotations (less undefined json, more python class)
     - [X] Allow annotation filtering for networks based on tags (eg different
         classify networks for different coarse-grain tags)
     - [X] Pipeline
-    - [O] TODOs
+    - [X] TODOs
         - [X] Sort subsets in `ds.get_subsets`
         - [X] Allow creating subsets in the web interface.
         - [X] RW permissions for users in web.
         - [X] In test, optionally output predictions + ground truth to a
             csv, so better stats can be computed with R by the user.
-        - [ ] Allow restarting training with latest weights if weights directory exists,
-            or maybe recover gracefully from Ctrl+C when training, to allow interrupt
-            before overfitting etc. Or both.
+        - [X] Resume training and recover gracefully from Ctrl+C when training
     - [ ] Docs
 
 # -- DOCS --

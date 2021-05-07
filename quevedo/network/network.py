@@ -129,23 +129,35 @@ class Network:
         (self.path / 'darknet.cfg').write_text(
             self.get_net_config(num_classes))
 
-    def train(self):
+    def train(self, initial=None):
         '''Trains the neural network. When finished, removes partial weights and
-        keeps only the last.'''
+        keeps only the last. Can be interrupted and optionally resumed later.'''
         oldcwd = os.getcwd()
         os.chdir(self.path)
+        final = None
 
         weight_d = Path('weights')
         weight_d.mkdir(exist_ok=True)
 
-        self.dataset.run_darknet(self.network_type, 'train',
-                'darknet.data', 'darknet.cfg')
+        args = [self.network_type, 'train', 'darknet.data',
+                'darknet.cfg']
+        if initial:
+            args.append(initial)
 
-        os.replace(str(weight_d / 'darknet_final.weights'),
-                'darknet_final.weights')
+        try:
+            self.dataset.run_darknet(*args)
+            final = 'darknet_final.weights'
+        except KeyboardInterrupt:
+            final = 'darknet_last.weights'
+            if not (weight_d / final).exists():
+                final = None
+
+        if final is not None:
+            os.replace(str(weight_d / final), 'darknet_final.weights')
         rmtree(str(weight_d))
-
         os.chdir(oldcwd)
+
+        return final
 
     def load(self):
         '''Loads the weights for the trained neural network so it can be used to
