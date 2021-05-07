@@ -77,7 +77,6 @@ class DetectNet(Network):
             tag = self.get_tag(g.tags)
             if tag is None:
                 continue
-            stats.add(tag)
             logo = {'box': g.box, 'name': tag}
             if len(predictions) > 0:
                 similarities = sorted(((box_similarity(p, logo), i) for (i, p) in
@@ -85,12 +84,13 @@ class DetectNet(Network):
                 (sim, idx) = similarities[0]
                 if sim > 0.7:
                     predictions.pop(idx)
-                    stats.true_positives[tag] += 1
+                    # Tag equality is checked in the similarity computation
+                    stats.register(tag, tag)
                     continue
-            stats.false_negatives[tag] += 1
+            stats.register(None, tag)
         # Unassigned predictions are false positives
         for pred in predictions:
-            stats.false_positives[pred['name']] += 1
+            stats.register(pred['name'], None)
 
     def auto_annotate(self, a):
         graphemes = []

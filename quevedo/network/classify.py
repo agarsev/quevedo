@@ -63,20 +63,13 @@ class ClassifyNet(Network):
 
     def test(self, annotation, stats):
         true_tag = self.get_tag(annotation.tags)
-        if true_tag is None:
+        if true_tag is None:  # Should we allow empty images?
             return
         predictions = self.predict(annotation.image_path)
         best = predictions[0]
-        stats.add(true_tag)
         # TODO thresholds should be configuration, in detect too
-        if best['confidence'] < 0.5:  # no prediction
-            if true_tag != '':
-                stats.false_negatives[true_tag] += 1
-        else:
-            if true_tag == best['tag']:
-                stats.true_positives[true_tag] += 1
-            else:
-                stats.false_positives[best['tag']] += 1
+        stats.register(best['tag'] if best['confidence'] >= 0.5 else None,
+                       true_tag)
 
     def auto_annotate(self, a):
         preds = self.predict(a.image)

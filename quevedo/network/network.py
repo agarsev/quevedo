@@ -183,7 +183,7 @@ class Network:
 
     def test(self, annotation, stats):
         '''Use the network to get the prediction for a real annotation, compare
-        results and update stats.'''
+        results and update stats. See test.py for `stats`.'''
         raise NotImplementedError
 
     def auto_annotate(self, annotation):

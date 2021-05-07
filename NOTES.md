@@ -10,17 +10,15 @@
     - [X] Allow annotation filtering for networks based on tags (eg different
         classify networks for different coarse-grain tags)
     - [X] Pipeline
-    - [o] TODOs
+    - [O] TODOs
         - [X] Sort subsets in `ds.get_subsets`
         - [X] Allow creating subsets in the web interface.
         - [X] RW permissions for users in web.
-        - [ ] In test, compute a confusion matrix (at least for classify) for deeper
-            inspection. Better yet, optionally output predictions + ground truth to a
-            csv, stats etc. can be better computed with R later.
+        - [X] In test, optionally output predictions + ground truth to a
+            csv, so better stats can be computed with R by the user.
         - [ ] Allow restarting training with latest weights if weights directory exists,
             or maybe recover gracefully from Ctrl+C when training, to allow interrupt
             before overfitting etc. Or both.
-        - [ ] Fix/rework example scripts in `examples`
     - [ ] Docs
 
 # -- DOCS --
@@ -32,7 +30,13 @@
     - [ ] Concepts, dataset structure, file formats
     - [ ] CLI usage
     - [ ] Config file
-    - [ ] Dev guide
+- [ ] Examples
+    - [ ] Scripts for use of quevedo as library and for use as internal script
+        (fixing tags, changing images, etc.)
+    - [ ] Example notebooks
+    - [ ] Example R notebook computing eg. confusion matrix from test and other
+        stats
+- [ ] Developer guide
 
 # -- BACKLOG --
 
