@@ -7,11 +7,6 @@
 
 - [O] Milestone: v1
     - [X] Refactor annotations (less undefined json, more python class)
-        - [X] dataset
-        - [X] web 
-        - [X] classes
-        - [X] extract_graphemes, generate
-        - [X] network
     - [X] Allow annotation filtering for networks based on tags (eg different
         classify networks for different coarse-grain tags)
     - [X] Pipeline
@@ -19,7 +14,6 @@
         - [X] Sort subsets in `ds.get_subsets`
         - [X] Allow creating subsets in the web interface.
         - [X] RW permissions for users in web.
-        - [ ] Check possible bugs in ids in extract_graphemes
         - [ ] In test, compute a confusion matrix (at least for classify) for deeper
             inspection. Better yet, optionally output predictions + ground truth to a
             csv, stats etc. can be better computed with R later.
@@ -44,11 +38,11 @@
 
 Maybe for next version
 
+- [ ] **BUG** Remove "saved" message when doing changes (inconsistent)
 - [ ] In split command, add a "k-set" to offset split index, which combined
     with the seed can allow for cross-validation
 - [ ] Auto-save changes in the web interface if enabled in the config file
     (nowadays people aren't so used to clicking save)
-- [ ] Remove "saved" message when doing changes (inconsistent)
 - [ ] Allow deleting entries in web (just move the last to the hole). Maybe
     add `delete` in cli too?
 - [ ] Filter/search annotations in listing according to some tag(s).
@@ -58,10 +52,14 @@ Maybe for next version
 - [ ] Instead of a "check" for annotated/not annotated, custom "flags" in
     config.toml that are checkboxes in meta and can be toggled in web interface.
 - [ ] Improve nets. Try again with grayscale images now that we use AlexeyAB
-    fork, check letterboxing, try different configs, etc.
+    fork, check letterboxing, try different configs, etc. Some of this can be
+    done by improving the python code that access the darknet dll (eg the
+    channels) and some might be better to do ourselves (eg letterboxing and
+    resizing)
 - [ ] When scripts modify images, don't save it automatically, but return it
     (ie return modified_tags, modified_img) and then it is `run_script` that
     saves the image to the appropriate path. Then, the updated image can be sent
-    to the web interface to be previewed, and if want to save it sent back to
-    the server on "save".
+    to the web interface to be previewed, and if they want to save it send it
+    back to the server on "save". The only complication is that the image is now
+    frontend state, not just a src link.
 - [ ] Web user groups.
