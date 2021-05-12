@@ -1,6 +1,8 @@
 # This file is a Quevedo dataset configuration file. Find more at:
 # https://www.github.com/agarsev/quevedo
 
+# Local overrides can be written in `config.local.toml`
+
 title = "$title"
 
 description = """ 
@@ -54,6 +56,9 @@ subject = "Classify graphemes"
 # ...
 
 [web]
+host = "localhost"
+port = "5000"
+mount_path = ""
 lang = "en"
 public = true # Set to false to require login
 # Generate your own secret key with, for example: 
@@ -66,10 +71,10 @@ secret_key = "ce8c9cd0316faac773645648ac827ff6"
 # #     python -c 'import hashlib; print(hashlib.new("sha1", "thepassword".encode("utf8")).hexdigest());'
 # password = ""
 # read = "ALL" # Can read all subsets
-# read = [ "public" ] # Can read all subsets that contain the string 'public'
+# # read = [ "public" ] # Can read all subsets that contain the string 'public'
 # write = "NONE" # Can't write (modify) any subsets
-# write = [ "set1$", "set2$" ] # Can write to set1 and set2, both logogram or
-#                              # graphemes (they are regexes)
+# # write = [ "set1$$", "set2$$" ] # Can write to set1 and set2, both logogram or
+#                                  # graphemes (they are regexes)
 #
 # [web.users.user2]
 # ...

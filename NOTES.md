@@ -17,6 +17,11 @@
         - [X] In test, optionally output predictions + ground truth to a
             csv, so better stats can be computed with R by the user.
         - [X] Resume training and recover gracefully from Ctrl+C when training
+        - [ ] Improve train/test set. Instead of "set", "slice"/"division", and
+            it's an integer. Orthogonal dimension to subsets. Slices to include
+            can be chosen somehow, as params or something (think DVC). This
+            enables cross-validation while preserving "slice" through extract
+            etc.
     - [ ] Docs
 
 # -- DOCS --
@@ -41,8 +46,6 @@
 Maybe for next version
 
 - [ ] **BUG** Remove "saved" message when doing changes (inconsistent)
-- [ ] In split command, add a "k-set" to offset split index, which combined
-    with the seed can allow for cross-validation
 - [ ] Auto-save changes in the web interface if enabled in the config file
     (nowadays people aren't so used to clicking save)
 - [ ] Allow deleting entries in web (just move the last to the hole). Maybe

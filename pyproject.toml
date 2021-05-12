@@ -7,7 +7,7 @@ authors = ["Antonio F. G. Sevilla <afgs@ucm.es>"]
 [tool.poetry.dependencies]
 python = "^3.7"
 click = "^7.1.1"
-pillow = "^7.1.1"
+pillow = "^8"
 flask = { version = "^1.1.2", optional = true }
 forcelayout = { version = "^1.0.6", optional = true }
 toml = "^0.10.2"

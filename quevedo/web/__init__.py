@@ -9,9 +9,9 @@ languages = [str(fn.stem) for fn in
 
 @click.command()
 @click.pass_obj
-@click.option('-h', '--host', default='localhost')
-@click.option('-p', '--port', default='5000')
-@click.option('-m', '--mount-path', default='', help="Mount path for the web application")
+@click.option('-h', '--host')
+@click.option('-p', '--port')
+@click.option('-m', '--mount-path', help="Mount path for the web application")
 @click.option('--browser/--no-browser', default=True, help="Launch browser with the web app")
 @click.option('-l', '--language', help="Language for the UI (default from config file)",
               type=click.Choice(languages, case_sensitive=False))
@@ -24,8 +24,15 @@ def launcher(obj, host, port, browser, mount_path, language):
     dataset = obj['dataset']
     click.echo("Loading dataset '{}'...".format(dataset.config['title']))
 
+    config = dataset.config.get('web', {})
     if language is None:
-        language = dataset.config.get('web', {}).get('lang', 'en')
+        language = config.get('lang', 'en')
+    if host is None:
+        host = config.get('host', 'localhost')
+    if port is None:
+        port = config.get('port', '5000')
+    if mount_path is None:
+        mount_path = config.get('mount_path', '')
 
     app.load_dataset(dataset, language)
     url = "http://{}:{}".format(host, port)

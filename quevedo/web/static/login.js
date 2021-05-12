@@ -1,6 +1,6 @@
 // 2021-03-03 Antonio F. G. Sevilla <afgs@ucm.es>
 
-import Text from '../i18n.js';
+import Text from './i18n.js';
 
 const html = htm.bind(preact.h);
 const { useState, useRef } = preactHooks;
@@ -24,7 +24,7 @@ function App () {
                 pass: pass.current.value,
             })
         }).then(r => {
-            if (r.ok) { window.location = '/'; }
+            if (r.ok) { window.location = r.url; }
             else { setResp(2); }
         });
         e.preventDefault();

@@ -40,7 +40,7 @@ class Annotation:
                     pil_image=None, **kwds):
         if image_path is not None:
             copyfile(image_path, self.image_path)
-            self.update(filename=image_path.stem)
+            self.update(meta={'filename': image_path.stem})
         elif binary_data is not None:
             self.image_path.write_bytes(binary_data)
         elif pil_image is not None:

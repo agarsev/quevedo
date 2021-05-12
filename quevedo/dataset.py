@@ -24,6 +24,7 @@ class Dataset:
         self.logogram_path = self._path / 'logograms'
         self.grapheme_path = self._path / 'graphemes'
         self.config_path = self._path / 'config.toml'
+        self.local_config_path = self._path / 'config.local.toml'
         self.script_path = self._path / 'scripts'
 
     def create(self):
@@ -148,6 +149,8 @@ class Dataset:
             if not self.config_path.exists():
                 raise SystemExit("Path '{}' is not a valid dataset".format(self._path))
             self.config = toml.loads(self.config_path.read_text())
+            if self.local_config_path.exists():
+                self.config.update(**toml.loads(self.local_config_path.read_text()))
             return self.config
 
 

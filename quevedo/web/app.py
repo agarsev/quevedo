@@ -1,7 +1,7 @@
 # 2020-04-07 Antonio F. G. Sevilla <afgs@ucm.es>
 # vi:foldmethod=marker
 
-from flask import Flask, request, send_from_directory, session, redirect, url_for
+from flask import Flask, request, send_from_directory, session, redirect
 from functools import wraps
 import hashlib
 from itertools import chain
@@ -81,8 +81,9 @@ def run(host, port, path):
 
 @app.route('/login')
 def login_page():
-    if app_data['config']['public']:
-        return redirect(url_for('index'))
+    if (app_data['config']['public'] or
+            session.get('user', None) is not None):
+        return redirect(app_data['mount_path'])
     ds = app_data['dataset']
     return html_template.substitute(
         title=ds.config['title'],
@@ -97,7 +98,7 @@ def authenticated(func):
     def check_auth(*args, **kwargs):
         if (not app_data['config']['public'] and
                 session.get('user', None) is None):
-            return redirect(url_for('login_page'))
+            return redirect(app_data['mount_path'] + 'login')
         return func(*args, **kwargs)
     return check_auth
 
@@ -200,7 +201,7 @@ def do_login():
         password = hashlib.new("sha1", data["pass"].encode("utf8")).hexdigest()
         if password == user['password']:
             session['user'] = user
-            return redirect(url_for('index'))
+            return redirect(app_data['mount_path'])
     except KeyError:
         pass
     return "Unauthorized", 403
