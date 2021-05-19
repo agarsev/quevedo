@@ -2,7 +2,11 @@
 
 # Quevedo
 
-SignWriting recognition tool, part of VISSE project.
+Quevedo is a tool for managing datasets of images with complex semantics, with
+a focus on the training and evaluation of machine learning algorithms on these
+images.
+
+Quevedo is part of the [VisSE project][VISSE].
 
 ## Features
 
@@ -13,11 +17,11 @@ SignWriting recognition tool, part of VISSE project.
 
 Base requirements: [python 3], [poetry], [darknet].
 
-Install:
-- Development: `poetry install` after clone.
-- With wheel: TODO
+- [ ] Install darknet for training
+- [ ] Install with wheel
+- [ ] Install for development - poetry, dependencies, building, etc
 
-Usage:
+## Getting started
 
 - Development: `poetry run quevedo -D <PATH_TO_THE_DATASET> command`.
 - In the dataset directory: `quevedo command`.
@@ -49,3 +53,4 @@ Antonio F. G. Sevilla <afgs@ucm.es>
 [darknet]: https://pjreddie.com/darknet/install/
 [poetry]: https://python-poetry.org/
 [python 3]: https://www.python.org/
+[VISSE]: https://www.ucm.es/visse
