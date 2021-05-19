@@ -2,18 +2,24 @@
 
 # Quevedo
 
-Quevedo is a tool for managing datasets of images with complex semantics, with
-a focus on the training and evaluation of machine learning algorithms on these
-images.
+Quevedo is a python tool for managing datasets of images with compositional
+semantics, with a focus on the training and evaluation of machine learning
+algorithms on these images.
 
-Quevedo is part of the [VisSE project][VISSE].
+Quevedo is part of the [VisSE project](https://www.ucm.es/visse). The code can
+be found at [GitHub](https://github.com/agarsev/quevedo), and detailed
+documentation HERE (TODO).
 
 ## Features
 
-- SW dataset management (annotation, extraction, preparation)
-- Deep learning network training and testing
+- Dataset management, including hierarchical dataset organization, subset
+    partitioning, and semantically guided data augmentation.
+- Structural annotation of source images using a web interface, with support for
+    different users and the live visualization of data processing scripts.
+- Deep learning network management, training, configuration and evaluation,
+    using [darknet].
 
-## Usage
+## Installation
 
 Base requirements: [python 3], [poetry], [darknet].
 
@@ -21,7 +27,7 @@ Base requirements: [python 3], [poetry], [darknet].
 - [ ] Install with wheel
 - [ ] Install for development - poetry, dependencies, building, etc
 
-## Getting started
+## Usage
 
 - Development: `poetry run quevedo -D <PATH_TO_THE_DATASET> command`.
 - In the dataset directory: `quevedo command`.
@@ -29,28 +35,12 @@ Base requirements: [python 3], [poetry], [darknet].
 
 For more information, and the list of commands, run `poetry run quevedo --help`.
 
-## About the dataset
+## About
 
-Datasets are plain directories with a specified structure inside:
+Author: [Antonio F. G. Sevilla](https://github.com/agarsev) <afgs@ucm.es>
 
-- `config.toml`: information and configuration for the dataset.
-- `real`: directory with "real" SW transcriptions (from humans), organized in
-  subdirectories. Transcriptions are numbered starting from `1`. For each
-  transcription, there must be an image file (`{number}.png`). There can be also
-  annotation files (`{number}.json`) and darknet-format bounding boxes files
-  (`{number}.txt`).
-- `symbols`: directory with the symbols extracted from the real transcriptions.
-- `generated`: directory with generated images that look like SW trascriptions
-  and can be used to augment the training data.
-- `experiments`: directory with configuration for different train/test
-  experiments.
-
-## Author
-
-Antonio F. G. Sevilla <afgs@ucm.es>
-
+Quevedo is licensed under the Open Software License version 3.0.
 
 [darknet]: https://pjreddie.com/darknet/install/
 [poetry]: https://python-poetry.org/
 [python 3]: https://www.python.org/
-[VISSE]: https://www.ucm.es/visse

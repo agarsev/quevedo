@@ -8,6 +8,7 @@ nav:
     - Step by step: User_guide.md
     - Dataset configuration: config.md
   - cli.md
+  - data_augmentation.md
   - About:
     - about.md
     - license.md 

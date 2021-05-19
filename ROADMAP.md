@@ -2,11 +2,16 @@
 
 ## Version 1
 
-Remaining: documentation
-
-- [ ] Add license file, and license information for the dependencies.
-    This must be shown in the web somehow too.
-- [ ] Rewrite README.md with latest info.
+- [o] License
+    - [X] Add license file
+    - [ ] Add OSL 3 notice to own source (after copyright)
+    - [ ] Add license information for the dependencies, and link to this info in
+        the web interface.
+- [o] README.md 
+    - [X] Overview
+    - [X] Authorship
+    - [ ] Installation
+    - [ ] Usage
 - [ ] Write the user guide
     - [ ] Concepts, dataset structure, file formats
     - [ ] CLI usage
@@ -18,6 +23,7 @@ Remaining: documentation
     - [ ] Example R notebook computing eg. confusion matrix from test and other
         stats
 - [ ] Developer guide
+- [ ] Deploy documentation
 
 Notes to document:
 
