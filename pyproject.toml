@@ -10,7 +10,7 @@ keywords = ["machine learning", "computer vision", "sign language", "corpus ling
 
 [tool.poetry.dependencies]
 python = "^3.7"
-click = "^7.1.1"
+click = "^8"
 pillow = "^8"
 flask = { version = "^1.1.2", optional = true }
 forcelayout = { version = "^1.0.6", optional = true }

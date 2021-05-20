@@ -7,7 +7,7 @@ import importlib.util
 from quevedo import Dataset, Target
 
 
-# From @wecsam
+# Adapted from @wecsam
 # https://stackoverflow.com/questions/4383571/importing-files-from-different-folder
 def module_from_file(module_name, file_path):
     file = (file_path / module_name).with_suffix('.py')
@@ -19,15 +19,18 @@ def module_from_file(module_name, file_path):
 
 @click.command()
 @click.option('--scriptname', '-s', required=True,
-              help="Name of the script to run")
+              help="Name of the script to run, without path or extension")
 @click.option('--grapheme-set', '-g', multiple=True,
               help="Process graphemes from these sets")
 @click.option('--logogram-set', '-l', multiple=True,
-              help="Process graphemes from these sets")
+              help="Process logograms from these sets")
 @click.pass_obj
 def run_script(obj, scriptname, grapheme_set, logogram_set):
-    '''Run a data processing script on dataset objects. The script should be in
-    the 'scripts' directory of the dataset, and have a "process" method.'''
+    '''Run a data processing script on dataset objects.
+
+    The script should be in the 'scripts' directory of the dataset, and have a
+    "process" method which will be called by Quevedo on each grapheme or
+    logogram in the selected subsets.'''
 
     ds: Dataset = obj['dataset']
 

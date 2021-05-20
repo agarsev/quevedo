@@ -69,7 +69,7 @@ class Stats():
         return results
 
 
-@click.command()
+@click.command('test')
 @click.pass_obj
 @click.option('--print/--no-print', '-p', 'do_print', default=True,
               help='Show results in the command line')
@@ -85,7 +85,9 @@ def test(obj, do_print, results_csv, results_json, predictions_csv, on_train):
     '''Compute evaluation metrics for a trained neural network.
 
     By default annotations marked as "test" (see train/test split) are used.
-    Precision, recall and f-score are computed for each class.'''
+    Precision, recall and f-score are computed for each class, as well as global
+    metrics (macro average). For more detailed statistics, the full predictions
+    can be printed into a csv to be loaded into other software (like R).'''
 
     dataset = obj['dataset']
     network = dataset.get_network(obj['network'])

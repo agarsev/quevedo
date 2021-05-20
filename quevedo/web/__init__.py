@@ -8,7 +8,7 @@ languages = [str(fn.stem) for fn in
              (Path(__file__).parent / 'static/i18n').glob('*.js')]
 
 
-@click.command()
+@click.command('web')
 @click.pass_obj
 @click.option('-h', '--host')
 @click.option('-p', '--port')
@@ -17,9 +17,13 @@ languages = [str(fn.stem) for fn in
 @click.option('-l', '--language', help="Language for the UI (default from config file)",
               type=click.Choice(languages, case_sensitive=False))
 def launcher(obj, host, port, browser, mount_path, language):
-    ''' Run a web application for managing and annotating the logograms in
-    the dataset.
-    '''
+    '''Run a web interface to the dataset.
+
+    The web application launched can be used to browse and manage the
+    dataset files. Annotation pages are provided for both graphemes and
+    logograms to allow visual annotation of objects. Very basic user management
+    is also provided. Configuration can be written under the `web` key of the
+    dataset configuration.'''
     from quevedo.web import app
 
     dataset = obj['dataset']

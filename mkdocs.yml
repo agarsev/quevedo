@@ -3,15 +3,14 @@ site_description: |
   Documentation for Quevedo: a tool for managing datasets of images with complex semantics
 repo_url: https://github.com/agarsev/quevedo
 nav:
-  - User Guide:
-    - Concepts: concepts.md
-    - Step by step: User_guide.md
-    - Dataset configuration: config.md
-  - cli.md
-  - data_augmentation.md
-  - About:
-    - about.md
-    - license.md 
+  - Home: index.md
+  - User Guides:
+    - concepts.md
+    - User_guide.md
+    - config.md
+    - data_augmentation.md
+  - Usage:
+    - cli.md
 edit_uri: ''
 site_dir: dist/docs
 theme: readthedocs

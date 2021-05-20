@@ -7,13 +7,14 @@ from pathlib import Path
 from .test import test
 
 
-@click.command()
+@click.command('prepare')
 @click.pass_obj
 def prepare(obj):
-    ''' Creates the files needed for training and testing darknet.
+    '''Create the files needed for training and using this network.
 
-    Important: after moving (changing the path) of the dataset, this command
-    *must* be called again before any additional training or predicting.'''
+    The training files, net configuration, and mapping from dataset tags to
+    net classes are stored in a directory named after the chosen net (-N flag)
+    under the `networks` path.'''
 
     dataset = obj['dataset']
     network = dataset.get_network(obj['network'])
@@ -22,15 +23,17 @@ def prepare(obj):
     click.echo("Neural network '{}' ready for training".format(network.name))
 
 
-@click.command()
+@click.command('train')
 @click.option('--resume/--no-resume', '-c', default=True,
               help="Start training with existing weights from a previous run")
 @click.pass_obj
 def train(obj, resume):
-    ''' Trains a neural network to recognize the SW in this dataset.
+    '''Train the neural network.
 
-    Uses the annotations and configuration created, and calls the darknet
-    binary with the appropriate information.'''
+    The training configuration and files must have been created by running the
+    command `prepare`.  The weights obtained after training are stored in the
+    network directory: `/<dataset>/networks/<network_name>/darknet_final.weights`.
+    '''
 
     dataset = obj['dataset']
     network = dataset.get_network(obj['network'])
@@ -53,7 +56,7 @@ def train(obj, resume):
         click.echo("Neural network '{}' trained".format(network.name))
 
 
-@click.command()
+@click.command('predict')
 @click.option('--image', '-i', type=click.Path(exists=True),
               required=True, help="Image to predict")
 @click.pass_obj

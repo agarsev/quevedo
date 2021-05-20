@@ -155,10 +155,10 @@ class Dataset:
             return self.config
 
 
-@click.command()
+@click.command('create')
 @click.pass_context
 def create(ctx):
-    ''' Creates a dataset directory with the correct structure.'''
+    '''Create and initialize a Quevedo dataset.'''
     dataset = ctx.obj['dataset']
 
     dataset.create()
@@ -185,7 +185,7 @@ def style(condition, right, wrong=None):
     return click.style(str(text), fg=color)
 
 
-@click.command()
+@click.command('add_images')
 @click.pass_obj
 @click.option('--image_dir', '-i', multiple=True, type=click.Path(exists=True),
               required=True, help="Directory from which to import images")
@@ -196,7 +196,7 @@ def style(condition, right, wrong=None):
 @click.option('-r', '--replace', 'existing', flag_value='r',
               help='''Replace old images with new ones, if any.''')
 def add_images(obj, image_dir, grapheme_set, logogram_set, existing):
-    ''' Import images from directories to a dataset.'''
+    '''Import images from external directories into the dataset.'''
     dataset = obj['dataset']
 
     if grapheme_set is not None:
@@ -223,16 +223,18 @@ def add_images(obj, image_dir, grapheme_set, logogram_set, existing):
     click.echo("\n")
 
 
-@click.command()
+@click.command('split')
 @click.option('--grapheme-set', '-g', multiple=True, help="Grapheme set(s) to split.")
 @click.option('--logogram-set', '-l', multiple=True, help="Logogram set(s) to split.")
 @click.option('--percentage', '-p', type=click.IntRange(0, 100), default=60)
 @click.option('--seed', type=click.INT, help='A seed for the random split algorithm.')
 @click.pass_obj
 def train_test_split(obj, grapheme_set, logogram_set, percentage, seed):
-    '''Split annotation files in the given subsets into two sets, one for
-    training and one for test, in the given subsets. This split will not be done
-    physically but rather as a mark on the annotation file.
+    '''Split files into train and test groups.
+
+    The annotations in the given subsets will be split into two groups, one for
+    training and one for test.  This split will not be done physically but
+    rather as a mark stored on the annotation file.
 
     If no subsets are given, all annotations will be marked. If homogeneous
     split is required, call this command once for each set.'''
@@ -269,10 +271,10 @@ def count(l):
     return sum(1 for _ in l)
 
 
-@click.command()
+@click.command('info')
 @click.pass_obj
 def info(obj):
-    ''' Returns status information about a dataset.'''
+    '''Get general status information about a dataset.'''
     dataset: Dataset = obj['dataset']
 
     path = dataset.path
@@ -325,11 +327,14 @@ def info(obj):
     click.echo('')
 
 
-@click.command()
+@click.command('config')
 @click.option('--editor', '-e', help="Editor to use instead of the automatically detected one")
 @click.pass_obj
 def config_edit(obj, editor):
-    ''' Edit dataset configuration file (config.toml).'''
+    '''Edit dataset configuration.
+
+    This command is a simple convenience to launch an editor open at the
+    configuration file (config.toml).'''
     dataset = obj['dataset']
     info = dataset.config # Ensure valid dataset
     click.edit(filename=str(dataset.config_path), editor=editor)

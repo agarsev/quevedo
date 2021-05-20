@@ -12,17 +12,26 @@
     - [X] Authorship
     - [ ] Installation
     - [ ] Usage
-- [ ] Write the user guide
-    - [ ] Concepts, dataset structure, file formats
-    - [ ] CLI usage
+- [.] User guides
+    - [X] Concepts
+    - [ ] Networks
     - [ ] Config file
+    - [ ] Data augmentation
+    - [ ] Step by step
+- [o] Usage
+    - [X] CLI
+    - [ ] Web application
+    - [ ] Developer guide / as library
+- [ ] About
+    - [ ] VISSE
+    - [ ] Dependencies
+    - [ ] License
 - [ ] Examples
     - [ ] Scripts for use of quevedo as library and for use as internal script
         (fixing tags, changing images, etc.)
     - [ ] Example notebooks
     - [ ] Example R notebook computing eg. confusion matrix from test and other
-        stats
-- [ ] Developer guide
+        stats?
 - [ ] Deploy documentation
 - [ ] Publish
     - [ ] Github Release

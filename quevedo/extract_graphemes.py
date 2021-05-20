@@ -6,7 +6,7 @@ import click
 from quevedo.annotation import Target
 
 
-@click.command()
+@click.command('extract')
 @click.option('-f', '--from', 'dir_from', default='default',
               help='''Logogram subset from which to extract graphemes.''')
 @click.option('-t', '--to', 'dir_to', default='default',
@@ -17,7 +17,12 @@ from quevedo.annotation import Target
               help='''Replace old graphemes with new ones, if any.''')
 @click.pass_obj
 def extract_graphemes(obj, dir_from, dir_to, existing):
-    '''Extracts graphemes from annotated logograms into their own files'''
+    '''Extract graphemes from annotated logograms.
+
+    This command takes all the logograms in the given subset, extracts the
+    graphemes annotated in each of them, and stores them as independent
+    annotations (carrying over the relevant information) in the chosen grapheme
+    subset.'''
 
     dataset = obj['dataset']
     graph_d = dataset.create_subset(Target.GRAPH, dir_to, existing)

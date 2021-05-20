@@ -122,10 +122,14 @@ def create_logogram(graphemes):
               help='''Replace old logograms with new ones, if any.''')
 @click.pass_obj
 def generate(obj, dir_from, dir_to, existing):
-    '''Generates artificial logograms for training (data augmentation) by
-    randomly combining graphemes together. Some direction can be given to the
-    generation process, see options in config file. Only graphemes marked for
-    training will be used.'''
+    '''Generate artificial logograms from existing graphemes.
+
+    This command creates new logograms in the chosen subset by
+    randomly combining graphemes together. The generation process can be
+    somewhat controlled in the configuration file.
+
+    Since the goal of this process is to perform data augmentation for
+    training, only graphemes in the "train" group will be used.'''
 
     dataset = obj['dataset']
     dataset.create_subset(Target.LOGO, dir_to, existing)
