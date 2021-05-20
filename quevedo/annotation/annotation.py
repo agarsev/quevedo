@@ -1,4 +1,5 @@
 # 2020-11-11 Antonio F. G. Sevilla <afgs@ucm.es>
+# Licensed under the Open Software License version 3.0
 
 from enum import Flag
 import json

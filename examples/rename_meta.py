@@ -1,4 +1,5 @@
 # 2021-02-22 Antonio F. G. Sevilla <afgs@ucm.es>
+# Licensed under the Open Software License version 3.0
 #
 # Example of a script that changes meta keys names. For example if you
 # misspelled them in a previous script like I did... Or maybe if you realize a

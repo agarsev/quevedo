@@ -2,9 +2,9 @@
 
 ## Version 1
 
-- [o] License
+- [O] License
     - [X] Add license file
-    - [ ] Add OSL 3 notice to own source (after copyright)
+    - [X] Add OSL 3 notice to own source (after copyright)
     - [ ] Add license information for the dependencies, and link to this info in
         the web interface.
 - [o] README.md 
@@ -24,6 +24,9 @@
         stats
 - [ ] Developer guide
 - [ ] Deploy documentation
+- [ ] Publish
+    - [ ] Github Release
+    - [ ] Publish to PyPI
 
 Notes to document:
 

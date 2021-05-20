@@ -1,4 +1,5 @@
 // 2021-03-22 Antonio F. G. Sevilla <afgs@ucm.es>
+// Licensed under the Open Software License version 3.0
 
 const html = htm.bind(preact.h);
 const { useState, useEffect, useRef } = preactHooks;

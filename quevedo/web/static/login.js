@@ -1,4 +1,5 @@
 // 2021-03-03 Antonio F. G. Sevilla <afgs@ucm.es>
+// Licensed under the Open Software License version 3.0
 
 import Text from './i18n.js';
 

@@ -1,4 +1,5 @@
 # 2021-02-22 Antonio F. G. Sevilla <afgs@ucm.es>
+# Licensed under the Open Software License version 3.0
 #
 # Example of a script that moves tags one position down in a dataset and subset
 # (sudbir). This can be useful if you need to add a new tag to the tag schema,

@@ -39,7 +39,8 @@ For more information, and the list of commands, run `poetry run quevedo --help`.
 
 Author: [Antonio F. G. Sevilla](https://github.com/agarsev) <afgs@ucm.es>
 
-Quevedo is licensed under the Open Software License version 3.0.
+Quevedo is licensed under the [Open Software License version
+3.0](https://opensource.org/licenses/OSL-3.0).
 
 [darknet]: https://pjreddie.com/darknet/install/
 [poetry]: https://python-poetry.org/

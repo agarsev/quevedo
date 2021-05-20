@@ -1,4 +1,5 @@
 // 2020-12-02 Antonio F. G. Sevilla <afgs@ucm.es>
+// Licensed under the Open Software License version 3.0
 
 import Text from './i18n.js';
 import { useChangeStack, useList } from './common_state.js';

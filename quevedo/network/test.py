@@ -1,4 +1,5 @@
 # 2020-05-06 Antonio F. G. Sevilla <afgs@ucm.es>
+# Licensed under the Open Software License version 3.0
 
 import click
 from collections import Counter

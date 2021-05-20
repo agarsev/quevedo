@@ -1,4 +1,5 @@
 # 2020-10-08 Antonio F. G. Sevilla <afgs@ucm.es>
+# Licensed under the Open Software License version 3.0
 
 import json
 import os

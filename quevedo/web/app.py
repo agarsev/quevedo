@@ -1,4 +1,5 @@
 # 2020-04-07 Antonio F. G. Sevilla <afgs@ucm.es>
+# Licensed under the Open Software License version 3.0
 # vi:foldmethod=marker
 
 from flask import Flask, request, send_from_directory, session, redirect

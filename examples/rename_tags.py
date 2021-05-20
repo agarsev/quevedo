@@ -1,4 +1,5 @@
 # 2021-02-22 Antonio F. G. Sevilla <afgs@ucm.es>
+# Licensed under the Open Software License version 3.0
 #
 # Example of a script that translates tags values (annotations) from an old
 # naming schema to a new one. That is, it modifies the values written in by the

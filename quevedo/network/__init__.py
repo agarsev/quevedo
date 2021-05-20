@@ -1,4 +1,5 @@
 # 2021-04-21 Antonio F. G. Sevilla <afgs@ucm.es>
+# Licensed under the Open Software License version 3.0
 
 
 from .detect import DetectNet
