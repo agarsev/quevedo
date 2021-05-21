@@ -26,6 +26,7 @@
     - [ ] VISSE
     - [ ] Dependencies
     - [ ] License
+- [ ] Links between concepts and pages in the docs
 - [ ] Examples
     - [ ] Scripts for use of quevedo as library and for use as internal script
         (fixing tags, changing images, etc.)

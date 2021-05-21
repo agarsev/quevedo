@@ -6,6 +6,7 @@ nav:
   - Home: index.md
   - User Guides:
     - concepts.md
+    - nets.md
     - User_guide.md
     - config.md
     - data_augmentation.md

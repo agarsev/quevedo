@@ -93,26 +93,32 @@ evaluate different metrics on the dataset, or shell scripts to process images or
 extract annotation information. A special case are python files (ending in
 `.py`) which Quevedo can understand (TODO: link scripts) 
 
-
-```
+```txt
 dataset_root
-|- config.toml
-|- logograms
-|  |- subset_1
-|  |  |- 1.png
-|  |  |- 1.json
-|  |  |- 2.png
-|  |  |- 2.json
-|  |  \- ...
-|  \- other_subset
-|- graphemes
-|- networks
-|  |- network_1
-|  |  |- train
-|  |  |- weights
-|  |  \- ...
-|  \- network_2
-|- scripts
+├─ config.toml
+├─ logograms
+│  ├─ subset_1
+│  │  ├─ 1.png
+│  │  ├─ 1.json
+│  │  ├─ 2.png
+│  │  ├─ 2.json
+│  │  └─ ...
+│  └─ other_subset
+├─ graphemes
+│  ├─ subset_1
+│  │  ├─ 1.png
+│  │  ├─ 1.json
+│  │  └─ ...
+│  └─ other_subset
+├─ networks
+│  ├─ network_1
+│  │  ├─ train
+│  │  ├─ darknet.cfg
+│  │  ├─ darknet_final.weights
+│  │  ├─ results.json
+│  │  └─ ...
+│  └─ network_2
+└─ scripts
 ```
 
 *Example of a Quevedo dataset directory structure*
@@ -125,10 +131,6 @@ standard formats, Quevedo datasets can interact nicely with other tools, such as
 therefore a DVC repository too. This can help with dataset sharing and
 experiment reproducibility. We recommend using git to track configuration files
 and scripts, and DVC to track source data, annotations, and experiments.
-
-## Networks
-
-TODO
 
 
 [UML]: https://www.uml.org/
