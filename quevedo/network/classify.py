@@ -49,7 +49,12 @@ class ClassifyNet(Network):
         # TODO: Read somewhere how to choose these params
         template = Template((Path(__file__).parent.parent /
                              'darknet/alexnet.cfg').read_text())
+        augment = self.config.get('augment', {})
         return template.substitute(
+            flip=augment.get('flip', 0),
+            angle=augment.get('angle', 0),
+            exposure=augment.get('exposure', 0),
+            aspect=augment.get('aspect', 0),
             num_classes=num_classes,
             num_max_batches=num_classes * 10,  # maybe?
             num_connected=num_classes * 10)

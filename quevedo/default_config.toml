@@ -48,6 +48,13 @@ subject = "Classify graphemes"
 # include = [ "value" ]  # Values for the criterion to use
 # # exclude = [ "value" ]  # Alternatively, values to exclude
 
+# Automatic data augmentation can be configured here:
+# [network.two.augment]
+# angle = 10
+# flip = 1  # yes/no, 1/0
+# exposure = 0.8
+# aspect = 0.8  # only for classify tasks
+
 # Add more networks like so:
 # [network.other]
 # task = "detect" or "classify"
