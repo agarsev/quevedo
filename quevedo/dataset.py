@@ -188,14 +188,20 @@ def style(condition, right, wrong=None):
 @click.command('add_images')
 @click.pass_obj
 @click.option('--image_dir', '-i', multiple=True, type=click.Path(exists=True),
-              required=True, help="Directory from which to import images")
+              required=True, help="Directory from which to import images.")
 @click.option('--grapheme-set', '-g', help="Import the images to this grapheme set.")
 @click.option('--logogram-set', '-l', help="Import the images to this logogram set.")
 @click.option('-m', '--merge', 'existing', flag_value='m',
               help='''Merge new images with existing ones, if any.''')
 @click.option('-r', '--replace', 'existing', flag_value='r',
               help='''Replace old images with new ones, if any.''')
-def add_images(obj, image_dir, grapheme_set, logogram_set, existing):
+@click.option('--sort-numeric', 'sort', flag_value='1',
+              help="Sort images ids by filename (numeric).")
+@click.option('--sort-alphabetic', 'sort', flag_value='a',
+              help="Sort images ids by filename (alphabetic).")
+@click.option('--no-sort', 'sort', flag_value='n',
+              help="Don't sort images to import.  [default]")
+def add_images(obj, image_dir, grapheme_set, logogram_set, existing, sort):
     '''Import images from external directories into the dataset.'''
     dataset = obj['dataset']
 
@@ -216,7 +222,12 @@ def add_images(obj, image_dir, grapheme_set, logogram_set, existing):
         click.echo("Importing images from '{}' to '{}'...".format(
             d, dest_dir), nl=False)
         num = 0
-        for img in Path(d).glob('*.png'):
+        sources = Path(d).glob('*.png')
+        if sort == 'a':
+            sources = sorted(sources)
+        elif sort == '1':
+            sources = sorted(sources, key=lambda fn: int(fn.stem))
+        for img in sources:
             dataset.new_single(target, dest, image_path=img)
             num = num + 1
         click.echo("imported {}".format(style(num > 0, num)))

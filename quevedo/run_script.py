@@ -17,7 +17,7 @@ def module_from_file(module_name, file_path):
     return module
 
 
-@click.command()
+@click.command("run_script")
 @click.option('--scriptname', '-s', required=True,
               help="Name of the script to run, without path or extension")
 @click.option('--grapheme-set', '-g', multiple=True,

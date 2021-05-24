@@ -21,8 +21,8 @@ From now on, everything run in the dataset directory
 ## Add data
 
     quevedo add_images -i image_directory -l logogram_set
-    dvc add logograms
-    git add logograms.dvc .gitignore
+    dvc add logograms/*
+    git add logograms/logogram_set.dvc logograms/.gitignore
     git commit -m "Imported logograms"
 
 ## Automatically process the data
