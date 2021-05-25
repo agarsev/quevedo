@@ -29,7 +29,7 @@ Commands:
   info        Get general status information about a dataset.
   predict     Get predictions for an image using the trained neural network.
   prepare     Create the files needed for training and using this network.
-  run-script  Run a data processing script on dataset objects.
+  run_script  Run a data processing script on dataset objects.
   split       Split files into train and test groups.
   test        Compute evaluation metrics for a trained neural network.
   train       Train the neural network.
@@ -102,12 +102,18 @@ Usage: quevedo add_images [OPTIONS]
 
   Import images from external directories into the dataset.
 
+  For now, images need to be in the PNG format, and have 3 channels (color)
+  and 8 bit depth.
+
 Options:
-  -i, --image_dir PATH     Directory from which to import images  [required]
+  -i, --image_dir PATH     Directory from which to import images.  [required]
   -g, --grapheme-set TEXT  Import the images to this grapheme set.
   -l, --logogram-set TEXT  Import the images to this logogram set.
   -m, --merge              Merge new images with existing ones, if any.
   -r, --replace            Replace old images with new ones, if any.
+  --sort-numeric           Sort images ids by filename (numeric).
+  --sort-alphabetic        Sort images ids by filename (alphabetic).
+  --no-sort                Don't sort images to import.  [default]
   --help                   Show this message and exit.
 ```
 
@@ -249,10 +255,10 @@ Options:
   --help                    Show this message and exit.
 ```
 
-## `run-script`
+## `run_script`
 
 ```txt
-Usage: quevedo run-script [OPTIONS]
+Usage: quevedo run_script [OPTIONS]
 
   Run a data processing script on dataset objects.
 

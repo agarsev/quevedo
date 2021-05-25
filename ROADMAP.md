@@ -7,26 +7,19 @@
     - [X] Add OSL 3 notice to own source (after copyright)
     - [ ] Add license information for the dependencies, and link to this info in
         the web interface.
-- [o] README.md 
+- [X] README.md 
     - [X] Overview
     - [X] Authorship
-    - [ ] Installation
-    - [ ] Usage
+    - [X] Installation
+    - [X] Usage
 - [o] Docs
     - [X] Concepts
     - [X] Networks
-        - [X] explain
-        - [X] config
-        - [X] usage
     - [ ] Config file
     - [X] CLI
     - [ ] Web application
     - [ ] Developer guide / as library
     - [ ] Use with DVC?
-- [ ] About
-    - [ ] VISSE
-    - [ ] Dependencies
-    - [ ] License
 - [ ] Links between concepts and pages in the docs
 - [ ] Examples
     - [ ] Scripts for use of quevedo as library and for use as internal script
@@ -39,13 +32,6 @@
 - [ ] Publish
     - [ ] Github Release
     - [ ] Publish to PyPI
-
-Notes to document:
-
-- images need to be 3 channel
-- To add languages for the web, copy and edit a file in `/quevedo/web/static/i18n`
-- When training, if a file's corresponding tag is missing, the file is ignored.
-    If multitag, only ignored if all tags are missing (not tested)
 
 ## Future
 

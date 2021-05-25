@@ -1,4 +1,4 @@
-site_name: Quevedo
+site_name: Quevedo Documentation
 site_description: |
   Documentation for Quevedo: a tool for managing datasets of images with complex semantics
 repo_url: https://github.com/agarsev/quevedo
@@ -8,10 +8,11 @@ nav:
     - concepts.md
     - nets.md
   - Usage:
-    - cli.md
     - config.md
+    - cli.md
     - web.md
   - Guides:
+    - dev.md
     - User_guide.md
     - with_dvc.md
 edit_uri: ''

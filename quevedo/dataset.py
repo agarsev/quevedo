@@ -202,7 +202,10 @@ def style(condition, right, wrong=None):
 @click.option('--no-sort', 'sort', flag_value='n',
               help="Don't sort images to import.  [default]")
 def add_images(obj, image_dir, grapheme_set, logogram_set, existing, sort):
-    '''Import images from external directories into the dataset.'''
+    '''Import images from external directories into the dataset.
+
+    For now, images need to be in the PNG format, and have 3 channels (color)
+    and 8 bit depth.'''
     dataset = obj['dataset']
 
     if grapheme_set is not None:

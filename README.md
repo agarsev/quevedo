@@ -21,27 +21,94 @@ documentation HERE (TODO).
 
 ## Installation
 
-Base requirements: [python 3], [poetry], [darknet].
+Quevedo requires `python >= 3.7`, and can be installed from PyPI: (TODO)
 
-- [ ] Install darknet for training
-- [ ] Install with wheel
-- [ ] Install for development - poetry, dependencies, building, etc
+```shell
+$ python3 -m pip install quevedo
+```
+
+Or directly from the wheel in the release file (TODO)
+
+```shell
+$ curl blabla
+$ python3 -m pip install quevedo-wheel-blabla
+```
+
+To use the neural network module, you will also need [to install darknet](TODO:
+link to docs nets#installation).
+
+### Development
+
+To develop on quevedo, we use [poetry] as our environment, dependency and build
+management tool. In the quevedo code directory, run:
+
+```shell
+$ poetry install
+```
+
+Then you can run quevedo with
+
+```shell
+$ poetry run quevedo
+```
 
 ## Usage
 
-- Development: `poetry run quevedo -D <PATH_TO_THE_DATASET> command`.
-- In the dataset directory: `quevedo command`.
-- In other directory: `quevedo -D <PATH_TO_THE_DATASET> command`.
+To create a dataset:
 
-For more information, and the list of commands, run `poetry run quevedo --help`.
+```shell
+$ quevedo -D path/to/new/dataset create
+```
+
+Then you can **cd** into the dataset directory so that the `-D` option is not
+needed.
+
+To see information about a downloaded dataset:
+
+```shell
+$ quevedo info
+```
+
+To launch the web interface
+
+```shell
+$ quevedo web
+```
+
+For more information, and the list of commands, run `quevedo --help` or `quevedo
+<command> --help` or see [here](TODO: link to docs/cli.md).
+
+## Dependencies
+
+Quevedo makes use of the following open source projects:
+
+- [python 3]
+- [poetry]
+- [darknet]
+- [click]
+- [flask]
+- [preactjs]
+
+Additionally, we use the [toml] and [forcelayout] libraries, and build our
+documentation with [mkdocs].
 
 ## About
-
-Author: [Antonio F. G. Sevilla](https://github.com/agarsev) <afgs@ucm.es>
 
 Quevedo is licensed under the [Open Software License version
 3.0](https://opensource.org/licenses/OSL-3.0).
 
+### VisSE team
+
+- [Antonio F. G. Sevilla](https://github.com/agarsev) <afgs@ucm.es>
+- [Alberto Díaz Esteban](https://www.ucm.es/directorio?id=20069)
+- [Jose María Lahoz-Bengoechea](https://ucm.es/lengespyteoliter/cv-lahoz-bengoechea-jose-maria)
+
 [darknet]: https://pjreddie.com/darknet/install/
 [poetry]: https://python-poetry.org/
 [python 3]: https://www.python.org/
+[click]: https://click.palletsprojects.com/
+[flask]: https://flask.palletsprojects.com/en/2.0.x/
+[preactjs]: https://preactjs.com/
+[toml]: https://pypi.org/project/toml/
+[forcelayout]: https://pypi.org/project/forcelayout/
+[mkdocs]: https://www.mkdocs.org/
