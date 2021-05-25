@@ -151,13 +151,73 @@ In visual writing systems, not all of this transformations are without meaning,
 so by default they are disabled so that the user can choose which options make
 sense for their particular use case and data.
 
-### Full Example
+## Usage
+
+### At the command line
+ 
+Once the network has been configured, the files necessary for training it can be
+created by running [`prepare`](cli.md#prepare). This will create a directory in
+the dataset, under `networks`, with the name of the neural network. By default,
+Quevedo will use the neural network marked with `default = True`, so to change
+to a different one use the option `-N <network>` (since this is an option common
+too many commands, it must be used after the `quevedo` binary name but *before*
+the command).
+
+Once the directory with all the files needed for training has been created, a
+simple invocation of [`train`](cli.md#train) will launch the darknet executable to
+train the neural network. This command can be interrupted, and if enough time
+has passed that some partial training weights have been found, it can be later
+resumed by calling `train` again (to train from zero, use `--no-resume`).
+
+The weights obtained by the training process will be stored in the network
+directory with the name `darknet_final.weights`. This is a darknet file that can
+be used independently of Quevedo.
+
+To evaluate the results, the [`test`](cli.md#test) command can be used, which will
+get the predictions from the net for the annotations marked as "test" (see
+[`split`](cli.md#split)) and output some metrics, and optionally the full
+predictions as a **csv** file so that fine metrics or visualizations can be
+computed with something else (like [R]). The [`predict`](cli.md#predict) command
+can be used to directly get the predictions from the neural network for some
+image, not necessarily one in the dataset.
+
+Since commands can be chained, a full pipeline of training and testing the net
+can be written as:
+
+```shell
+$ quevedo -D path/to/dataset -N network_name prepare train test
+```
+
+### At the web interface
+
+Trained neural networks can also be used at the web interface. Networks for
+detection will be available for logograms, and classifier ones will be available
+for graphemes. They will be listed at the top right of the interface. When
+running them, the current annotation image will be fed to the neural network,
+and the predictions applied (but not saved until the user presses the **save**
+button). This can be used to visualize the neural network results, or to
+bootstrap manual annotation of logograms and graphemes.
+
+TODO: image
+
+TODO: link to page about web
+
+## Example Configuration
 
 ```toml
+# Annotations for each grapheme
 tag_schema = [ "COARSE", "FINE", "ALTERATION" ]
 
+# Configuration for the darknet binary and library
+[darknet]
+path = "darknet/darknet" 
+library = "darknet/libdarknet.so"
+# By passing the -mjpeg_port argument to darknet, a live image of training
+# progress can be seen at that port (in localhost)
+options = [ "-mjpeg_port", "8090" ]
+
 # Detect graphemes in logograms, and also assign a coarse-grained tag
-[network.detect]
+[network.logograms]
 subject = "Detect and classify coarse grain graphemes in a logogram"
 default = true
 task = "detect"
@@ -194,13 +254,9 @@ criterion = "FINE"
 include = [ "multifaceted", "accentuated" ]
 ```
 
-## Usage
-
-- [ ] Use on the CLI
-- [ ] Use on the web interface
-
 [Darknet]: http://pjreddie.com/darknet/
 [YOLO]: https://pjreddie.com/darknet/yolo/
+[R]: https://www.r-project.org/
 
 [^AlexNet]:
     Krizhevsky, Alex; Sutskever, Ilya; Hinton, Geoffrey E.

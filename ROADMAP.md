@@ -14,10 +14,10 @@
     - [ ] Usage
 - [o] Docs
     - [X] Concepts
-    - [O] Networks
+    - [X] Networks
         - [X] explain
         - [X] config
-        - [ ] usage
+        - [X] usage
     - [ ] Config file
     - [X] CLI
     - [ ] Web application

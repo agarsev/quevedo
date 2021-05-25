@@ -10,11 +10,15 @@ nav:
   - Usage:
     - cli.md
     - config.md
+    - web.md
   - Guides:
     - User_guide.md
+    - with_dvc.md
 edit_uri: ''
 site_dir: dist/docs
 theme: readthedocs
 markdown_extensions:
   - footnotes
   - admonition
+  - toc:
+      permalink: True
