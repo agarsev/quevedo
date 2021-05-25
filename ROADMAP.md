@@ -12,16 +12,17 @@
     - [X] Authorship
     - [ ] Installation
     - [ ] Usage
-- [.] User guides
+- [o] Docs
     - [X] Concepts
-    - [ ] Networks
+    - [O] Networks
+        - [X] explain
+        - [X] config
+        - [ ] usage
     - [ ] Config file
-    - [ ] Data augmentation
-    - [ ] Step by step
-- [o] Usage
     - [X] CLI
     - [ ] Web application
     - [ ] Developer guide / as library
+    - [ ] Use with DVC?
 - [ ] About
     - [ ] VISSE
     - [ ] Dependencies
@@ -33,6 +34,7 @@
     - [ ] Example notebooks
     - [ ] Example R notebook computing eg. confusion matrix from test and other
         stats?
+- [ ] TODOs
 - [ ] Deploy documentation
 - [ ] Publish
     - [ ] Github Release

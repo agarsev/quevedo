@@ -1,4 +1,4 @@
-# Concepts
+# Quevedo Datasets
 
 Quevedo datasets consist of source images, annotations on those images, and
 other metadata that can help with their interpretation. While it can be used for

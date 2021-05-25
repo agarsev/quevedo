@@ -56,13 +56,160 @@ binary for training can be set in the `options` key.
 
 ## Network configuration
 
-Section in config
+Neural networks are ideal to deal with image data, due to their ability to
+find patterns and their combinations. Quevedo can help with preparing the
+configuration and training files to train darknet neural networks, can launch
+the actual training, and can compute evaluation metrics on the resulting network
+weights. It can also be used as a library to peruse the trained network in an
+application, not only for research.
+
+But no net is a silver bullet for every kind problem, and Quevedo datasets deal
+with different types of data with complex annotations. Therefore, Quevedo allows
+different network configurations to be kept in the configuration file, aiding
+both ensemble applications and exploration of the problem space.
+
+To add a neural network configuration to Quevedo, add a section to the
+`config.toml` file with the heading `[network.<network_name>]`. The initial
+configuration file that Quevedo creates for every dataset contains some examples
+that can be commented out and modified.
+
+Under this heading, different options can be set, like a `subject` key that
+gives a brief description of the purpose of the network. The most important
+configuration option is `task`, which can take the values `classify` or
+`detect`.
+
+### Classifier
+
+Classifier networks can be used with individual graphemes, and therefore use the
+data in the grapheme subsets of the dataset. Classify networks see the image as
+a whole, and try to find the best matching "class" from the classes they have
+been trained in. In Quevedo, classify networks are built with the
+AlexNet[^AlexNet]
+architecture , a CNN well suited to the task.
+
+### Detector
+
+Detector networks try to find objects in an image, and therefore are well suited
+for finding the different graphemes that make up a logogram. Apart from
+detecting the boundary boxes of the different objects, they can also do
+classification of the objects themselves. Depending on the nature and complexity
+of the data, classification of graphemes can be performed by the same network
+that detects them within a logogram, or can be better split into a different (or
+many) classifier networks. The detector network architecture used by Quevedo is
+YOLOv3[^YOLOv3].
+
+!!! note
+    After the prepare step of network use, a network configuration file is
+    produced that can be edited to fine-tune the network architecture.
+
+### Tag selection
+
+Since Quevedo datasets support a multi-tag annotation schema, a single
+"class"/"label" has to be selected for the networks in order to perform
+classification (including detector networks, since they have a classification
+step). By default the first tag of the tag schema will be used, but other tags
+can be selected by writing `tag = "some_tag_in_the_schema"`. A combination of
+the tags can be used by listing them, for example
+`tag = [ "some_tag", "some_other_tag" ]`. This will produce a single label for
+each grapheme by combining the values of the tags with an underscore in between,
+and train and evaluate the network with that single label.
+
+### Annotation selection
+
+To specify what subsets of data to use for training and testing of a neural
+network, we can list the names in the `subsets` option.  Additionally, we might
+want to select some logograms or graphemes to use for a particular network based
+on the tag values. We can do this by leaving the relevant tags for that network
+empty, in which case Quevedo will skip the annotation.
+
+In classify networks, finer control can also be achieved using a "filter"
+section for the network configuration. This filter accepts a key `criterion`
+which determines what tag from the annotation schema to use to select
+annotations. Then, an `include` or `exclude` key can be set to the list of
+values to filter. When `include` is used, if a grapheme is tagged with any of
+the values in the list, it is included for training and test, otherwise it is
+ignored. With `exclude`, the reverse happens.
+
+### Data augmentation
+
+Recent versions of darknet include automatic data augmentation that happens "on
+the fly", while the network is being trained. This data augmentation is not
+based on semantics of the images, but on image properties like contrast or
+rotation. By slightly and randomly modifying the images that the network is
+trained on, overfitting can be avoided and better generalization achieved. Some
+relevant options for grapheme and logogram recognition are supported by Quevedo,
+and if set in the network configuration will be written into the Darknet
+configuration file.
+
+The header to use is `[network.<network_name>.augment]`, and
+the options supported are `angle` (randomly rotate images up to this amount of
+degrees), `exposure` (change brightness of the image), `flip` (if set to `1`,
+images are sometimes flipped), and, only for classify networks `aspect`, which
+modifies the grapheme width/height relation.
+
+In visual writing systems, not all of this transformations are without meaning,
+so by default they are disabled so that the user can choose which options make
+sense for their particular use case and data.
+
+### Full Example
+
+```toml
+tag_schema = [ "COARSE", "FINE", "ALTERATION" ]
+
+# Detect graphemes in logograms, and also assign a coarse-grained tag
+[network.detect]
+subject = "Detect and classify coarse grain graphemes in a logogram"
+default = true
+task = "detect"
+tag = "COARSE"
+subsets = [ "italian", "spanish" ]
+
+[network.shapes]
+subject = "Classify grapheme shapes"
+task = "classify"
+tag = [ "FINE" ]
+subsets = [ "simple", "complicated" ]
+
+# When training grapheme classification, augment the data
+[network.shapes.augment]
+angle = 10
+exposure = 0.5
+
+# Some graphemes present alterations, annotated in the "ALTERATION" tag. We want
+# to train a specific classifier for these graphemes
+[network.altered]
+subject = "Classify the alterations of 'complicated' graphemes"
+task = "classify"
+# The label to train will be a concatenation of the "fine" tag and the
+# "alteration"
+tag = [ "FINE", "ALTERATION" ]
+# We have stored the graphemes with these alterations in the "complicated"
+# subset
+subsets = [ "complicated" ]
+
+# Only graphemes with the values "multifaceted" or " accentuated" for the
+# "FINE" tag will be used
+[network.altered.filter]
+criterion = "FINE"
+include = [ "multifaceted", "accentuated" ]
+```
 
 ## Usage
 
-## Detector
-
-## Classifier
+- [ ] Use on the CLI
+- [ ] Use on the web interface
 
 [Darknet]: http://pjreddie.com/darknet/
 [YOLO]: https://pjreddie.com/darknet/yolo/
+
+[^AlexNet]:
+    Krizhevsky, Alex; Sutskever, Ilya; Hinton, Geoffrey E.
+    (2017). ["ImageNet classification with deep convolutional neural
+    networks"](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf).
+    *Communications of the ACM. 60 (6): 84–90. doi:10.1145/3065386. ISSN 0001-0782.
+    S2CID 195908774.*
+
+[^YOLOv3]:
+    Redmon, Joseph and Farhadi, Ali (2018). ["YOLOv3: An Incremental
+    Improvement"](https://arxiv.org/pdf/1804.02767.pdf;). *arXiv preprint
+    arXiv:1804.02767.*

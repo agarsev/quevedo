@@ -39,6 +39,7 @@ subject = "Focus on grapheme type learning and recognition"
 [network.two]
 task = "classify"
 # tag = "tag"
+# tag = [ "tag1", "tag2" ] # A combination of tags can be used as the network "class"
 subsets = [ "default" ]
 subject = "Classify graphemes"
 

@@ -4,14 +4,17 @@ site_description: |
 repo_url: https://github.com/agarsev/quevedo
 nav:
   - Home: index.md
-  - User Guides:
+  - Concepts:
     - concepts.md
     - nets.md
-    - User_guide.md
-    - config.md
-    - data_augmentation.md
   - Usage:
     - cli.md
+    - config.md
+  - Guides:
+    - User_guide.md
 edit_uri: ''
 site_dir: dist/docs
 theme: readthedocs
+markdown_extensions:
+  - footnotes
+  - admonition
