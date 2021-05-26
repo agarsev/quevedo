@@ -18,7 +18,7 @@ function getNextColor () {
 
 export function LogogramEditor (props) {
     return html`
-        <h2>${Text['graphemes']}</h2>
+        <h2>${Text['logogram_annotation']}</h2>
         <${GraphemeList} ...${props} />
     `;
 }

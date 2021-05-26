@@ -12,12 +12,12 @@
     - [X] Authorship
     - [X] Installation
     - [X] Usage
-- [o] Docs
+- [O] Docs
     - [X] Concepts
     - [X] Networks
     - [ ] Config file
     - [X] CLI
-    - [ ] Web application
+    - [X] Web application
     - [ ] Developer guide / as library
     - [ ] Use with DVC?
 - [ ] Links between concepts and pages in the docs

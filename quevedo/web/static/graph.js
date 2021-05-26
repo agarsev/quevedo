@@ -7,7 +7,7 @@ import Text from './i18n.js';
 
 export function GraphemeEditor ({ id, tags, columns }) {
     return html`
-        <h2>${Text['graphemes']}</h2>
+        <h2>${Text['grapheme_annotation']}</h2>
         <div class="GraphemeList">
             <div class="Annotation">
                 <img src="img/${id.full}.png" />

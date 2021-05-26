@@ -22,5 +22,6 @@ export default {
     saving: 'Guardando...', // Message when sending changes to server
     saved: 'Guardado', // Message when changes were succesfully saved
     meta: 'Metadatos', // Additional information for an annotation
-    graphemes: 'Grafemas (pinchar y arrastrar para dibujar)', // Title of grapheme list and box
+    logogram_annotation: 'Etiquetas (pinchar y arrastrar para dibujar)',
+    grapheme_annotation: 'Etiquetas',
 };

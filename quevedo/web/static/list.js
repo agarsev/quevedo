@@ -76,9 +76,13 @@ function DirEntry ({ name, count, target }) {
 }
 
 function NewDir ({ upload }) {
+    let new_dir = () => {
+        let name = prompt(Text['name_for_subset']);
+        if (name) upload(name);
+    };
     return html`<li class="Entry DirEntry">
         <h2>${Text['new_subset']}</h2>
-        <a href="#" onclick=${() => upload(prompt(Text['name_for_subset']))}>📤</a>
+        <a href="#" onclick=${new_dir}>📤</a>
     </li>`;
 }
 
@@ -127,7 +131,9 @@ function AnnoEntry ({ id, title, set, annotated }) {
         title;
     return html`<li class="Entry LogoEntry">
         <h2>${id} — ${title} <span class="set">(${set})</span></h2>
-        <img src="img/${dir}/${id}.png" onclick=${() => window.location=edit_link}/>
+        <a href="${edit_link}">
+            <img src="img/${dir}/${id}.png" />
+        </a>
         <p>
             <a href="${edit_link}">📝</a>
             ${annotated>0?`✔️ (${annotated})`:null}
