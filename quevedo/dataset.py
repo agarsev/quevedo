@@ -15,12 +15,19 @@ from quevedo.annotation import Annotation, Target, Logogram, Grapheme
 
 
 class Dataset:
-    ''' Class representing a SW dataset'''
+    '''Class representing a Quevedo dataset.
 
+    It provides access to the annotations, subsets, and any neural networks
+    contained.
+
+    Args:
+        path: the path to the dataset directory (existing or to be created)
+    '''
+
+    # We lazy load the dataset path to allow the "create" command to create the
+    # directory but other commands to fail if it doesn't exist. This is due to
+    # how click works, and unlikely to be fixed.
     def __init__(self, path):
-        '''We lazy load the dataset path to allow the "create" command to create the
-        directory but other commands to fail if it doesn't exist. This is due to how
-        click works, and unlikely to be fixed. '''
         self._path = Path(path)
         self.logogram_path = self._path / 'logograms'
         self.grapheme_path = self._path / 'graphemes'
@@ -29,6 +36,7 @@ class Dataset:
         self.script_path = self._path / 'scripts'
 
     def create(self):
+        '''Create or initialize a directory to be a Quevedo dataset.'''
         p = self._path
         if p.exists() and len(listdir(p)) > 0:
             raise SystemExit("Directory '{}' not empty, aborting".format(p.resolve()))
@@ -44,6 +52,10 @@ class Dataset:
         run([darknet['path'], *args, *darknet['options']])
 
     def list_networks(self):
+        '''Get a list of all neural networks for this dataset.
+
+        Returns:
+            list of [Networks](#network)'''
         return [create_network(self, n) for n in self.config['network'].keys()]
 
     def get_network(self, name):

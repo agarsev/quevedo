@@ -25,6 +25,7 @@ quevedo = "quevedo.cli:cli"
 
 [tool.poetry.dev-dependencies]
 mkdocs = "^1.1.2"
+mkapi = "^1.0.14"
 
 [build-system]
 requires = ["poetry_core>=1.0.0"]

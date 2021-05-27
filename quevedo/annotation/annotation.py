@@ -11,16 +11,25 @@ Target = Flag('AnnotationTarget', 'LOGO GRAPH')
 
 class Annotation:
     '''Class representing a single annotation of either a logogram of a
-    sign or signs in the dataset or an isolated grapheme.'''
+    sign or signs in the dataset or an isolated grapheme.
+
+    Args:
+        path: the full path to the annotation files (either source image or tag
+            dictionary, which should share path and filename but not extension
+            (the annotation dictionary need not exist).
+        '''
 
     target = None  # Should be set by concrete class
 
     def __init__(self, path):
         path = Path(path)
+        #: Number which identifies this annotation in its subset
         self.id = path.stem
         self.json_path = path.with_suffix('.json')
         self.image_path = path.with_suffix('.png')
+        #: Dictionary of metadata annotations
         self.meta = {}
+        #: Train/test split to which the annotation belongs
         self.set = 'train'
         if self.json_path.exists():
             self.update(**json.loads(self.json_path.read_text()))
