@@ -189,6 +189,24 @@ pyparsing = ">=2.2.1"
 python-dateutil = ">=2.7"
 
 [[package]]
+name = "mike"
+version = "1.0.0"
+description = "Manage multiple versions of your MkDocs-powered documentation"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+jinja2 = "*"
+mkdocs = ">=1.0"
+pyyaml = "*"
+verspec = "*"
+
+[package.extras]
+dev = ["coverage", "flake8 (>=3.0)"]
+test = ["coverage", "flake8 (>=3.0)"]
+
+[[package]]
 name = "mkapi"
 version = "1.0.14"
 description = "An Auto API Documentation tool."
@@ -336,6 +354,17 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "verspec"
+version = "0.1.0"
+description = "Flexible version handling"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.extras]
+test = ["coverage", "flake8 (>=3.7)", "mypy", "pretend", "pytest"]
+
+[[package]]
 name = "werkzeug"
 version = "2.0.1"
 description = "The comprehensive WSGI web application library."
@@ -365,7 +394,7 @@ web = ["flask"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "6daf902164009fd7016e7476cf13fee70c71af8cd9208a9e105d53f24ab66b2c"
+content-hash = "23b94e9c53c8bd6bee72a6b62c4b979e2df78ac58ad02ce7fd1955970d37783a"
 
 [metadata.files]
 click = [
@@ -508,6 +537,10 @@ matplotlib = [
     {file = "matplotlib-3.4.2-cp39-cp39-win32.whl", hash = "sha256:b1d5a2cedf5de05567c441b3a8c2651fbde56df08b82640e7f06c8cd91e201f6"},
     {file = "matplotlib-3.4.2-cp39-cp39-win_amd64.whl", hash = "sha256:df815378a754a7edd4559f8c51fc7064f779a74013644a7f5ac7a0c31f875866"},
     {file = "matplotlib-3.4.2.tar.gz", hash = "sha256:d8d994cefdff9aaba45166eb3de4f5211adb4accac85cbf97137e98f26ea0219"},
+]
+mike = [
+    {file = "mike-1.0.0-py3-none-any.whl", hash = "sha256:521261cc1d72c07b995c0b80e0031c971d8839c9720c1a884203d9e4bdc6a47b"},
+    {file = "mike-1.0.0.tar.gz", hash = "sha256:15819cef713366e58c85202a622871a0b62c85f227bc47e8525e17c7ad8198c6"},
 ]
 mkapi = [
     {file = "mkapi-1.0.14-py3-none-any.whl", hash = "sha256:88bff6a183f09a5c80acf3c9edfc32e0ff3e2585589a9b6a962aae0467a79a12"},
@@ -723,6 +756,10 @@ typing-extensions = [
     {file = "typing_extensions-3.10.0.0-py2-none-any.whl", hash = "sha256:0ac0f89795dd19de6b97debb0c6af1c70987fd80a2d62d1958f7e56fcc31b497"},
     {file = "typing_extensions-3.10.0.0-py3-none-any.whl", hash = "sha256:779383f6086d90c99ae41cf0ff39aac8a7937a9283ce0a414e5dd782f4c94a84"},
     {file = "typing_extensions-3.10.0.0.tar.gz", hash = "sha256:50b6f157849174217d0656f99dc82fe932884fb250826c18350e159ec6cdf342"},
+]
+verspec = [
+    {file = "verspec-0.1.0-py3-none-any.whl", hash = "sha256:741877d5633cc9464c45a469ae2a31e801e6dbbaa85b9675d481cda100f11c31"},
+    {file = "verspec-0.1.0.tar.gz", hash = "sha256:c4504ca697b2056cdb4bfa7121461f5a0e81809255b41c03dda4ba823637c01e"},
 ]
 werkzeug = [
     {file = "Werkzeug-2.0.1-py3-none-any.whl", hash = "sha256:6c1ec500dcdba0baa27600f6a22f6333d8b662d22027ff9f6202e3367413caa8"},

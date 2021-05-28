@@ -28,7 +28,7 @@
     - [ ] Example R notebook computing eg. confusion matrix from test and other
         stats?
 - [ ] TODOs
-- [ ] Deploy documentation
+- [X] Deploy documentation
 - [ ] Publish
     - [ ] Github Release
     - [ ] Publish to PyPI

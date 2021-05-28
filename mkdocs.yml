@@ -23,6 +23,7 @@ theme: readthedocs
 plugins:
   - mkapi:
       src_dirs: [ quevedo ]
+  - mike
 markdown_extensions:
   - footnotes
   - admonition
