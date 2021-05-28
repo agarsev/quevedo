@@ -12,19 +12,25 @@ class Network:
     graphemes.'''
 
     def __init__(self, dataset, name):
+        #: Name of the network
         self.name = name
+        #: Parent dataset
         self.dataset = dataset
         try:
+            #: Dictionary with the network configuration
             self.config = dataset.config['network'][name]
         except ValueError:
             raise SystemExit("No such network: {}".format(name))
 
+        #: Path to the network directory
         self.path = dataset.path / 'networks' / name
         self.path.mkdir(exist_ok=True, parents=True)
         self._darknet = None
 
         if 'tag' not in self.config:
+            #: function to get the relevant tag/label/class for the network from a list of tags according to the dataset's `tag_schema`
             self.get_tag = lambda tags: get_tag_by_index(tags, 0)
+            #: function to get the `tag_schema` values from the tag/label/class predicted by the network
             self.prediction_to_tag = lambda tags, tag: update_tag(tags, 0, tag)
         else:
             tag = self.config['tag']
@@ -54,32 +60,45 @@ class Network:
         return weights.exists()
 
     def get_annotations(self, set='train'):
+        '''Get the annotations configured for use with this network.
+
+        Args:
+            set: retrieve either train or test annotations.
+
+        Returns:
+            a list of relevant [Annotations](#annotations).
+        '''
         subsets = self.config.get('subsets')
         annotations = self.dataset.get_annotations(self.target, subsets)
         return [a for a in annotations if a.set == set and self.filter(a)]
 
     def filter(self, annotation):
         '''Override to control the annotations included in training by checking
-        their tags.'''
+        their tags. TODO: make protected.'''
         return True
 
     def update_tag_set(self, tag_set, annotation):
         '''Add the relevant tag from this annotation to the tag set (used while
-        collecting all tags prior to training).'''
+        collecting all tags prior to training). TODO: make protected.'''
         raise NotImplementedError
 
     def prepare_annotation(self, annotation, num, tag_set):
         '''Prepare the files needed to train this annotation. Return the name
-        that the final file (link or copy) should have.'''
+        that the final file (link or copy) should have. TODO: make protected.'''
         raise NotImplementedError
 
     def get_net_config(self, num_classes):
-        '''Get the darknet architecture (.cfg file contents) for this net.'''
+        '''Get the darknet architecture (.cfg file contents) for this net. TODO:
+        make protected.'''
         raise NotImplementedError
 
     def prepare(self):
-        ''' Creates the files needed for training and testing darknet.'''
+        '''Creates the files needed for training and testing darknet.
 
+        Stores the files in the network directory so they can be reused or
+        tracked by a version control system. Must be called before any training,
+        testing or predicting using the net.
+        '''
         annotations = self.get_annotations('train')
 
         self.train_path = self.path / 'train'
@@ -131,8 +150,14 @@ class Network:
             self.get_net_config(num_classes))
 
     def train(self, initial=None):
-        '''Trains the neural network. When finished, removes partial weights and
-        keeps only the last. Can be interrupted and optionally resumed later.'''
+        '''Trains the neural network.
+
+        When finished, removes partial weights and keeps only the last. Can be
+        interrupted and optionally resumed later.
+
+        Args:
+            initial: path to the weights from which to resume training.
+        '''
         oldcwd = os.getcwd()
         os.chdir(self.path)
         final = None
@@ -191,17 +216,41 @@ class Network:
         os.chdir(oldcwd)
 
     def predict(self, image_path):
-        '''Use the trained neural network to predict results from an image.'''
+        '''Use the trained neural network to predict results from an image.
+
+        Args:
+            image_path: path to the image in the file system.
+
+        Returns:
+            a list of dictionaries with the predictions. Each prediction has a
+            `confidence` value. Classify networks have a `tag` key for the
+            predicted class, each entry is a possible classification of the
+            image. Detector networks results are possible graphemes found, each
+            with a `name` (predicted class) and `box` (bounding box).
+            '''
         raise NotImplementedError
 
     def test(self, annotation, stats):
-        '''Use the network to get the prediction for a real annotation, compare
-        results and update stats. See test.py for `stats`.'''
+        '''Method to test the network on an annotation.
+
+        This method is intended for internal library use, you probably want to
+        use `predict` instead.
+
+        Uses the network to get the prediction for a real annotation, compare
+        results and update stats. See `test.py` for `stats`.'''
         raise NotImplementedError
 
     def auto_annotate(self, annotation):
-        '''Use the network to annotate a real instance, possibly already
-        partially annotated.'''
+        '''Use the network to automatically annotate a real instance.
+
+        In detector networks, existing bound graphemes will be removed. In
+        classify networks, tags which are not relevant to this network won't be
+        modified, so it can be used incrementally.
+
+        Args:
+            annotation: [Annotation](#annotations) to automatically tag using
+                this network's predictions.
+        '''
         raise NotImplementedError
 
 

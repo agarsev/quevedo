@@ -85,7 +85,7 @@ class Dataset:
                 file. If not provided, the default network will be returned.
 
         Returns:
-            a [Network](#network) object.
+            a [Network](#quevedonetworknetworknetwork) object.
         '''
         if name is None:
             return next(n for n in self.list_networks() if n.config['default'])

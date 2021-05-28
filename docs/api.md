@@ -13,9 +13,12 @@ For example:
 from quevedo import Dataset, Target
 
 ds = Dataset('path/to/the/dataset')
+
+# annotation is of type quevedo.Annotation
 annotation = ds.get_single(Target.GRAPH, 'subset', 32)
 print(annotation.to_dict())
 
+# net is of type quevedo.Network
 net = ds.get_network('grapheme_classify')
 net.auto_annotate(annotation)
 annotation.save()
@@ -40,4 +43,15 @@ which make up a logogram.
 
 ## Networks
 
-![mkapi](quevedo.network.network.Network)
+Network objects in Quevedo represent the network itself, but also their
+configuration, training and testing process, and use. There are two types of
+networks, Detector networks and Classifier networks (TODO: link to concepts)
+that work on logograms and graphemes, respectively.
+
+The Network base class documented here is a base class that defines general
+behaviour, but code specific to each type of network lives in its own class.
+Therefore, you should get the network from a Quevedo dataset's method
+[`get_network`](#quevedodatasetdatasetget_network) so that the proper instance
+is built.
+
+### ![mkapi](quevedo.network.network.Network)

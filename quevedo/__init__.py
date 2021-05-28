@@ -3,3 +3,4 @@
 
 from quevedo.dataset import Dataset
 from quevedo.annotation import Annotation, Target, Logogram, Grapheme
+from quevedo.network.network import Network
