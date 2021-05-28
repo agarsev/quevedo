@@ -9,7 +9,7 @@
   
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Developer guide - Quevedo Documentation</title>
+  <title>Quevedo as a library - Quevedo Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../css/theme.css" />
@@ -23,7 +23,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Developer guide";
+    var mkdocs_page_name = "Quevedo as a library";
     var mkdocs_page_input_path = "dev.md";
     var mkdocs_page_url = null;
   </script>
@@ -59,7 +59,7 @@
                     <li class="toctree-l1"><a class="reference internal" href="../nets/">Neural networks</a>
                     </li>
                 </ul>
-                <p class="caption"><span class="caption-text">Usage</span></p>
+                <p class="caption"><span class="caption-text">Admin Guides</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../config/">Dataset Configuration</a>
                     </li>
@@ -68,25 +68,26 @@
                     <li class="toctree-l1"><a class="reference internal" href="../web/">Web Interface</a>
                     </li>
                 </ul>
-                <p class="caption"><span class="caption-text">Guides</span></p>
+                <p class="caption"><span class="caption-text">User Guides</span></p>
                 <ul class="current">
                     <li class="toctree-l1"><a class="reference internal" href="../web_use/">Using the web interface</a>
-                    </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Developer guide</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#quevedo-as-a-library">Quevedo as a library</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#hack-on-quevedo">Hack on Quevedo</a>
-    </li>
-    </ul>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../User_guide/">Guide</a>
                     </li>
                     <li class="toctree-l1"><a class="" href="../with_dvc.md">None</a>
                     </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Quevedo as a library</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#call-from-python">Call from python</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#user-scripts">User scripts</a>
+    </li>
+    </ul>
+                    </li>
                 </ul>
+                <p class="caption"><span class="caption-text">API</span></p>
                 <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../api/">API</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../api/">Reference</a>
                     </li>
                 </ul>
       </div>
@@ -110,11 +111,11 @@
     
       
         
-          <li>Guides &raquo;</li>
+          <li>User Guides &raquo;</li>
         
       
     
-    <li>Developer guide</li>
+    <li>Quevedo as a library</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -125,10 +126,14 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="developer-guide">Developer guide<a class="headerlink" href="#developer-guide" title="Permanent link">&para;</a></h1>
-<h2 id="quevedo-as-a-library">Quevedo as a library<a class="headerlink" href="#quevedo-as-a-library" title="Permanent link">&para;</a></h2>
-<h2 id="hack-on-quevedo">Hack on Quevedo<a class="headerlink" href="#hack-on-quevedo" title="Permanent link">&para;</a></h2>
-<p>To add languages for the web, copy and edit a file in <code>/quevedo/web/static/i18n</code></p>
+                <h1 id="quevedo-as-a-library">Quevedo as a library<a class="headerlink" href="#quevedo-as-a-library" title="Permanent link">&para;</a></h1>
+<p>Quevedo can be used as a command line application to manage a dataset, but it
+can also be used from other Python code to make programatic access to the
+dataset more convenient, or in user scripts run by Quevedo on the dataset
+objects.</p>
+<h2 id="call-from-python">Call from python<a class="headerlink" href="#call-from-python" title="Permanent link">&para;</a></h2>
+<p>Some info, then refer to API reference.</p>
+<h2 id="user-scripts">User scripts<a class="headerlink" href="#user-scripts" title="Permanent link">&para;</a></h2>
               
             </div>
           </div>
@@ -136,10 +141,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../User_guide/" class="btn btn-neutral float-right" title="Guide">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../api/" class="btn btn-neutral float-right" title="Reference">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../web_use/" class="btn btn-neutral" title="Using the web interface"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../User_guide/" class="btn btn-neutral" title="Guide"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -167,10 +172,10 @@
           <a href="https://github.com/agarsev/quevedo" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../web_use/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../User_guide/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../User_guide/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../api/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
