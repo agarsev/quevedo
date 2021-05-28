@@ -1,6 +1,6 @@
 # Reference
 
-## Dataset
+## Datasets
 
 Dataset objects are the main entry point for user code in Quevedo. They provide
 methods to manage the dataset, but also to retrieve other objects within it.
@@ -15,23 +15,29 @@ from quevedo import Dataset, Target
 ds = Dataset('path/to/the/dataset')
 annotation = ds.get_single(Target.GRAPH, 'subset', 32)
 print(annotation.to_dict())
+
+net = ds.get_network('grapheme_classify')
+net.auto_annotate(annotation)
+annotation.save()
 ```
 
-![mkapi](quevedo.Dataset)
+### ![mkapi](quevedo.Dataset)
 
-## Target
+## Annotations
 
 Quevedo annotations are of two types, logograms and graphemes, both derived from
 the parent class `Annotation`. When it is necessary to distinguish logograms and
 graphemes in a process, there is the enum `Target`, which can take the values
 `Target.GRAPH` or `Target.LOGO`. the values `Target.GRAPH` or `Target.LOGO`.
 
-## Annotation
+There is also the `BoundGrapheme` class, used to represent each of the graphemes
+which make up a logogram.
 
-![mkapi](quevedo.annotation.Annotation)
-![mkapi](quevedo.annotation.Logogram)
-![mkapi](quevedo.annotation.Grapheme)
+### ![mkapi](quevedo.annotation.Annotation)
+### ![mkapi](quevedo.annotation.Grapheme)
+### ![mkapi](quevedo.annotation.Logogram)
+### ![mkapi](quevedo.annotation.logogram.BoundGrapheme)
 
-## Network
+## Networks
 
 ![mkapi](quevedo.network.network.Network)
