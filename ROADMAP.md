@@ -13,22 +13,20 @@
     - [X] Installation
     - [ ] How to install extras
     - [X] Usage
-- [O] Docs
+- [o] Docs
     - [ ] How to install extras
     - [X] Concepts
     - [X] Networks
     - [ ] Config file
     - [X] CLI
     - [X] Web application
-    - [ ] Developer guide / as library
-    - [ ] Use with DVC?
+    - [o] Developer guide
+        - [X] API Reference
+        - [ ] User scripts
+    - [ ] User guide
+        - [ ] Example of shell use, with git and DVC
 - [ ] Links between concepts and pages in the docs
-- [ ] Examples
-    - [ ] Scripts for use of quevedo as library and for use as internal script
-        (fixing tags, changing images, etc.)
-    - [ ] Example notebooks
-    - [ ] Example R notebook computing eg. confusion matrix from test and other
-        stats?
+- [ ] Rework examples
 - [ ] TODOs
 - [X] Deploy documentation
 - [ ] Publish

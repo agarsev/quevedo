@@ -5,8 +5,8 @@ can also be used from other Python code to make programatic access to the
 dataset more convenient, or in user scripts run by Quevedo on the dataset
 objects.
 
+## Call from python
+
+Some info, then refer to API reference.
+
 ## User scripts
-
-## Extending Quevedo
-
-To add languages for the web, copy and edit a file in `/quevedo/web/static/i18n`

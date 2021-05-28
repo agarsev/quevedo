@@ -25,7 +25,6 @@ class Network:
         #: Path to the network directory
         self.path = dataset.path / 'networks' / name
         self.path.mkdir(exist_ok=True, parents=True)
-        self._darknet = None
 
         if 'tag' not in self.config:
             #: function to get the relevant tag/label/class for the network from a list of tags according to the dataset's `tag_schema`
@@ -70,35 +69,34 @@ class Network:
         '''
         subsets = self.config.get('subsets')
         annotations = self.dataset.get_annotations(self.target, subsets)
-        return [a for a in annotations if a.set == set and self.filter(a)]
+        return [a for a in annotations if a.set == set and self._filter(a)]
 
-    def filter(self, annotation):
+    def _filter(self, annotation):
         '''Override to control the annotations included in training by checking
-        their tags. TODO: make protected.'''
+        their tags.'''
         return True
 
-    def update_tag_set(self, tag_set, annotation):
+    def _update_tag_set(self, tag_set, annotation):
         '''Add the relevant tag from this annotation to the tag set (used while
-        collecting all tags prior to training). TODO: make protected.'''
+        collecting all tags prior to training).'''
         raise NotImplementedError
 
-    def prepare_annotation(self, annotation, num, tag_set):
+    def _prepare_annotation(self, annotation, num, tag_set):
         '''Prepare the files needed to train this annotation. Return the name
-        that the final file (link or copy) should have. TODO: make protected.'''
+        that the final file (link or copy) should have.'''
         raise NotImplementedError
 
-    def get_net_config(self, num_classes):
-        '''Get the darknet architecture (.cfg file contents) for this net. TODO:
-        make protected.'''
+    def _get_net_config(self, num_classes):
+        '''Get the darknet architecture (.cfg file contents) for this net.'''
         raise NotImplementedError
 
     def prepare(self):
-        '''Creates the files needed for training and testing darknet.
+        '''Creates the files needed for training (and later using) darknet.
 
         Stores the files in the network directory so they can be reused or
-        tracked by a version control system. Must be called before any training,
-        testing or predicting using the net.
-        '''
+        tracked by a version control system. Must be called before training, and
+        files not deleted (except maybe the "train" directory) before
+        testing or predicting with the net.'''
         annotations = self.get_annotations('train')
 
         self.train_path = self.path / 'train'
@@ -111,7 +109,7 @@ class Network:
         # Collect all tags and sort them to get a deterministic list
         all_tags = set()
         for t in annotations:
-            self.update_tag_set(all_tags, t)
+            self._update_tag_set(all_tags, t)
         all_tags = sorted(all_tags)
 
         # We build a map from our tags to arbitrary labels for darknet not to
@@ -133,7 +131,7 @@ class Network:
         with open(self.path / 'train.txt', 'w') as train_file:
             num = 1
             for t in annotations:
-                link_name = self.prepare_annotation(t, num, all_tags)
+                link_name = self._prepare_annotation(t, num, all_tags)
                 if link_name is None:
                     continue
                 num = num + 1
@@ -147,7 +145,7 @@ class Network:
 
         # See the cfg template files provided from upstream
         (self.path / 'darknet.cfg').write_text(
-            self.get_net_config(num_classes))
+            self._get_net_config(num_classes))
 
     def train(self, initial=None):
         '''Trains the neural network.
@@ -185,35 +183,35 @@ class Network:
 
         return final
 
-    def load(self):
-        '''Loads the weights for the trained neural network so it can be used to
-        predict.'''
+    @property
+    def _darknet(self):
+        '''Weights of the trained neural network'''
+        if not hasattr(self, '_darknet_weights'):
 
-        if self._darknet is not None:  # Already loaded
-            return
+            if not (self.path / 'darknet.cfg').exists():
+                raise SystemExit("Neural network has not been trained")
 
-        if not (self.path / 'darknet.cfg').exists():
-            raise SystemExit("Neural network has not been trained")
+            if not (self.path / 'darknet_final.weights').exists():
+                raise SystemExit("Neural network has not been trained")
 
-        if not (self.path / 'darknet_final.weights').exists():
-            raise SystemExit("Neural network has not been trained")
+            tag_map = json.loads((self.path / 'tag_map.json').read_text())
+            self.tag_map = {v: k for k, v in tag_map.items()}
 
-        tag_map = json.loads((self.path / 'tag_map.json').read_text())
-        self.tag_map = {v: k for k, v in tag_map.items()}
+            oldcwd = os.getcwd()
+            os.chdir(self.path)
 
-        oldcwd = os.getcwd()
-        os.chdir(self.path)
+            from quevedo.darknet import DarknetShutup, DarknetNetwork
 
-        from quevedo.darknet import DarknetShutup, DarknetNetwork
+            with DarknetShutup():
+                self._darknet_weights = DarknetNetwork(
+                    libraryPath=self.dataset.config['darknet']['library'],
+                    configPath='darknet.cfg',
+                    weightPath='darknet_final.weights',
+                    metaPath='darknet.data')
 
-        with DarknetShutup():
-            self._darknet = DarknetNetwork(
-                libraryPath=self.dataset.config['darknet']['library'],
-                configPath='darknet.cfg',
-                weightPath='darknet_final.weights',
-                metaPath='darknet.data')
+            os.chdir(oldcwd)
 
-        os.chdir(oldcwd)
+        return self._darknet_weights
 
     def predict(self, image_path):
         '''Use the trained neural network to predict results from an image.

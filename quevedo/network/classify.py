@@ -24,20 +24,20 @@ class ClassifyNet(Network):
                 crit = tag_schema.index(filt['criterion'])
                 if 'include' in filt:
                     tags = set(filt['include'])
-                    self.filter = lambda a: a.tags[crit] in tags
+                    self._filter = lambda a: a.tags[crit] in tags
                 else:
                     tags = set(filt['exclude'])
-                    self.filter = lambda a: a.tags[crit] not in tags
+                    self._filter = lambda a: a.tags[crit] not in tags
             except KeyError:
                 raise RuntimeError("Incorrect filter config for network '{}'".format(
                     self.name)) from None
 
-    def update_tag_set(self, tag_set, annotation):
+    def _update_tag_set(self, tag_set, annotation):
         tag = self.get_tag(annotation.tags)
         if tag is not None:
             tag_set.add(tag)
 
-    def prepare_annotation(self, annotation, num, tag_set):
+    def _prepare_annotation(self, annotation, num, tag_set):
         # For CNN, no need to write a label file, just put the label in the
         # filename
         tag = self.get_tag(annotation.tags)
@@ -45,7 +45,7 @@ class ClassifyNet(Network):
             return None
         return "{}_{}.png".format(self.tag_map[tag], num)
 
-    def get_net_config(self, num_classes):
+    def _get_net_config(self, num_classes):
         # TODO: Read somewhere how to choose these params
         template = Template((Path(__file__).parent.parent /
                              'darknet/alexnet.cfg').read_text())
@@ -60,8 +60,6 @@ class ClassifyNet(Network):
             num_connected=num_classes * 10)
 
     def predict(self, image):
-        if self._darknet is None:
-            self.load()
         return [{
             'tag': self.tag_map[tag.decode('utf8')],
             'confidence': conf

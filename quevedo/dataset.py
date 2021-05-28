@@ -47,9 +47,9 @@ class Dataset:
     @property
     def config(self):
         '''dict: [Dataset configuration](config.md)'''
-        if not self.config_path.exists():
-            raise SystemExit("Path '{}' is not a valid dataset".format(self._path))
         if not hasattr(self, '_config'):
+            if not self.config_path.exists():
+                raise SystemExit("Path '{}' is not a valid dataset".format(self._path))
             self._config = toml.loads(self.config_path.read_text())
             if self.local_config_path.exists():
                 self._config.update(**toml.loads(self.local_config_path.read_text()))

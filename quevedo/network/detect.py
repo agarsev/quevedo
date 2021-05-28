@@ -17,7 +17,7 @@ class DetectNet(Network):
     names_file_name = 'names'  # Darknet is not very consistent
     network_type = 'detector'
 
-    def update_tag_set(self, tag_set, annotation):
+    def _update_tag_set(self, tag_set, annotation):
         try:
             tag_set.update(set(self.get_tag(g.tags)
                                for g in annotation.graphemes))
@@ -25,7 +25,7 @@ class DetectNet(Network):
             raise KeyError("Error getting annotations for logogram {} ({})".format(
                 annotation.id, json.dumps(annotation.to_dict())))
 
-    def prepare_annotation(self, annotation, num, tag_set):
+    def _prepare_annotation(self, annotation, num, tag_set):
         # For YOLO, we write an adjacent txt file with the bounding boxes and
         # the class (its index)
         link_name = "{}.png".format(num)
@@ -35,7 +35,7 @@ class DetectNet(Network):
                 *g.box) for g in annotation.graphemes))
         return link_name
 
-    def get_net_config(self, num_classes):
+    def _get_net_config(self, num_classes):
         num_max_batches = num_classes * 400  # 2000, 400 only for testing
         template = Template((Path(__file__).parent.parent /
                              'darknet/yolo.cfg').read_text())
@@ -51,9 +51,6 @@ class DetectNet(Network):
             num_steps_2=int(num_max_batches * 90 / 100))
 
     def predict(self, image):
-
-        if self._darknet is None:
-            self.load()
 
         if not isinstance(image, Image.Image):
             image = Image.open(image)

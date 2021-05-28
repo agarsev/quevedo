@@ -91,7 +91,6 @@ def test(obj, do_print, results_csv, results_json, predictions_csv, on_train):
 
     dataset = obj['dataset']
     network = dataset.get_network(obj['network'])
-    network.load()
 
     record = None
     record_path = None
