@@ -7,8 +7,8 @@ semantics, with a focus on the training and evaluation of machine learning
 algorithms on these images.
 
 Quevedo is part of the [VisSE project](https://www.ucm.es/visse). The code can
-be found at [GitHub](https://github.com/agarsev/quevedo), and detailed
-documentation HERE (TODO).
+be found at [GitHub](https://github.com/agarsev/quevedo), and [detailed
+documentation here](https://agarsev.github.io/quevedo).
 
 ## Features
 
@@ -20,6 +20,8 @@ documentation HERE (TODO).
     using [darknet].
 
 ## Installation
+
+TODO: install extras
 
 Quevedo requires `python >= 3.7`, and can be installed from PyPI: (TODO)
 
@@ -34,8 +36,8 @@ $ curl blabla
 $ python3 -m pip install quevedo-wheel-blabla
 ```
 
-To use the neural network module, you will also need [to install darknet](TODO:
-link to docs nets#installation).
+To use the neural network module, you will also need [to install
+darknet](https://agarsev.github.io/quevedo/latest/nets/#installation).
 
 ### Development
 
@@ -76,7 +78,7 @@ $ quevedo web
 ```
 
 For more information, and the list of commands, run `quevedo --help` or `quevedo
-<command> --help` or see [here](TODO: link to docs/cli.md).
+<command> --help` or see [here](https://agarsev.github.io/quevedo/latest/cli/).
 
 ## Dependencies
 
@@ -96,6 +98,9 @@ documentation with [mkdocs].
 
 Quevedo is licensed under the [Open Software License version
 3.0](https://opensource.org/licenses/OSL-3.0).
+
+Quevedo web includes a copy of [preactjs] for ease of offline use, distributed
+under the [MIT License](https://github.com/preactjs/preact/blob/master/LICENSE).
 
 ### VisSE team
 

@@ -2,17 +2,19 @@
 
 ## Version 1
 
-- [O] License
+- [X] License
     - [X] Add license file
     - [X] Add OSL 3 notice to own source (after copyright)
-    - [ ] Add license information for the dependencies, and link to this info in
+    - [X] Add license information for the dependencies, and link to this info in
         the web interface.
 - [X] README.md 
     - [X] Overview
     - [X] Authorship
     - [X] Installation
+    - [ ] How to install extras
     - [X] Usage
 - [O] Docs
+    - [ ] How to install extras
     - [X] Concepts
     - [X] Networks
     - [ ] Config file
