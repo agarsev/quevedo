@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>User Guide - Quevedo Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="//use.fontawesome.com/releases/v5.8.1/css/all.css" rel="stylesheet" />
+  <link href="//use.fontawesome.com/releases/v5.8.1/css/v4-shims.css" rel="stylesheet" />
+  <link href="../css/mkapi-common.css" rel="stylesheet" />
+  <link href="../css/mkapi-readthedocs.css" rel="stylesheet" />
+  <link href="../css/version-select.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "User Guide";
+    var mkdocs_page_input_path = "guide.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Quevedo Documentation</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Concepts</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../concepts/">Quevedo Datasets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../nets/">Neural networks</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Usage</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../config/">Dataset Configuration</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../cli/">Command Line Interface</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../web/">Web Interface</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../web_use/">Using the web interface</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../dev/">Developer guide</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../User_guide/">Guide</a>
+                    </li>
+                    <li class="toctree-l1"><a class="" href="../with_dvc.md">None</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../api/">API</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Quevedo Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>User Guide</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="user-guide">User Guide<a class="headerlink" href="#user-guide" title="Permanent link">&para;</a></h1>
+<p>This guide will walk through the steps necessary to create and populate a
+Quevedo dataset, and some examples on its use.</p>
+<h2 id="install">Install<a class="headerlink" href="#install" title="Permanent link">&para;</a></h2>
+<p>Quevedo is a python package, but it depends on darknet too, which is a C library
+by the inventor of the YOLO algorithm.</p>
+<p>To install Quevedo, you can use pip with the wheel released here (TODO):</p>
+<pre><code>$ python3 -m pip install quevedo-*.whl[web,force_layout]
+</code></pre>
+<p>This will install all extras too (web interface, force_layout for data
+augmentation). If you don't need them you can leave them out.</p>
+<p>If Quevedo was properly installed, the <code>quevedo</code> binary should be available in
+the path. You can test it using:</p>
+<pre><code>$ quevedo --help
+</code></pre>
+<p>Which will print useful help about the tool.</p>
+<h2 id="repository-creation">Repository Creation<a class="headerlink" href="#repository-creation" title="Permanent link">&para;</a></h2>
+<p>A Quevedo repository is a collection of data (in image form) and metadata
+describing that image, with the purpose of training an automatic system to
+detect within new images the metadata contained within.</p>
+<p>It has been developed in the context of SignWriting recognition.</p>
+<p>To create a new repository, first create the directory where the data will be
+stored, then call <code>quevedo create</code> in that directory. You will be asked for the
+basic dataset information, and then the directory will be populated with the
+basic structure necessary for quevedo to operate.</p>
+<pre><code>$ mkdir signwriting
+$ cd signwriting
+$ quevedo create
+Title of the dataset: SignWriting
+Description of the dataset: VISSE SignWriting dataset
+Created dataset 'SignWriting' at '/home/agarsev/visse/signwriting'
+
+Configuration can be found in 'config.toml'. We recommend
+reading it now and adapting it to this dataset, but you can
+always do it later or use the command `config`.
+View config file now? [Y/n]:
+</code></pre>
+<p>The different directories and files inside a Quevedo repository use standard
+formats, so can be inspected manually and perused with other typical
+command-line tools. However, you don't need to do it, and can see the dataset as
+a black box and only access it with the <code>quevedo</code> binary.</p>
+<p>A special file inside the dataset is found at the root, called <code>config.toml</code>. This
+file, in TOML format, contains all the user configuration of the dataset. You
+can view and edit it manually, or running <code>quevedo config</code>.</p>
+<p>You can see a summary of the dataset information using the <code>info</code> command:</p>
+<pre><code>$ quevedo info
+SignWriting
+▔▔▔▔▔▔▔▔▔▔▔
+
+VISSE SignWriting dataset
+
+Tag schema: tag
+
+Real transcriptions: 0
+Annotated: 0/0
+Symbols extracted: no
+Transcriptions generated: no
+Darknet is not properly configured in config.toml
+
+Experiment: 'default'
+▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+focus on symbol type learning and recognition
+
+Dataset is not ready for training
+Neural network hasn't been trained
+</code></pre>
+<p>::: Note
+There are two ways to tell the <code>quevedo</code> binary what dataset to use. The first
+and easiest, which will be used in this guide, is to <code>cd</code> to the dataset
+directory. By default, <code>quevedo</code> assumes the current directory is the dataset to
+manage.</p>
+<p>Otherwise, most notably for scripting purposes, you can use the <code>-D</code> option to
+quevedo, to give the path to the dataset. This must be used <em>before</em> any
+commands, for example <code>quevedo -D /home/agarsev/visse/signwriting info</code>.</p>
+<p>Creating the dataset this way will automatically create its directory, so it can
+be a quick way to initialize it. It can also use relative paths:</p>
+<pre><code>quevedo -D signwriting create
+</code></pre>
+<p>will create a subdirectory <code>signwriting</code> in the current directory, and
+initialize it as a Quevedo dataset.
+:::</p>
+<h2 id="adding-images">Adding images<a class="headerlink" href="#adding-images" title="Permanent link">&para;</a></h2>
+<p>Now that we have the structure for the dataset, it's time to populate it with
+real data, i.e. images of writing transcriptions. These should be in some
+directory in the filesystem, and must have <code>.png</code> extension. Then, just run
+<code>quevedo add_images -i &lt;PATH&gt;</code>.</p>
+<p>Example:</p>
+<pre><code>$ quevedo add_images -i /home/agarsev/vocab/
+Importing images from '/home/agarsev/vocab/' to '/home/agarsev/visse/signwriting/real/default'...imported 136
+</code></pre>
+<p>Quevedo reports how many images were succesfully imported, and the path where
+they were stored. As you can see, it put the images in a subdirectory of the
+dataset named <code>real/default</code>. All "real" images (coming from informants, or
+other type of <em>actual</em> observations) are stored in the <code>real</code> subdirectory. This
+directory is itself split in subdirectories that can be used to organize
+transcriptions in sets or batches. By default, images are assigned to the
+<code>default</code> directory. To change this, you can use the <code>--name</code> option, like so:</p>
+<pre><code>quevedo add_images -i &lt;PATH&gt; --name &lt;NAME_OF_THE_SUBSET&gt;
+</code></pre>
+<p>If you change your mind at any point, you can rename the subdirectories under
+<code>real</code>, quevedo doesn't give any special meaning to subset names.</p>
+<p>If you list the contents of the <code>real/default</code> directory, you will notice two
+things:</p>
+<ol>
+<li><em>Filenames now are numbers</em>. Quevedo numbers transcriptions in a subset
+   sequentially, so the pair subset name + number constitutes a unique id for
+   each observation.</li>
+<li><em>JSON files</em>. Along with the transcriptions, there are some new <code>.json</code>
+   files, also sequentially numbered. Quevedo stores metadata and annotations
+   for the transcriptions in these files, which can be examined by hand or other
+   tools. Each <code>&lt;number&gt;.json</code> file stores the metadata for the equally numbered
+   <code>&lt;number&gt;.png</code> transcription.</li>
+</ol>
+<p>The original file names for the transcriptions are kept in the annotation file,
+in a "notes" field, in case it is useful information. The "notes" field is only
+for users, quevedo does not peruse it in any way.</p>
+<p>If some information is to be added to the whole subset, a markdown file can be
+created in the subset directory with the name <code>README.md</code>. This file will be
+displayed in the web interface, and humans navigating the dataset manually will 
+immediately know to read it. This file can contain information regarding the
+source of the data, annotator identities, etc. Quevedo doesn't use this file in
+any way.</p>
+<p>::: Note</p>
+<p>Since the dataset is just a particular directory structure, with standard files
+in appropriate locations, it is easy to version control it using a VCS like
+git. Using <code>README.md</code> files in the appropriate locations helps users navigate
+the dataset, and tracking their changes in a VCS allows date and authorship
+information to be stored in a standard way.</p>
+<p>Using a VCS also means keeping a history of the project, and being able to
+revert changes if something goes wrong.</p>
+<p>The root of the dataset is also a good place to store licensing information (in
+a <code>LICENSE</code> file) and general human-readable information (in a <code>README.md</code>),
+different from the configuration in <code>config.toml</code>.</p>
+<p>Distributed VC systems like git also make it easy to share datasets, and
+collaborate in their preparation and annotation. For example, the dataset we are
+building in this guide can be accessed and examined at the URL @TODO@.</p>
+<p>:::</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/agarsev/quevedo" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../js/mkapi.js" defer></script>
+      <script src="../js/version-select.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

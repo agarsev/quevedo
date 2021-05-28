@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Web Interface - Quevedo Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="//use.fontawesome.com/releases/v5.8.1/css/all.css" rel="stylesheet" />
+  <link href="//use.fontawesome.com/releases/v5.8.1/css/v4-shims.css" rel="stylesheet" />
+  <link href="../css/mkapi-common.css" rel="stylesheet" />
+  <link href="../css/mkapi-readthedocs.css" rel="stylesheet" />
+  <link href="../css/version-select.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Web Interface";
+    var mkdocs_page_input_path = "web.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Quevedo Documentation</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Concepts</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../concepts/">Quevedo Datasets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../nets/">Neural networks</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Usage</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../config/">Dataset Configuration</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../cli/">Command Line Interface</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Web Interface</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#server-options">Server options</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#interface-options">Interface options</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#users">Users</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../web_use/">Using the web interface</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../dev/">Developer guide</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../User_guide/">Guide</a>
+                    </li>
+                    <li class="toctree-l1"><a class="" href="../with_dvc.md">None</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../api/">API</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Quevedo Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Usage &raquo;</li>
+        
+      
+    
+    <li>Web Interface</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="web-interface">Web Interface<a class="headerlink" href="#web-interface" title="Permanent link">&para;</a></h1>
+<p>The data that Quevedo aims to manage are highly visual, and therefore a visual
+interface can be very useful. Indeed, in the case of annotation, being able to
+see the target of annotation is fundamental. It is also a task which may
+be shared between a team, or conducted by people who are not data scientists or
+engineers and don't feel comfortable with code and a command line interface.</p>
+<p>Quevedo provides a web interface which can be used to visualize, manage and
+annotate data in a Quevedo dataset. The web interface has the advantage that is
+graphical, and it can also be run on a server or some shared computer accesible
+via the internet so that collaborators can work on the dataset without any
+infrastructure needs on their part (beyond a modern browser).</p>
+<p>To use the web interface locally, just run <code>quevedo web</code>. This will launch the
+server in a local port and open a browser window at the appropriate location. To
+quit the server, just press <code>Ctrl+C</code> in the terminal window. For more options
+see the rest of this document, and for usage of the web interface see
+<a href="../web_use/">here</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The web interface for Quevedo is not intended to be used as a permanent,
+production website, but rather to provide access to collaborators during a
+project.</p>
+</div>
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<p>Some options for the web interface can be configured in the <a href="../config/">dataset
+configuration file</a>. Since some of these settings may be sensitive,
+they can be set in the local configuration file if the dataset is going to be
+distributed publicly.</p>
+<p>The main configuration is set under the heading <code>web</code>, and the following options
+can be set:</p>
+<h2 id="server-options">Server options<a class="headerlink" href="#server-options" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>host</code>, <code>port</code>: IP address and port to bind the server to.</li>
+<li><code>mount_path</code>: path under which the application will be mounted.</li>
+<li><code>secret_key</code>: secret string to sign session cookies. You can generate a random
+    one for your installation with
+    <code>python -c 'from secrets import token_hex; print(token_hex(16))'</code>.</li>
+</ul>
+<h2 id="interface-options">Interface options<a class="headerlink" href="#interface-options" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>lang</code>: the language for messages in the web interface. Supported values for
+    now are <code>en</code> (english) or <code>es</code> (spanish).</li>
+<li><code>public</code>: If true, no login will be required. If false, access will only be
+    provided to logged in users.</li>
+</ul>
+<h2 id="users">Users<a class="headerlink" href="#users" title="Permanent link">&para;</a></h2>
+<p>To create a user (needed if the dataset interface is not set to <code>public</code>) add a
+heading <code>[web.users.&lt;user_name&gt;]</code>, with the following options:</p>
+<ul>
+<li><code>password</code>: hex digest of the sha1 hash of the password for the user. You can
+    generate the hash with the following code:
+    <code>python -c 'import hashlib; print(hashlib.new("sha1", "thepassword".encode("utf8")).hexdigest());'</code>.</li>
+<li><code>read</code>: subsets that the user has <em>read</em> access to. Can be <code>ALL</code>, <code>NONE</code>, or a
+    list of subsets to allow access to. These strings are actually
+    <a href="https://docs.python.org/3/library/re.html#regular-expression-syntax">regexes</a>, so any subset matching them will be available.</li>
+<li><code>write</code>: subsets that the user has <em>write</em> access to. Follows the same syntax
+    of <code>read</code>. Write access means adding annotations to a subset, and <em>saving</em>
+    modified annotations to the server (the annotation can be changed locally,
+    but not saved).</li>
+</ul>
+<p>Assuming we have the sets <code>spanish_a</code>, <code>spanish_b</code> and <code>english_a</code>:</p>
+<ul>
+<li><code>read = [ "spanish", "english" ]</code> will allow access to all sets.</li>
+<li><code>read = [ "spanish_a" ]</code> will only allow access to the <code>spanish_a</code> set.</li>
+<li><code>read = [ "_a" ]</code> will allow access to the <code>spanish_a</code> and <code>english_a</code> sets.</li>
+</ul>
+<p>You can use <code>^</code>, <code>$</code>, and other <a href="https://docs.python.org/3/library/re.html#regular-expression-syntax">regex</a> syntax to be more specific.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This system of managing users is not very sophisticated, intended to prevent
+mistakes or unintentional leaks of data rather than actual security. Please
+don't put here your email or bank passwords, nor ask your collaborators to
+provide them to you.</p>
+</div>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../web_use/" class="btn btn-neutral float-right" title="Using the web interface">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../cli/" class="btn btn-neutral" title="Command Line Interface"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/agarsev/quevedo" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../cli/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../web_use/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../js/mkapi.js" defer></script>
+      <script src="../js/version-select.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
