@@ -11,7 +11,7 @@ from subprocess import run
 import toml
 
 from quevedo.network import create_network
-from quevedo.annotation import Annotation, Target, Logogram, Grapheme
+from quevedo.annotation import Target, Logogram, Grapheme
 
 
 class Dataset:
@@ -35,12 +35,31 @@ class Dataset:
         self.local_config_path = self._path / 'config.local.toml'
         self.script_path = self._path / 'scripts'
 
+    @property
+    def path(self):
+        '''pathlib.Path: Path to the dataset directory.'''
+        if not hasattr(self, '_checked_path'):
+            if not self._path.exists():
+                raise SystemExit("Dataset '{}' does not exist".format(self._path))
+            self._checked_path = self._path
+        return self._checked_path
+
+    @property
+    def config(self):
+        '''dict: [Dataset configuration](config.md)'''
+        if not self.config_path.exists():
+            raise SystemExit("Path '{}' is not a valid dataset".format(self._path))
+        if not hasattr(self, '_config'):
+            self._config = toml.loads(self.config_path.read_text())
+            if self.local_config_path.exists():
+                self._config.update(**toml.loads(self.local_config_path.read_text()))
+        return self._config
+
     def create(self):
         '''Create or initialize a directory to be a Quevedo dataset.'''
         p = self._path
         if p.exists() and len(listdir(p)) > 0:
             raise SystemExit("Directory '{}' not empty, aborting".format(p.resolve()))
-        self.path = p
         (self.logogram_path).mkdir(parents=True)
         (self.grapheme_path).mkdir()
         (self.path / 'networks').mkdir()
@@ -59,12 +78,31 @@ class Dataset:
         return [create_network(self, n) for n in self.config['network'].keys()]
 
     def get_network(self, name):
+        '''Get a single neural network by name.
+
+        Args:
+            name: name of the neural network as specified in the configuration
+                file. If not provided, the default network will be returned.
+
+        Returns:
+            a [Network](#network) object.
+        '''
         if name is None:
             return next(n for n in self.list_networks() if n.config['default'])
         else:
             return create_network(self, name)
 
     def get_single(self, target: Target, subset, id):
+        '''Retrieve a single annotation.
+
+        Args:
+            target: [Target](#target) (type) of the annotation to retrieve.
+            subset: name of the subset where the annotation is stored.
+            id: number of the annotation in the subset.
+
+        Returns:
+            a single [Annotation](#annotation) of the appropriate type.
+        '''
         if target == Target.LOGO:
             return Logogram(self.logogram_path / subset / id)
         elif target == Target.GRAPH:
@@ -73,6 +111,20 @@ class Dataset:
             raise ValueError('A single target is needed')
 
     def new_single(self, target: Target, subset, **kwds):
+        '''Create a new annotation.
+
+        This method creates the annotation files in the corresponding directory,
+        and initializes them with
+        [`create_from`](#quevedo.annotation.annotation.Annotation.create_from).
+        Any extra arguments will be passed to that method.
+
+        Args:
+            target: [Target](#target) (type) of the annotation to create.
+            subset: name of the (existing) subset where to place it.
+
+        Returns:
+            the new [Annotation](#annotation).
+        '''
         if target == Target.LOGO:
             path = self.logogram_path / subset
             next_id = sum(1 for _ in path.glob('*.png')) + 1
@@ -86,8 +138,22 @@ class Dataset:
         return a
 
     def get_annotations(self, target: Target, subset=None):
-        '''Returns a generator that yields all annotations, those of a given
-        target, or only those in a given subset (or subsets) and target.'''
+        '''Get annotations from the dataset.
+
+        Depending on the arguments, all annotations, those of a given
+        target, or only those in a given subset (or subsets) and target will be
+        selected.
+
+        Args:
+            target: [Target](#target) (type) of the annotations to retrieve. Can
+                be the sum of both types to get all annotations:
+                `Target.GRAPH | Target.LOGO`.
+            subset: name of the subsets to get, or `None` to get annotations from
+                all subsets.
+
+        Returns:
+            a generator that yields selected annotations.
+        '''
         if subset is None or len(subset) == 0:
             if Target.LOGO in target:
                 ret = (Logogram(file) for file in
@@ -114,7 +180,15 @@ class Dataset:
             return chain(*(self.get_annotations(target, d) for d in subset))
 
     def get_subsets(self, target: Target):
-        '''Gets information about the subsets in a given target.'''
+        '''Gets information about subsets in the dataset.
+
+        Args:
+            target: [Target](#target) (type) of the annotation subsets.
+
+        Returns:
+            a sorted list of `dict`, each with the keys `name` for the name of
+            the subset, and `count` for the number of annotations in it.
+        '''
         if target == Target.LOGO:
             path = self.logogram_path
         elif target == Target.GRAPH:
@@ -127,10 +201,18 @@ class Dataset:
                       key=lambda s: s['name'])
 
     def create_subset(self, target: Target, name, existing='a'):
-        '''Creates the directory for a new subset. If it exists, behaviour is
-        controlled by `existing`. It can be 'a' to abort (the default), 'r' to
-        remove existing annotations, or 'm' (merge) to do nothing. Returns the
-        creeated path.'''
+        '''Creates the directory for a new subset.
+
+        Args:
+            target: [Target](#target) (type) of the annotation subset to create.
+            name: name for the new subset.
+            existing: controls behaviour when the directory already exists.  It
+                can be 'a' to abort (the default), 'r' to remove existing
+                annotations, or 'm' (merge) to do nothing.
+
+        Returns:
+            the path of the created directory.
+        '''
         if target == Target.LOGO:
             path = self.logogram_path / name
         elif target == Target.GRAPH:
@@ -151,20 +233,6 @@ class Dataset:
             else:
                 raise click.Abort()
         return path
-
-    def __getattr__(self, attr):
-        if attr == 'path':
-            if not self._path.exists():
-                raise SystemExit("Dataset '{}' does not exist".format(self._path))
-            self.path = self._path
-            return self.path
-        if attr == 'config':
-            if not self.config_path.exists():
-                raise SystemExit("Path '{}' is not a valid dataset".format(self._path))
-            self.config = toml.loads(self.config_path.read_text())
-            if self.local_config_path.exists():
-                self.config.update(**toml.loads(self.local_config_path.read_text()))
-            return self.config
 
 
 @click.command('create')

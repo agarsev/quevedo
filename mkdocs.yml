@@ -7,16 +7,17 @@ nav:
   - Concepts:
     - concepts.md
     - nets.md
-  - Usage:
+  - Admin Guide:
     - config.md
     - cli.md
     - web.md
-  - Guides:
+  - User Guide:
     - web_use.md
-    - dev.md
     - User_guide.md
     - with_dvc.md
-  - API: api.md
+  - Developer Guide:
+    - dev.md
+    - api.md
 edit_uri: ''
 site_dir: dist/docs
 theme: readthedocs
