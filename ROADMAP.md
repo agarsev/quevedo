@@ -28,6 +28,8 @@
 - [ ] Rework examples
 - [ ] TODOs
 - [X] Deploy documentation
+- [ ] Make a toy dataset and add to release so people can play even if they
+    don't have data.
 - [ ] Publish
     - [ ] Github Release
     - [ ] Publish to PyPI

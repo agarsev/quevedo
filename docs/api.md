@@ -14,7 +14,7 @@ from quevedo import Dataset, Target
 
 ds = Dataset('path/to/the/dataset')
 
-# annotation is of type quevedo.Annotation
+# annotation is of type quevedo.Grapheme, a subclass of quevedo.Annotation
 annotation = ds.get_single(Target.GRAPH, 'subset', 32)
 print(annotation.to_dict())
 
@@ -22,9 +22,19 @@ print(annotation.to_dict())
 net = ds.get_network('grapheme_classify')
 net.auto_annotate(annotation)
 annotation.save()
+
+# creating a quevedo.Logogram (subclass of quevedo.Annotation)
+new_a = ds.new_single(Target.LOGO, 'my_new_subset',
+                      image_path='path/to/the/image',
+                      graphemes=[
+                          {'tags': ['character', 'letter_a'],
+                           'box': [0.2, 0.6, 0.3, 0.3]},
+                          {'tags': ['character', 'accute_accent']
+                           'box': [0.2, 0.2, 0.1, 0.2]}
+                      ])
 ```
 
-### ![mkapi](quevedo.Dataset)
+### ![mkapi](quevedo.Dataset|short)
 
 ## Annotations
 
@@ -36,10 +46,10 @@ graphemes in a process, there is the enum `Target`, which can take the values
 There is also the `BoundGrapheme` class, used to represent each of the graphemes
 which make up a logogram.
 
-### ![mkapi](quevedo.annotation.Annotation)
-### ![mkapi](quevedo.annotation.Grapheme)
-### ![mkapi](quevedo.annotation.Logogram)
-### ![mkapi](quevedo.annotation.logogram.BoundGrapheme)
+### ![mkapi](quevedo.annotation.Annotation|short)
+### ![mkapi](quevedo.annotation.Grapheme|short)
+### ![mkapi](quevedo.annotation.Logogram|short)
+### ![mkapi](quevedo.annotation.logogram.BoundGrapheme|short)
 
 ## Networks
 
@@ -54,4 +64,4 @@ Therefore, you should get the network from a Quevedo dataset's method
 [`get_network`](#quevedodatasetdatasetget_network) so that the proper instance
 is built.
 
-### ![mkapi](quevedo.network.network.Network)
+### ![mkapi](quevedo.network.network.Network|short)

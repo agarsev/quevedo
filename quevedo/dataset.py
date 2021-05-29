@@ -96,7 +96,7 @@ class Dataset:
         '''Retrieve a single annotation.
 
         Args:
-            target: [Target](#target) (type) of the annotation to retrieve.
+            target: [Target](#annotations) (type) of the annotation to retrieve.
             subset: name of the subset where the annotation is stored.
             id: number of the annotation in the subset.
 
@@ -119,7 +119,7 @@ class Dataset:
         Any extra arguments will be passed to that method.
 
         Args:
-            target: [Target](#target) (type) of the annotation to create.
+            target: [Target](#annotations) (type) of the annotation to create.
             subset: name of the (existing) subset where to place it.
 
         Returns:
@@ -145,7 +145,7 @@ class Dataset:
         selected.
 
         Args:
-            target: [Target](#target) (type) of the annotations to retrieve. Can
+            target: [Target](#annotations) (type) of the annotations to retrieve. Can
                 be the sum of both types to get all annotations:
                 `Target.GRAPH | Target.LOGO`.
             subset: name of the subsets to get, or `None` to get annotations from
@@ -183,7 +183,7 @@ class Dataset:
         '''Gets information about subsets in the dataset.
 
         Args:
-            target: [Target](#target) (type) of the annotation subsets.
+            target: [Target](#annotations) (type) of the annotation subsets.
 
         Returns:
             a sorted list of `dict`, each with the keys `name` for the name of
@@ -204,7 +204,7 @@ class Dataset:
         '''Creates the directory for a new subset.
 
         Args:
-            target: [Target](#target) (type) of the annotation subset to create.
+            target: [Target](#annotations) (type) of the annotation subset to create.
             name: name for the new subset.
             existing: controls behaviour when the directory already exists.  It
                 can be 'a' to abort (the default), 'r' to remove existing
