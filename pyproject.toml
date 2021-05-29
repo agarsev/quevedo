@@ -5,7 +5,7 @@ version = "1.0.0"
 authors = ["Antonio F. G. Sevilla <afgs@ucm.es>"]
 license = "OSL-3.0"
 repository = "https://github.com/agarsev/quevedo"
-documentation = "TODO"
+documentation = "https://agarsev.github.io/quevedo"
 keywords = ["machine learning", "computer vision", "sign language", "corpus linguistics", "dataset"]
 
 [tool.poetry.dependencies]

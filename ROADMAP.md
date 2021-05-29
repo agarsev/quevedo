@@ -11,10 +11,9 @@
     - [X] Overview
     - [X] Authorship
     - [X] Installation
-    - [ ] How to install extras
+    - [X] How to install extras
     - [X] Usage
 - [o] Docs
-    - [ ] How to install extras
     - [X] Concepts
     - [X] Networks
     - [ ] Config file
