@@ -13,10 +13,10 @@
     - [X] Installation
     - [X] How to install extras
     - [X] Usage
-- [o] Docs
+- [O] Docs
     - [X] Concepts
     - [X] Networks
-    - [ ] Config file
+    - [X] Config file
     - [X] CLI
     - [X] Web application
     - [o] Developer guide
