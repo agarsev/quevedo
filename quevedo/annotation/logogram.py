@@ -67,4 +67,4 @@ class BoundGrapheme():
             l = float(self.box[0]) * width - (w / 2)
             u = float(self.box[1]) * height - (h / 2)
             self._image_data = img.crop((l, u, l + w, u + h))
-        return self.image
+        return self._image_data
