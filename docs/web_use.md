@@ -55,20 +55,25 @@ button to store them permanently.
     If you are a collaborator, please ask the lead of the project what each of
     these functions do and when to use them.
 
-If you manage the dataset, the functions available are of two kinds:
+The functions available are of two kinds:
 
-- **Trained networks**. When editing graphemes, any neural networks which have
-    been already trained and which have the task `classify` will be listed. When
-    run, the annotation image will be fed to the neural network, the prediction
-    decoded, and the new tags sent to the web interface. This can be used to
-    both visually check the networks, and to bootstrap manual annotation by
-    using the networks output as a first step.
-- **User scripts**. Any script under the `scripts` directory which has a
-    filename starting with *grapheme* will be listed and available for
-    collaborators to use. Please note that any code in the script will be able
-    to be run by collaborators, so if there are potentially dangerous operations
-    or modifications in the script, don't make it available in the web interface
-    (by changing the name) or properly advise your collaborators.
+#### Trained networks
+
+When editing graphemes, any neural networks which have
+been already trained and which have the task `classify` will be listed. When
+run, the annotation image will be fed to the neural network, the prediction
+decoded, and the new tags sent to the web interface. This can be used to
+both visually check the networks, and to bootstrap manual annotation by
+using the networks output as a first step.
+
+#### User scripts
+
+Any [user script](dev.md#user-scripts) under the `scripts` directory which has a
+filename starting with *grapheme* will be listed and available for collaborators
+to use. Please note that any code in the script will be able to be run by
+collaborators, so if there are potentially dangerous operations or modifications
+in the script, don't make it available in the web interface (by changing the
+name) or properly advise your collaborators.
 
 ## Logogram annotation
 

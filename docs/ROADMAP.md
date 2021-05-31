@@ -13,15 +13,15 @@
     - [X] Installation
     - [X] How to install extras
     - [X] Usage
-- [O] Docs
+- [X] Docs
     - [X] Concepts
     - [X] Networks
     - [X] Config file
     - [X] CLI
     - [X] Web application
-    - [o] Developer guide
+    - [X] Developer guide
         - [X] API Reference
-        - [ ] Use as library and user scripts
+        - [X] Use as library and user scripts
     - [ ] User guide: example of shell use, with git and DVC
 - [ ] Rework examples
 - [ ] TODOs
