@@ -137,7 +137,7 @@ class Dataset:
             raise ValueError('A single target is needed')
         return a
 
-    def get_annotations(self, target: Target, subset=None):
+    def get_annotations(self, target: Target = Target.GRAPH | Target.LOGO, subset=None):
         '''Get annotations from the dataset.
 
         Depending on the arguments, all annotations, those of a given
@@ -145,9 +145,9 @@ class Dataset:
         selected.
 
         Args:
-            target: [Target](#annotations) (type) of the annotations to retrieve. Can
-                be the sum of both types to get all annotations:
-                `Target.GRAPH | Target.LOGO`.
+            target: [Target](#annotations) (type) of the annotations to
+                retrieve. By default, it is the union of both types, so all
+                annotations are retrieved: `Target.GRAPH | Target.LOGO`.
             subset: name of the subsets to get, or `None` to get annotations from
                 all subsets.
 
