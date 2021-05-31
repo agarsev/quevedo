@@ -21,7 +21,8 @@ documentation here](https://agarsev.github.io/quevedo).
 
 ## Installation
 
-Quevedo requires `python >= 3.7`, and can be installed from PyPI: (TODO)
+Quevedo requires `python >= 3.7`, and can be installed from
+[PyPI](https://pypi.org/project/quevedo/):
 
 ```shell
 $ pip install quevedo
@@ -33,11 +34,11 @@ Or, if you want any extras, like the web interface:
 $ pip install quevedo[web]
 ```
 
-Or directly from the wheel in the release file (TODO)
+Or directly from the wheel in the [release
+file](https://github.com/agarsev/quevedo/releases):
 
 ```shell
-$ curl blabla
-$ pip install quevedo-wheel-blabla
+$ pip install quevedo-1.0.0-py3-none-any.whl[web]
 ```
 
 To use the neural network module, you will also need [to install

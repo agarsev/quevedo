@@ -62,12 +62,16 @@ other information. This can be used to store information about the filenames,
 the source of the data, or in the case of logograms, information about the
 logogram itself not associated with any particular grapheme.
 
-(TODO: image)
+![Logogram annotation](img/web_logogram_anno.png)
+
+*Example of the annotation of a logogram in the web interface*
 
 ## Dataset structure
 
-Each Quevedo dataset is a directory on disk, containing a configuration file
-`config.toml`, and a number of directories. (TODO: link config)
+Each Quevedo dataset is a directory on disk, containing a [configuration
+file](config.md) named `config.toml`, and a number of directories. Files which
+Quevedo doesn't recognize will be ignored, so it is safe to add these files that
+other programs (such as [git] or [DVC]) may need.
 
 Annotations are stored in subdirectories of the `logograms` and `graphemes`
 directories (depending on their type). Each subdirectory represents a data
@@ -83,15 +87,15 @@ numbered, so corresponding images and json files are easily found.
 
 There are two additional directories which Quevedo uses: `networks` and
 `scripts`. In the `networks` directory, the training configuration and weight
-files for each different neural network are stored (TODO: link networks). Each
-network has a name, and its files are all organized in the subdirectory of
-`networks` with the network name.
+files for each different [neural network](nets.md#network-configuration) are
+stored. Each network has a name, and its files are all organized in the
+subdirectory of `networks` with the network name.
 
 The `scripts` directory can contain useful scripts for additional management of
 the dataset. For example, a researcher can store the `.r` scripts used to
 evaluate different metrics on the dataset, or shell scripts to process images or
 extract annotation information. A special case are python files (ending in
-`.py`) which Quevedo can understand (TODO: link scripts) 
+`.py`) which Quevedo [can understand](dev.md#user-scripts).
 
 ```txt
 dataset_root

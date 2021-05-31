@@ -46,7 +46,7 @@ class ClassifyNet(Network):
         return "{}_{}.png".format(self.tag_map[tag], num)
 
     def _get_net_config(self, num_classes):
-        # TODO: Read somewhere how to choose these params
+        # FIXME: Choose these params better and allow user customisation
         template = Template((Path(__file__).parent.parent /
                              'darknet/alexnet.cfg').read_text())
         augment = self.config.get('augment', {})
@@ -71,7 +71,7 @@ class ClassifyNet(Network):
             return
         predictions = self.predict(annotation.image_path)
         best = predictions[0]
-        # TODO thresholds should be configuration, in detect too
+        # FIXME thresholds should be configuration, in detect too
         stats.register(best['tag'] if best['confidence'] >= 0.5 else None,
                        true_tag)
 

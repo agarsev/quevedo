@@ -1,36 +1,6 @@
 # Roadmap
 
-## Version 1
-
-- [X] License
-    - [X] Add license file
-    - [X] Add OSL 3 notice to own source (after copyright)
-    - [X] Add license information for the dependencies, and link to this info in
-        the web interface.
-- [X] README.md 
-    - [X] Overview
-    - [X] Authorship
-    - [X] Installation
-    - [X] How to install extras
-    - [X] Usage
-- [X] Docs
-    - [X] Concepts
-    - [X] Networks
-    - [X] Config file
-    - [X] CLI
-    - [X] Web application
-    - [X] Developer guide
-        - [X] API Reference
-        - [X] Use as library and user scripts
-    - [X] User guide: example of shell use, with git and DVC
-- [ ] TODOs
-- [X] Rework examples
-- [X] Deploy documentation
-- [X] Make a toy dataset and add to release so people can play even if they
-    don't have data.
-- [ ] Publish
-    - [ ] Github Release -> add toy dataset
-    - [ ] Publish to PyPI
+2021-05-31: Version 1 Finished! 🥳 
 
 ## Future
 

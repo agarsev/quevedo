@@ -265,7 +265,7 @@ class DarknetNetwork():
         def make_c_image(image):
             # Darknet wants the pixel data by plane/channel instead of by pixel.
             # Since our images are b&w, we just get the r channel and repeat it
-            # 3 times. TODO: THIS IS A HACK AND SHOULD BE FIXED AND DONE PROPERLY
+            # 3 times. FIXME: this is a hack and should be fixed and done properly
             w, h = image.size
             img = lib.make_image(w, h, 3)
             data = [c_float(pixel[0]/255.0) for pixel in image.getdata()]

@@ -190,17 +190,14 @@ $ quevedo -D path/to/dataset -N network_name prepare train test
 
 ### At the web interface
 
-Trained neural networks can also be used at the web interface. Networks for
-detection will be available for logograms, and classifier ones will be available
-for graphemes. They will be listed at the top right of the interface. When
-running them, the current annotation image will be fed to the neural network,
-and the predictions applied (but not saved until the user presses the **save**
-button). This can be used to visualize the neural network results, or to
-bootstrap manual annotation of logograms and graphemes.
-
-TODO: image
-
-TODO: link to page about web
+Trained neural networks can also be used on the [web
+interface](web_use.md#trained-networks). Networks for detection will be
+available for logograms, and classifier ones will be available for graphemes.
+They will be listed at the top right of the interface. When running them, the
+current annotation image will be fed to the neural network, and the predictions
+applied (but not saved until the user presses the **save** button). This can be
+used to visualize the neural network results, or to bootstrap manual annotation
+of logograms and graphemes.
 
 ## Example Configuration
 

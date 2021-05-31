@@ -55,8 +55,9 @@ which make up a logogram.
 
 Network objects in Quevedo represent the network itself, but also their
 configuration, training and testing process, and use. There are two types of
-networks, Detector networks and Classifier networks (TODO: link to concepts)
-that work on logograms and graphemes, respectively.
+networks, [Detector](nets.md#detector) networks and
+[Classifier](nets.md#classifier) networks, which work on logograms and graphemes
+respectively.
 
 The Network base class documented here is a base class that defines general
 behaviour, but code specific to each type of network lives in its own class.
