@@ -22,9 +22,9 @@
     - [X] Developer guide
         - [X] API Reference
         - [X] Use as library and user scripts
-    - [ ] User guide: example of shell use, with git and DVC
-- [ ] Rework examples
+    - [X] User guide: example of shell use, with git and DVC
 - [ ] TODOs
+- [ ] Rework examples
 - [X] Deploy documentation
 - [X] Make a toy dataset and add to release so people can play even if they
     don't have data.
