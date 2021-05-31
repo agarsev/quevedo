@@ -21,17 +21,15 @@
     - [X] Web application
     - [o] Developer guide
         - [X] API Reference
-        - [ ] User scripts
-    - [ ] User guide
-        - [ ] Example of shell use, with git and DVC
-- [ ] Links between concepts and pages in the docs
+        - [ ] Use as library and user scripts
+    - [ ] User guide: example of shell use, with git and DVC
 - [ ] Rework examples
 - [ ] TODOs
 - [X] Deploy documentation
-- [ ] Make a toy dataset and add to release so people can play even if they
+- [X] Make a toy dataset and add to release so people can play even if they
     don't have data.
 - [ ] Publish
-    - [ ] Github Release
+    - [ ] Github Release -> add toy dataset
     - [ ] Publish to PyPI
 
 ## Future

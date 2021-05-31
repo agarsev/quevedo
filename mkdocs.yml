@@ -12,9 +12,8 @@ nav:
     - cli.md
     - web.md
   - User Guides:
+    - guide.md
     - web_use.md
-    - User_guide.md
-    - with_dvc.md
     - dev.md
   - API:
     - Reference: api.md
@@ -24,7 +23,7 @@ theme: readthedocs
 plugins:
   - mkapi:
       src_dirs: [ quevedo ]
-  - mike
+      #  - mike
 markdown_extensions:
   - footnotes
   - admonition
