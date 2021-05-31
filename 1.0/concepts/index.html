@@ -80,11 +80,9 @@
                 </ul>
                 <p class="caption"><span class="caption-text">User Guides</span></p>
                 <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../guide/">Building a Dataset</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="../web_use/">Using the web interface</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../User_guide/">Guide</a>
-                    </li>
-                    <li class="toctree-l1"><a class="" href="../with_dvc.md">None</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../dev/">Quevedo as a library</a>
                     </li>
@@ -181,10 +179,13 @@ Additionally, both graphemes and logograms can have "meta" tags which represent
 other information. This can be used to store information about the filenames,
 the source of the data, or in the case of logograms, information about the
 logogram itself not associated with any particular grapheme.</p>
-<p>(TODO: image)</p>
+<p><img alt="Logogram annotation" src="../img/web_logogram_anno.png" /></p>
+<p><em>Example of the annotation of a logogram in the web interface</em></p>
 <h2 id="dataset-structure">Dataset structure<a class="headerlink" href="#dataset-structure" title="Permanent link">&para;</a></h2>
-<p>Each Quevedo dataset is a directory on disk, containing a configuration file
-<code>config.toml</code>, and a number of directories. (TODO: link config)</p>
+<p>Each Quevedo dataset is a directory on disk, containing a <a href="../config/">configuration
+file</a> named <code>config.toml</code>, and a number of directories. Files which
+Quevedo doesn't recognize will be ignored, so it is safe to add these files that
+other programs (such as <a href="https://git-scm.com/">git</a> or <a href="https://dvc.org/">DVC</a>) may need.</p>
 <p>Annotations are stored in subdirectories of the <code>logograms</code> and <code>graphemes</code>
 directories (depending on their type). Each subdirectory represents a data
 subset, which can be used to perform different experiments on different sets, or
@@ -197,14 +198,14 @@ external tools and inspected by humans. The annotations are sequentially
 numbered, so corresponding images and json files are easily found.</p>
 <p>There are two additional directories which Quevedo uses: <code>networks</code> and
 <code>scripts</code>. In the <code>networks</code> directory, the training configuration and weight
-files for each different neural network are stored (TODO: link networks). Each
-network has a name, and its files are all organized in the subdirectory of
-<code>networks</code> with the network name.</p>
+files for each different <a href="../nets/#network-configuration">neural network</a> are
+stored. Each network has a name, and its files are all organized in the
+subdirectory of <code>networks</code> with the network name.</p>
 <p>The <code>scripts</code> directory can contain useful scripts for additional management of
 the dataset. For example, a researcher can store the <code>.r</code> scripts used to
 evaluate different metrics on the dataset, or shell scripts to process images or
 extract annotation information. A special case are python files (ending in
-<code>.py</code>) which Quevedo can understand (TODO: link scripts) </p>
+<code>.py</code>) which Quevedo <a href="../dev/#user-scripts">can understand</a>.</p>
 <pre><code class="language-txt">dataset_root
 ├─ config.toml
 ├─ logograms

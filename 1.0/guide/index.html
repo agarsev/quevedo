@@ -9,7 +9,7 @@
   
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>User Guide - Quevedo Documentation</title>
+  <title>Building a Dataset - Quevedo Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../css/theme.css" />
@@ -23,7 +23,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "User Guide";
+    var mkdocs_page_name = "Building a Dataset";
     var mkdocs_page_input_path = "guide.md";
     var mkdocs_page_url = null;
   </script>
@@ -69,12 +69,28 @@
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">User Guides</span></p>
-                <ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Building a Dataset</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#create-repo">Create repo</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#add-data">Add data</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#automatically-process-the-data">Automatically process the data</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#annotate-the-data">Annotate the data</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#augment-the-data">Augment the data</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#split">Split</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#train-and-test-the-neural-network">Train and test the neural network</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#exploitation">Exploitation</a>
+    </li>
+    </ul>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="../web_use/">Using the web interface</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../User_guide/">Guide</a>
-                    </li>
-                    <li class="toctree-l1"><a class="" href="../with_dvc.md">None</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../dev/">Quevedo as a library</a>
                     </li>
@@ -104,8 +120,12 @@
     <li><a href="..">Docs</a> &raquo;</li>
     
       
+        
+          <li>User Guides &raquo;</li>
+        
+      
     
-    <li>User Guide</li>
+    <li>Building a Dataset</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -116,147 +136,172 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="user-guide">User Guide<a class="headerlink" href="#user-guide" title="Permanent link">&para;</a></h1>
-<p>This guide will walk through the steps necessary to create and populate a
-Quevedo dataset, and some examples on its use.</p>
-<h2 id="install">Install<a class="headerlink" href="#install" title="Permanent link">&para;</a></h2>
-<p>Quevedo is a python package, but it depends on darknet too, which is a C library
-by the inventor of the YOLO algorithm.</p>
-<p>To install Quevedo, you can use pip with the wheel released here (TODO):</p>
-<pre><code>$ python3 -m pip install quevedo-*.whl[web,force_layout]
+                <h1 id="building-a-dataset">Building a Dataset<a class="headerlink" href="#building-a-dataset" title="Permanent link">&para;</a></h1>
+<p>In this guide, we give an example of the commands and steps needed to create and
+use a Quevedo dataset. It might be helpful to have an environment available
+where you can test the different commands as you read the guide, and maybe some
+data that you can import. The process of creating a dataset is often not
+straightforward or works out on the first step, so don't worry about making
+mistakes and having to repeat the process (but please don't delete your original
+data! Keep those safe in some backup or cloud. Quevedo only works with data it
+has copied, so deleting a Quevedo dataset is safe as long as you keep copies of
+your original data somewhere).</p>
+<p>In this guide we use <a href="https://git-scm.com/">git</a> and <a href="https://dvc.org/">DVC</a> to manage repository versions and
+workflows, but that is not necessary, so you can ignore those steps if you don't
+use them. Also, we assume Quevedo is installed and available as the <code>quevedo</code>
+command, if not, please follow the steps <a href="..#installation">here</a>.</p>
+<h2 id="create-repo">Create repo<a class="headerlink" href="#create-repo" title="Permanent link">&para;</a></h2>
+<p>To initialize the directory where the data and annotations will live, use the
+<a href="../cli/#create"><code>create</code></a> command:</p>
+<pre><code class="language-shell">$ quevedo -D dataset_name create
 </code></pre>
-<p>This will install all extras too (web interface, force_layout for data
-augmentation). If you don't need them you can leave them out.</p>
-<p>If Quevedo was properly installed, the <code>quevedo</code> binary should be available in
-the path. You can test it using:</p>
-<pre><code>$ quevedo --help
+<p>It will offer you the opportunity to customize the <a href="../config/">configuration
+file</a> for the repository, and set your <a href="../config/#annotation-schema">annotation
+schema</a> and other information. You can modify it
+later by editing the <code>config.toml</code> file, or using the <a href="../cli/#config"><code>config</code></a>
+command.</p>
+<p>From this point on, we will run commands with the dataset directory as working
+dir, so change to it with <code>cd dataset_name</code>, and we won't need the <code>-D</code> flag
+anymore.</p>
+<p>If you want to use git and/or DVC, initialize the repository with the commands:</p>
+<pre><code class="language-shell">$ git init
+$ git add -A .
+$ git commit -m &quot;Created quevedo repository&quot;
+$ dvc init
+$ git commit -m &quot;Initialize DVC&quot;
 </code></pre>
-<p>Which will print useful help about the tool.</p>
-<h2 id="repository-creation">Repository Creation<a class="headerlink" href="#repository-creation" title="Permanent link">&para;</a></h2>
-<p>A Quevedo repository is a collection of data (in image form) and metadata
-describing that image, with the purpose of training an automatic system to
-detect within new images the metadata contained within.</p>
-<p>It has been developed in the context of SignWriting recognition.</p>
-<p>To create a new repository, first create the directory where the data will be
-stored, then call <code>quevedo create</code> in that directory. You will be asked for the
-basic dataset information, and then the directory will be populated with the
-basic structure necessary for quevedo to operate.</p>
-<pre><code>$ mkdir signwriting
-$ cd signwriting
-$ quevedo create
-Title of the dataset: SignWriting
-Description of the dataset: VISSE SignWriting dataset
-Created dataset 'SignWriting' at '/home/agarsev/visse/signwriting'
-
-Configuration can be found in 'config.toml'. We recommend
-reading it now and adapting it to this dataset, but you can
-always do it later or use the command `config`.
-View config file now? [Y/n]:
+<h2 id="add-data">Add data<a class="headerlink" href="#add-data" title="Permanent link">&para;</a></h2>
+<p>Once we have the structure, the first step is to import our data. This can be
+done using the <a href="../cli/#add_images"><code>add_images</code></a> command, specifying both the
+source directory and target subset. To specify the target subset, use the <code>-l</code>
+flag if it's a logogram subset, or <code>-g</code> for graphemes. You can specify multiple
+source directories, which will be imported to the same subset.</p>
+<pre><code class="language-shell">$ quevedo add_images -i source_image_directory -l logogram_set
 </code></pre>
-<p>The different directories and files inside a Quevedo repository use standard
-formats, so can be inspected manually and perused with other typical
-command-line tools. However, you don't need to do it, and can see the dataset as
-a black box and only access it with the <code>quevedo</code> binary.</p>
-<p>A special file inside the dataset is found at the root, called <code>config.toml</code>. This
-file, in TOML format, contains all the user configuration of the dataset. You
-can view and edit it manually, or running <code>quevedo config</code>.</p>
-<p>You can see a summary of the dataset information using the <code>info</code> command:</p>
-<pre><code>$ quevedo info
-SignWriting
-▔▔▔▔▔▔▔▔▔▔▔
-
-VISSE SignWriting dataset
-
-Tag schema: tag
-
-Real transcriptions: 0
-Annotated: 0/0
-Symbols extracted: no
-Transcriptions generated: no
-Darknet is not properly configured in config.toml
-
-Experiment: 'default'
-▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
-focus on symbol type learning and recognition
-
-Dataset is not ready for training
-Neural network hasn't been trained
+<p>To track these data with DVC, run:</p>
+<pre><code class="language-shell">$ dvc add logograms/*
+$ git add logograms/logogram_set.dvc logograms/.gitignore
+$ git commit -m &quot;Imported logograms&quot;
 </code></pre>
-<p>::: Note
-There are two ways to tell the <code>quevedo</code> binary what dataset to use. The first
-and easiest, which will be used in this guide, is to <code>cd</code> to the dataset
-directory. By default, <code>quevedo</code> assumes the current directory is the dataset to
-manage.</p>
-<p>Otherwise, most notably for scripting purposes, you can use the <code>-D</code> option to
-quevedo, to give the path to the dataset. This must be used <em>before</em> any
-commands, for example <code>quevedo -D /home/agarsev/visse/signwriting info</code>.</p>
-<p>Creating the dataset this way will automatically create its directory, so it can
-be a quick way to initialize it. It can also use relative paths:</p>
-<pre><code>quevedo -D signwriting create
+<h2 id="automatically-process-the-data">Automatically process the data<a class="headerlink" href="#automatically-process-the-data" title="Permanent link">&para;</a></h2>
+<p>After the images are imported, we may want to use some preliminary automatic
+processing, like adding some tags that can be determined by code, preprocessing
+the images, etc. Create a <code>scripts</code> directory if it doesn't exist, and write
+your code there according to the <a href="../dev/#user-scripts">user script
+documentation</a>. Then you can run it on the appropriate
+subsets with the <a href="../cli/#run_script"><code>run_script</code></a> command.</p>
+<pre><code class="language-shell">$ mkdir scripts
+$ vim scripts/script_name.py
+$ quevedo run_script -s script_name -l logogram_set
+$ dvc add logograms
 </code></pre>
-<p>will create a subdirectory <code>signwriting</code> in the current directory, and
-initialize it as a Quevedo dataset.
-:::</p>
-<h2 id="adding-images">Adding images<a class="headerlink" href="#adding-images" title="Permanent link">&para;</a></h2>
-<p>Now that we have the structure for the dataset, it's time to populate it with
-real data, i.e. images of writing transcriptions. These should be in some
-directory in the filesystem, and must have <code>.png</code> extension. Then, just run
-<code>quevedo add_images -i &lt;PATH&gt;</code>.</p>
-<p>Example:</p>
-<pre><code>$ quevedo add_images -i /home/agarsev/vocab/
-Importing images from '/home/agarsev/vocab/' to '/home/agarsev/visse/signwriting/real/default'...imported 136
+<h2 id="annotate-the-data">Annotate the data<a class="headerlink" href="#annotate-the-data" title="Permanent link">&para;</a></h2>
+<p>Most of the important information in a dataset, apart to the source data, are
+the human annotations on these data (otherwise, why bother, right?). Since
+Quevedo deals with visual data, a graphical interface is needed for annotation,
+and is provided in the form of a <a href="../web/">web interface</a>. Remember to first set
+in the configuration file the annotation schema that you want to use, and then
+you can lanch the server with the <a href="../cli/#web"><code>web</code></a> command. If using git and
+dvc, remember to add and commit any modifications.</p>
+<pre><code class="language-shell">$ quevedo web
+$ dvc add logograms
+$ git commit -m &quot;Annotated logograms&quot;
 </code></pre>
-<p>Quevedo reports how many images were succesfully imported, and the path where
-they were stored. As you can see, it put the images in a subdirectory of the
-dataset named <code>real/default</code>. All "real" images (coming from informants, or
-other type of <em>actual</em> observations) are stored in the <code>real</code> subdirectory. This
-directory is itself split in subdirectories that can be used to organize
-transcriptions in sets or batches. By default, images are assigned to the
-<code>default</code> directory. To change this, you can use the <code>--name</code> option, like so:</p>
-<pre><code>quevedo add_images -i &lt;PATH&gt; --name &lt;NAME_OF_THE_SUBSET&gt;
+<h2 id="augment-the-data">Augment the data<a class="headerlink" href="#augment-the-data" title="Permanent link">&para;</a></h2>
+<p>Once logograms are manually annotated, Quevedo can extract the graphemes
+included within them to augment the number of grapheme instances available to
+us, with the <a href="../cli/#extract"><code>extract</code></a> command. If what we have are graphemes,
+we can generate artificial examples of logograms with the
+<a href="../cli/#command"><code>generate</code></a>. With these two commands, the data available for
+training increase, hopefully improving our algorithms.</p>
+<pre><code class="language-shell">$ quevedo extract -f logogram_set -t extracted_grapheme_set
+$ quevedo generate -f grapheme_set -t generated_logogram_set
 </code></pre>
-<p>If you change your mind at any point, you can rename the subdirectories under
-<code>real</code>, quevedo doesn't give any special meaning to subset names.</p>
-<p>If you list the contents of the <code>real/default</code> directory, you will notice two
-things:</p>
-<ol>
-<li><em>Filenames now are numbers</em>. Quevedo numbers transcriptions in a subset
-   sequentially, so the pair subset name + number constitutes a unique id for
-   each observation.</li>
-<li><em>JSON files</em>. Along with the transcriptions, there are some new <code>.json</code>
-   files, also sequentially numbered. Quevedo stores metadata and annotations
-   for the transcriptions in these files, which can be examined by hand or other
-   tools. Each <code>&lt;number&gt;.json</code> file stores the metadata for the equally numbered
-   <code>&lt;number&gt;.png</code> transcription.</li>
-</ol>
-<p>The original file names for the transcriptions are kept in the annotation file,
-in a "notes" field, in case it is useful information. The "notes" field is only
-for users, quevedo does not peruse it in any way.</p>
-<p>If some information is to be added to the whole subset, a markdown file can be
-created in the subset directory with the name <code>README.md</code>. This file will be
-displayed in the web interface, and humans navigating the dataset manually will 
-immediately know to read it. This file can contain information regarding the
-source of the data, annotator identities, etc. Quevedo doesn't use this file in
-any way.</p>
-<p>::: Note</p>
-<p>Since the dataset is just a particular directory structure, with standard files
-in appropriate locations, it is easy to version control it using a VCS like
-git. Using <code>README.md</code> files in the appropriate locations helps users navigate
-the dataset, and tracking their changes in a VCS allows date and authorship
-information to be stored in a standard way.</p>
-<p>Using a VCS also means keeping a history of the project, and being able to
-revert changes if something goes wrong.</p>
-<p>The root of the dataset is also a good place to store licensing information (in
-a <code>LICENSE</code> file) and general human-readable information (in a <code>README.md</code>),
-different from the configuration in <code>config.toml</code>.</p>
-<p>Distributed VC systems like git also make it easy to share datasets, and
-collaborate in their preparation and annotation. For example, the dataset we are
-building in this guide can be accessed and examined at the URL @TODO@.</p>
-<p>:::</p>
+<p>These steps can be added to a <a href="https://dvc.org/doc/user-guide/project-structure/pipelines-files">DVC pipelines
+file</a> so that
+DVC tracks the procedure and the results, and when we distribute the dataset
+other people can reproduce the full process. To have dvc automatically fill the
+pipelines file, run the commands with
+<a href="https://dvc.org/doc/start/data-pipelines"><code>dvc run</code></a>:</p>
+<pre><code class="language-shell">$ dvc run -n extract \
+          -d logograms/logogram_set \
+          -o graphemes/extracted_set \
+          quevedo extract -f logogram_set -t extracted_set
+</code></pre>
+<h2 id="split">Split<a class="headerlink" href="#split" title="Permanent link">&para;</a></h2>
+<p>For experimentation, we often need to divide our files into a <strong>train</strong> test on
+which to train the algorithms, and a <strong>test</strong> or evaluation set which acts as a
+stand-in for "new" or "unknown" data. To have Quevedo perform this split
+randomly, use the <a href="../cli/#split"><code>split</code></a> command:</p>
+<pre><code class="language-shell">$ quevedo split -l logogram_set -p 70
+</code></pre>
+<p>This will split the annotations in logogram_set into roughly 70% train files and
+30% test files. Depending on your needs, you might want to store this
+permanently with DVC by using <code>dvc add</code>, or add it as a procedural step in a
+pipeline. If you choose this last option, the split command understands a <code>seed</code>
+parameter so you can make your experiments reproducible.</p>
+<h2 id="train-and-test-the-neural-network">Train and test the neural network<a class="headerlink" href="#train-and-test-the-neural-network" title="Permanent link">&para;</a></h2>
+<p>Now that our data are properly organized and annotated, we can try training a
+neural network and evaluating its results. The first step is to
+<a href="../cli/#prepare"><code>prepare</code></a> the files needed for training, then calling the
+darknet binary with the <a href="../cli/#train"><code>train</code></a> command. Finally, the
+<a href="../cli/#test"><code>test</code></a> command evalates some quick metrics on the trained neural
+networks, and can also print all predictions so you can use your statistical
+software to get a more in-depth analysis.</p>
+<p>The commands can also be chained, so it is enough to run (but it will probably
+take some time):</p>
+<pre><code class="language-shell">$ quevedo prepare train test
+</code></pre>
+<p>Remember that first you must have <a href="../nets/#installation">installed darknet</a> and
+<a href="../nets/#network-configuration">configured the neural network</a> in the Quevedo
+configuration file. If you have more than one network, specify which one to use
+with the <code>-N</code> flag:</p>
+<pre><code class="language-shell">$ quevedo -N other_network prepare train test
+</code></pre>
+<p>To keep track of the neural network in DVC, we recommend setting preparation,
+training and test as different stages in the pipeline, so that intermediate
+artifacts can be cached and the expensive process of training only performed if
+necessary, and letting DVC track the produced metrics. If you have different
+networks, they can be set up as <a href="https://dvc.org/doc/user-guide/project-structure/pipelines-files#templating">template
+parameters</a>
+in the pipelines file to keep things
+<a href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself">DRY</a>.</p>
+<pre><code class="language-shell">$ dvc run -n prepare_detect \
+          -d logograms \
+          -o networks/detect/train.txt \
+          quevedo -N detect prepare
+$ dvc run -n train_detect \
+          -d networks/detect/train.txt \
+          -o networks/detect/darknet_final.weights \
+          quevedo -N detect train
+$ dvc run -n test_detect \
+          -d networks/detect/darknet_final.weights \
+          -m networks/detect/results.json \
+          quevedo -N detect test --results-json
+</code></pre>
+<h2 id="exploitation">Exploitation<a class="headerlink" href="#exploitation" title="Permanent link">&para;</a></h2>
+<p>When doing data science, sometimes it is enough to stop at this step. Data are
+annotated, neural networks trained, experiments run and conclusions obtained.
+But often the results are actually useful beyond the science, and we want to
+somehow peruse them. The trained neural network weights are stored in the
+<a href="../nets/#at-the-command-line">network directory</a>, and can be used with darknet in other
+applications or loaded by
+<a href="https://docs.opencv.org/3.4/d6/d0f/group__dnn.html#gafde362956af949cce087f3f25c6aff0d">OpenCV</a>
+for example. If access to the dataset data is needed, and not only the training
+results, Quevedo can also be <a href="../dev/">used as a library</a> from your own code.</p>
               
             </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../web_use/" class="btn btn-neutral float-right" title="Using the web interface">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../web/" class="btn btn-neutral" title="Web Interface"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -282,6 +327,10 @@ building in this guide can be accessed and examined at the URL @TODO@.</p>
           <a href="https://github.com/agarsev/quevedo" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
+        <span><a href="../web/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../web_use/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

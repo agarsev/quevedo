@@ -91,11 +91,9 @@
                 </ul>
                 <p class="caption"><span class="caption-text">User Guides</span></p>
                 <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="guide/">Building a Dataset</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="web_use/">Using the web interface</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="User_guide/">Guide</a>
-                    </li>
-                    <li class="toctree-l1"><a class="" href="with_dvc.md">None</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="dev/">Quevedo as a library</a>
                     </li>
@@ -155,13 +153,15 @@ documentation here</a>.</p>
     using <a href="https://pjreddie.com/darknet/install/">darknet</a>.</li>
 </ul>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
-<p>TODO: install extras</p>
-<p>Quevedo requires <code>python &gt;= 3.7</code>, and can be installed from PyPI: (TODO)</p>
-<pre><code class="language-shell">$ python3 -m pip install quevedo
+<p>Quevedo requires <code>python &gt;= 3.7</code>, and can be installed from PyPI:</p>
+<pre><code class="language-shell">$ pip install quevedo
 </code></pre>
-<p>Or directly from the wheel in the release file (TODO)</p>
-<pre><code class="language-shell">$ curl blabla
-$ python3 -m pip install quevedo-wheel-blabla
+<p>Or, if you want any extras, like the web interface:</p>
+<pre><code class="language-shell">$ pip install quevedo[web]
+</code></pre>
+<p>Or directly from the wheel in the <a href="https://github.com/agarsev/quevedo/releases">release
+file</a>:</p>
+<pre><code class="language-shell">$ pip install quevedo-1.0.0-py3-none-any.whl[web]
 </code></pre>
 <p>To use the neural network module, you will also need <a href="https://agarsev.github.io/quevedo/latest/nets/#installation">to install
 darknet</a>.</p>
@@ -182,7 +182,7 @@ needed.</p>
 <p>To see information about a downloaded dataset:</p>
 <pre><code class="language-shell">$ quevedo info
 </code></pre>
-<p>To launch the web interface</p>
+<p>To launch the web interface (you must have installed the "web" extra):</p>
 <pre><code class="language-shell">$ quevedo web
 </code></pre>
 <p>For more information, and the list of commands, run <code>quevedo --help</code> or <code>quevedo
@@ -266,5 +266,5 @@ under the <a href="https://github.com/preactjs/preact/blob/master/LICENSE">MIT L
 
 <!--
 MkDocs version : 1.1.2
-Build Date UTC : 2021-05-28 18:47:25.586146+00:00
+Build Date UTC : 2021-05-31 20:08:56.675641+00:00
 -->

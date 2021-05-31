@@ -9,7 +9,7 @@
   
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Guide - Quevedo Documentation</title>
+  <title>Roadmap - Quevedo Documentation</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../css/theme.css" />
@@ -23,8 +23,8 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Guide";
-    var mkdocs_page_input_path = "User_guide.md";
+    var mkdocs_page_name = "Roadmap";
+    var mkdocs_page_input_path = "ROADMAP.md";
     var mkdocs_page_url = null;
   </script>
   
@@ -69,28 +69,10 @@
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">User Guides</span></p>
-                <ul class="current">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../guide/">Building a Dataset</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="../web_use/">Using the web interface</a>
-                    </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Guide</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#create-repo">Create repo</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#add-data">Add data</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#automatically-process-the-data">Automatically process the data</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#annotate-the-data">Annotate the data</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#extract-graphemes">Extract graphemes</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#split">Split</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#prepare">Prepare</a>
-    </li>
-    </ul>
-                    </li>
-                    <li class="toctree-l1"><a class="" href="../with_dvc.md">None</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../dev/">Quevedo as a library</a>
                     </li>
@@ -120,12 +102,8 @@
     <li><a href="..">Docs</a> &raquo;</li>
     
       
-        
-          <li>User Guides &raquo;</li>
-        
-      
     
-    <li>Guide</li>
+    <li>Roadmap</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -136,62 +114,46 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="guide">Guide<a class="headerlink" href="#guide" title="Permanent link">&para;</a></h1>
-<p>Using quevedo repo with git and dvc</p>
-<h2 id="create-repo">Create repo<a class="headerlink" href="#create-repo" title="Permanent link">&para;</a></h2>
-<pre><code>quevedo -D dataset_name create
-</code></pre>
-<p>Modify config file</p>
-<pre><code>cd dataset_name
-</code></pre>
-<p>From now on, everything run in the dataset directory</p>
-<pre><code>git init
-git add -A .
-git commit -m "Created quevedo repository"
-dvc init
-git commit -m "Initialize DVC"
-</code></pre>
-<h2 id="add-data">Add data<a class="headerlink" href="#add-data" title="Permanent link">&para;</a></h2>
-<pre><code>quevedo add_images -i image_directory -l logogram_set
-dvc add logograms/*
-git add logograms/logogram_set.dvc logograms/.gitignore
-git commit -m "Imported logograms"
-</code></pre>
-<h2 id="automatically-process-the-data">Automatically process the data<a class="headerlink" href="#automatically-process-the-data" title="Permanent link">&para;</a></h2>
-<pre><code>mkdir scripts
-vim scripts/script_name.py
-quevedo run_script -s script_name -l logogram_set
-dvc add logograms
-</code></pre>
-<h2 id="annotate-the-data">Annotate the data<a class="headerlink" href="#annotate-the-data" title="Permanent link">&para;</a></h2>
-<p>Modify config file with <code>quevedo config</code> to set the schema. Recommend keep
-filename in meta tags.</p>
-<pre><code>quevedo web
-dvc add logograms
-git commit -m "Annotated logograms"
-</code></pre>
-<h2 id="extract-graphemes">Extract graphemes<a class="headerlink" href="#extract-graphemes" title="Permanent link">&para;</a></h2>
-<pre><code>quevedo extract -f logogram_set -t grapheme_set
-</code></pre>
-<h2 id="split">Split<a class="headerlink" href="#split" title="Permanent link">&para;</a></h2>
-<pre><code>quevedo split -l B22 -p 100
-</code></pre>
-<h2 id="prepare">Prepare<a class="headerlink" href="#prepare" title="Permanent link">&para;</a></h2>
-<pre><code>dvc run -n prepare_detect -d logograms -o networks/detect quevedo -N detect prepare
-</code></pre>
+                <h1 id="roadmap">Roadmap<a class="headerlink" href="#roadmap" title="Permanent link">&para;</a></h1>
+<p>2021-05-31: Version 1 Finished! 🥳 </p>
+<h2 id="future">Future<a class="headerlink" href="#future" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] Improve train/test set. Instead of "set", "slice"/"division", and
+    it's an integer. Orthogonal dimension to subsets. Slices to include
+    can be chosen somehow, as params or something (think DVC). This
+    enables cross-validation while preserving "slice" through extract
+    etc.</li>
+<li>[ ] Filter/search annotations in listing according to some tag(s).</li>
+<li>[ ] Autosuggest values for tagging.</li>
+<li>[ ] Remove "saved" message when doing changes (inconsistent)</li>
+<li>[ ] Instead of a "check" for annotated/not annotated, custom "flags" in
+    config.toml that are checkboxes in meta and can be toggled in web interface.</li>
+</ul>
+<h2 id="backlog">Backlog<a class="headerlink" href="#backlog" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[ ] Allow deleting entries in web (just move the last to the hole). Maybe
+    add <code>delete</code> in cli too?</li>
+<li>[ ] Auto-save changes in the web interface if enabled in the config file
+    (nowadays people aren't so used to clicking save)</li>
+<li>[ ] Mobile interface for the web app. Maybe integrate with camera/scan app,
+    make quevedo a target for "sharing" (uploading) images.</li>
+<li>[ ] Web user groups.</li>
+<li>[ ] When scripts modify images, don't save it automatically, but return it
+    (ie return modified_tags, modified_img) and then it is <code>run_script</code> that
+    saves the image to the appropriate path. Then, the updated image can be sent
+    to the web interface to be previewed, and if they want to save it send it
+    back to the server on "save". The only complication is that the image is now
+    frontend state, not just a src link.</li>
+<li>[ ] Improve nets. Try again with grayscale images now that we use AlexeyAB
+    fork, check letterboxing, try different configs, etc. Some of this can be
+    done by improving the python code that access the darknet dll (eg the
+    channels) and some might be better to do ourselves (eg letterboxing and
+    resizing)</li>
+</ul>
               
             </div>
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../dev/" class="btn btn-neutral float-right" title="Quevedo as a library">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../web_use/" class="btn btn-neutral" title="Using the web interface"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>
@@ -217,10 +179,6 @@ git commit -m "Annotated logograms"
           <a href="https://github.com/agarsev/quevedo" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../web_use/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../dev/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

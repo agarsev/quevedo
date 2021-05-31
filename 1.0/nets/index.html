@@ -102,11 +102,9 @@
                 </ul>
                 <p class="caption"><span class="caption-text">User Guides</span></p>
                 <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../guide/">Building a Dataset</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="../web_use/">Using the web interface</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../User_guide/">Guide</a>
-                    </li>
-                    <li class="toctree-l1"><a class="" href="../with_dvc.md">None</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../dev/">Quevedo as a library</a>
                     </li>
@@ -305,15 +303,14 @@ can be written as:</p>
 <pre><code class="language-shell">$ quevedo -D path/to/dataset -N network_name prepare train test
 </code></pre>
 <h3 id="at-the-web-interface">At the web interface<a class="headerlink" href="#at-the-web-interface" title="Permanent link">&para;</a></h3>
-<p>Trained neural networks can also be used at the web interface. Networks for
-detection will be available for logograms, and classifier ones will be available
-for graphemes. They will be listed at the top right of the interface. When
-running them, the current annotation image will be fed to the neural network,
-and the predictions applied (but not saved until the user presses the <strong>save</strong>
-button). This can be used to visualize the neural network results, or to
-bootstrap manual annotation of logograms and graphemes.</p>
-<p>TODO: image</p>
-<p>TODO: link to page about web</p>
+<p>Trained neural networks can also be used on the <a href="../web_use/#trained-networks">web
+interface</a>. Networks for detection will be
+available for logograms, and classifier ones will be available for graphemes.
+They will be listed at the top right of the interface. When running them, the
+current annotation image will be fed to the neural network, and the predictions
+applied (but not saved until the user presses the <strong>save</strong> button). This can be
+used to visualize the neural network results, or to bootstrap manual annotation
+of logograms and graphemes.</p>
 <h2 id="example-configuration">Example Configuration<a class="headerlink" href="#example-configuration" title="Permanent link">&para;</a></h2>
 <pre><code class="language-toml"># Annotations for each grapheme
 tag_schema = [ &quot;COARSE&quot;, &quot;FINE&quot;, &quot;ALTERATION&quot; ]
