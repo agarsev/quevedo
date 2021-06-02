@@ -123,7 +123,9 @@ function Header ({ title, id, links, saveChanges, message, show_save,
         ${functions.length<1?null:html`<select ref=${func_select}>
             ${functions.map(e=>html`<option value=${e}>${e}</option>`)}
         </select>`}
-        <button onclick=${() => runFunction(func_select.current.value)}>⚙️</button>
+        ${functions.length<1?null:html`
+            <button onclick=${() => runFunction(func_select.current.value)}>⚙️</button>
+        `}
     </header>`;
 }
 
