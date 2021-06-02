@@ -77,4 +77,5 @@ class ClassifyNet(Network):
 
     def auto_annotate(self, a):
         preds = self.predict(a.image)
-        self.prediction_to_tag(a.tags, preds[0]['tag'])
+        if len(preds) > 0:
+            self.prediction_to_tag(a.tags, preds[0]['tag'])
