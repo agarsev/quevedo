@@ -104,8 +104,13 @@ documentation with [mkdocs].
 Quevedo is licensed under the [Open Software License version
 3.0](https://opensource.org/licenses/OSL-3.0).
 
-Quevedo web includes a copy of [preactjs] for ease of offline use, distributed
+The web interface includes a copy of [preactjs] for ease of offline use, distributed
 under the [MIT License](https://github.com/preactjs/preact/blob/master/LICENSE).
+
+Quevedo is part of the project "Visualizando la SignoEscritura" (Proyecto VisSE,
+Facultad de Informática, Universidad Complutense de Madrid) as part of the
+program for funding of research projects on Accesible Technologies financed by
+INDRA and Fundación Universia.
 
 ### VisSE team
 
