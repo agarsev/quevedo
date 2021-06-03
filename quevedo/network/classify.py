@@ -56,7 +56,7 @@ class ClassifyNet(Network):
             exposure=augment.get('exposure', 0),
             aspect=augment.get('aspect', 0),
             num_classes=num_classes,
-            num_max_batches=num_classes * 10,  # maybe?
+            num_max_batches=1000 + num_classes * 40,  # maybe?
             num_connected=num_classes * 10)
 
     def predict(self, image):
