@@ -41,6 +41,8 @@ class Stats():
         total_fp = 0
         total_fn = 0
         total_obs = 0
+
+        # Per class
         for name in sorted(tag for tag in self.observations.keys()
                            if tag is not None):
             total_obs += self.observations[name]
@@ -58,9 +60,27 @@ class Stats():
                 'recall': rec,
                 'fscore': safe_divide(2 * prec * rec, prec + rec),
             }
+
+        # Macro average
+        mprec = 0
+        mrec = 0
+        mf = 0
+        n_cls = len(results.items())
+        for r in results.values():
+            mprec += r['precision']
+            mrec += r['recall']
+            mf += r['recall']
+        results['macro'] = {
+            'count': n_cls,
+            'precision': safe_divide(mprec, n_cls),
+            'recall': safe_divide(mrec, n_cls),
+            'fscore': safe_divide(mf, n_cls)
+        }
+
+        # Micro average
         prec = safe_divide(total_tp, total_tp + total_fp)
         rec = safe_divide(total_tp, total_tp + total_fn)
-        results['overall'] = {
+        results['micro'] = {
             'count': total_obs,
             'precision': prec,
             'recall': rec,
@@ -85,9 +105,10 @@ def test(obj, do_print, results_csv, results_json, predictions_csv, on_train):
     '''Compute evaluation metrics for a trained neural network.
 
     By default annotations marked as "test" (see train/test split) are used.
-    Precision, recall and f-score are computed for each class, as well as global
-    metrics (macro average). For more detailed statistics, the full predictions
-    can be printed into a csv to be loaded into other software (like R).'''
+    Precision, recall and f-score are computed for each class, as well as their
+    average (micro) and global metrics (macro average). For more detailed
+    statistics, the full predictions can be printed into a csv to be loaded into
+    other software (like R).'''
 
     dataset = obj['dataset']
     network = dataset.get_network(obj['network'])
