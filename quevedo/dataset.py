@@ -27,7 +27,7 @@ class Dataset:
     # We lazy load the dataset path to allow the "create" command to create the
     # directory but other commands to fail if it doesn't exist. This is due to
     # how click works, and unlikely to be fixed.
-    def __init__(self, path):
+    def __init__(self, path = '.'):
         self._path = Path(path)
         self.logogram_path = self._path / 'logograms'
         self.grapheme_path = self._path / 'graphemes'
@@ -127,10 +127,12 @@ class Dataset:
         '''
         if target == Target.LOGO:
             path = self.logogram_path / subset
+            path.mkdir(exist_ok=True)
             next_id = sum(1 for _ in path.glob('*.png')) + 1
             a = Logogram(path / str(next_id)).create_from(**kwds)
         elif target == Target.GRAPH:
             path = self.grapheme_path / subset
+            path.mkdir(exist_ok=True)
             next_id = sum(1 for _ in path.glob('*.png')) + 1
             a = Grapheme(path / str(next_id)).create_from(**kwds)
         else:

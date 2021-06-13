@@ -22,6 +22,7 @@ from quevedo.run_script import run_script
 @click.option('-D', '--dataset', type=click.Path(), default=getcwd(),
               help="Path to the dataset to use, by default use current directory")
 @click.option('-N', '--network', help="Neural network configuration to use")
+@click.version_option()
 @click.pass_context
 def cli(ctx, dataset, network):
     '''Quevedo is a tool for managing datasets of images with compositional

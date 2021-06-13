@@ -78,6 +78,9 @@ class Annotation:
                 dataset.
             pil_image: [PIL.Image.Image] object to be stored as image file for
                 this annotation in the dataset.
+
+        Returns:
+            self to allow chaining.
         '''
         if image_path is not None:
             copyfile(image_path, self.image_path)
@@ -91,6 +94,7 @@ class Annotation:
                              " object is needed")
         self.update(**kwds)
         self.save()
+        return self
 
     @property
     def image(self):
