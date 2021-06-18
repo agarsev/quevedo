@@ -1,16 +1,1724 @@
 <!DOCTYPE html>
-<html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Redirecting</title>
-  <noscript>
-    <meta http-equiv="refresh" content="1; url=../../1.0/api/" />
-  </noscript>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Reference - Quevedo Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="//use.fontawesome.com/releases/v5.8.1/css/all.css" rel="stylesheet" />
+  <link href="//use.fontawesome.com/releases/v5.8.1/css/v4-shims.css" rel="stylesheet" />
+  <link href="../css/mkapi-common.css" rel="stylesheet" />
+  <link href="../css/mkapi-readthedocs.css" rel="stylesheet" />
+  <link href="../css/version-select.css" rel="stylesheet" />
+  
   <script>
-    window.location.replace("../../1.0/api/");
+    // Current page data
+    var mkdocs_page_name = "Reference";
+    var mkdocs_page_input_path = "api.md";
+    var mkdocs_page_url = null;
   </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
 </head>
-<body>
-  Redirecting to <a href="../../1.0/api/">../../1.0/api/</a>...
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Quevedo Documentation</a>
+        
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Concepts</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../concepts/">Quevedo Datasets</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../nets/">Neural networks</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Admin Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../config/">Dataset Configuration</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../cli/">Command Line Interface</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../web/">Web Interface</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">User Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../guide/">Building a Dataset</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../web_use/">Using the web interface</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../dev/">Quevedo as a library</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Reference</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#datasets">Datasets</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#quevedodatasetdataset">Dataset</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedodatasetdatasetcreate">create</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedodatasetdatasetlist_networks">list_networks</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedodatasetdatasetget_network">get_network</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedodatasetdatasetget_single">get_single</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedodatasetdatasetnew_single">new_single</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedodatasetdatasetget_annotations">get_annotations</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedodatasetdatasetget_subsets">get_subsets</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedodatasetdatasetcreate_subset">create_subset</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#annotations">Annotations</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#quevedoannotationannotationannotation">Annotation</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedoannotationannotationannotationupdate">update</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedoannotationannotationannotationto_dict">to_dict</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedoannotationannotationannotationsave">save</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedoannotationannotationannotationcreate_from">create_from</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#quevedoannotationgraphemegrapheme">Grapheme</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedoannotationannotationannotationsave_1">save</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedoannotationannotationannotationcreate_from_1">create_from</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedoannotationgraphemegraphemeupdate">update</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedoannotationgraphemegraphemeto_dict">to_dict</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#quevedoannotationlogogramlogogram">Logogram</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedoannotationannotationannotationsave_2">save</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedoannotationannotationannotationcreate_from_2">create_from</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedoannotationlogogramlogogramupdate">update</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedoannotationlogogramlogogramto_dict">to_dict</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#quevedoannotationlogogramboundgrapheme">BoundGrapheme</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#networks">Networks</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#quevedonetworknetworknetwork">Network</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedonetworknetworknetworkis_prepared">is_prepared</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedonetworknetworknetworkis_trained">is_trained</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedonetworknetworknetworkget_annotations">get_annotations</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedonetworknetworknetworkprepare">prepare</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedonetworknetworknetworktrain">train</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedonetworknetworknetworkpredict">predict</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedonetworknetworknetworktest">test</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#quevedonetworknetworknetworkauto_annotate">auto_annotate</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Quevedo Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>API &raquo;</li>
+        
+      
+    
+    <li>Reference</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h1>
+<h2 id="datasets">Datasets<a class="headerlink" href="#datasets" title="Permanent link">&para;</a></h2>
+<p>Dataset objects are the main entry point for user code in Quevedo. They provide
+methods to manage the dataset, but also to retrieve other objects within it.
+Therefore, you don't usually need to create instances of other objects directly,
+but rather use the methods in the Dataset class to get them already built.</p>
+<p>For example:</p>
+<pre><code>from quevedo import Dataset, Target
+
+ds = Dataset('path/to/the/dataset')
+
+# annotation is of type quevedo.Grapheme, a subclass of quevedo.Annotation
+annotation = ds.get_single(Target.GRAPH, 'subset', 32)
+print(annotation.to_dict())
+
+# net is of type quevedo.Network
+net = ds.get_network('grapheme_classify')
+net.auto_annotate(annotation)
+annotation.save()
+
+# creating a quevedo.Logogram (subclass of quevedo.Annotation)
+new_a = ds.new_single(Target.LOGO, 'my_new_subset',
+                      image_path='path/to/the/image',
+                      graphemes=[
+                          {'tags': ['character', 'letter_a'],
+                           'box': [0.2, 0.6, 0.3, 0.3]},
+                          {'tags': ['character', 'accute_accent']
+                           'box': [0.2, 0.2, 0.1, 0.2]}
+                      ])
+</code></pre>
+<div class="mkapi-node" id="quevedo.dataset.Dataset">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object class code top">
+    <div class="mkapi-object-kind class top">class</div>
+    <h3 id="quevedodatasetdataset" class="mkapi-object-body class top"><code class="mkapi-object-name"><a href="#quevedodatasetdataset">Dataset</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">path=&#39;.&#39;</code><code class="mkapi-object-parenthesis">)</code></h3>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Class representing a Quevedo dataset.</p>
+<p>It provides access to the annotations, subsets, and any neural networks
+contained.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">path</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">the path to the dataset directory (existing or to be created)</span></li>
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section attributes">
+      <div class="mkapi-section-name attributes">
+          <span class="mkapi-section-name-body attributes">Attributes</span> 
+        </div>
+      <div class="mkapi-section-body attributes"><ul class="mkapi-items">
+
+
+
+<li class="readonly-property"><code class="mkapi-item-name">config</code>
+<span class="mkapi-item-type">(dict)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description"><a href="../config/">Dataset configuration</a></span></li>
+
+
+
+
+
+<li class="readonly-property"><code class="mkapi-item-name">path</code>
+<span class="mkapi-item-type">(pathlib.Path)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Path to the dataset directory.</span></li>
+
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section methods">
+      <div class="mkapi-section-name methods">
+          <span class="mkapi-section-name-body methods">Methods</span> 
+        </div>
+      <div class="mkapi-section-body methods"><ul class="mkapi-items">
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.dataset.Dataset.create">create</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Create or initialize a directory to be a Quevedo dataset.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.dataset.Dataset.create_subset">create_subset</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">target</code>, <code class="mkapi-object-signature">name</code>, <code class="mkapi-object-signature">existing</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Creates the directory for a new subset.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.dataset.Dataset.get_annotations">get_annotations</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">target</code>, <code class="mkapi-object-signature">subset</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Get annotations from the dataset.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.dataset.Dataset.get_network">get_network</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">name</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Get a single neural network by name.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.dataset.Dataset.get_single">get_single</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">target</code>, <code class="mkapi-object-signature">subset</code>, <code class="mkapi-object-signature">id</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Retrieve a single annotation.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.dataset.Dataset.get_subsets">get_subsets</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">target</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Gets information about subsets in the dataset.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.dataset.Dataset.list_networks">list_networks</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Get a list of all neural networks for this dataset.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.dataset.Dataset.new_single">new_single</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">target</code>, <code class="mkapi-object-signature">subset</code>, <code class="mkapi-object-signature">**kwds</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Create a new annotation.</span></li>
+
+
+</ul></div>
+    </div>
+  </div>
+
+  <div class="mkapi-members">
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.dataset.Dataset.create">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedodatasetdatasetcreate" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedodatasetdatasetcreate">create</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Create or initialize a directory to be a Quevedo dataset.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.dataset.Dataset.list_networks">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedodatasetdatasetlist_networks" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedodatasetdatasetlist_networks">list_networks</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Get a list of all neural networks for this dataset.</p></div>
+    </div>
+  <div class="mkapi-section returns">
+      <div class="mkapi-section-name returns">
+          <span class="mkapi-section-name-body returns">Returns</span> 
+        </div>
+      <div class="mkapi-section-body returns"><p>list of <a href="#network">Networks</a></p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.dataset.Dataset.get_network">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedodatasetdatasetget_network" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedodatasetdatasetget_network">get_network</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">name</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Get a single neural network by name.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">name</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">name of the neural network as specified in the configuration
+file. If not provided, the default network will be returned.</span></li>
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section returns">
+      <div class="mkapi-section-name returns">
+          <span class="mkapi-section-name-body returns">Returns</span> 
+        </div>
+      <div class="mkapi-section-body returns"><p>a <a href="#quevedonetworknetworknetwork">Network</a> object.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.dataset.Dataset.get_single">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedodatasetdatasetget_single" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedodatasetdatasetget_single">get_single</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">target</code>, <code class="mkapi-object-signature">subset</code>, <code class="mkapi-object-signature">id</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Retrieve a single annotation.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">target</code>
+<span class="mkapi-item-type">(AnnotationTarget)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description"><a href="#annotations">Target</a> (type) of the annotation to retrieve.</span></li>
+
+<li><code class="mkapi-item-name">subset</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">name of the subset where the annotation is stored.</span></li>
+
+<li><code class="mkapi-item-name">id</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">number of the annotation in the subset.</span></li>
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section returns">
+      <div class="mkapi-section-name returns">
+          <span class="mkapi-section-name-body returns">Returns</span> 
+        </div>
+      <div class="mkapi-section-body returns"><p>a single <a href="#annotation">Annotation</a> of the appropriate type.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.dataset.Dataset.new_single">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedodatasetdatasetnew_single" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedodatasetdatasetnew_single">new_single</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">target</code>, <code class="mkapi-object-signature">subset</code>, <code class="mkapi-object-signature">**kwds</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Create a new annotation.</p>
+<p>This method creates the annotation files in the corresponding directory,
+and initializes them with
+<a href="#quevedo.annotation.annotation.Annotation.create_from"><code>create_from</code></a>.
+Any extra arguments will be passed to that method.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">target</code>
+<span class="mkapi-item-type">(AnnotationTarget)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description"><a href="#annotations">Target</a> (type) of the annotation to create.</span></li>
+
+<li><code class="mkapi-item-name">subset</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">name of the (existing) subset where to place it.</span></li>
+
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section returns">
+      <div class="mkapi-section-name returns">
+          <span class="mkapi-section-name-body returns">Returns</span> 
+        </div>
+      <div class="mkapi-section-body returns"><p>the new <a href="#annotation">Annotation</a>.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.dataset.Dataset.get_annotations">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedodatasetdatasetget_annotations" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedodatasetdatasetget_annotations">get_annotations</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">target=&lt;AnnotationTarget.GRAPH|LOGO: 3&gt;</code>, <code class="mkapi-object-signature">subset=None</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Get annotations from the dataset.</p>
+<p>Depending on the arguments, all annotations, those of a given
+target, or only those in a given subset (or subsets) and target will be
+selected.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">target</code>
+<span class="mkapi-item-type">(AnnotationTarget, optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description"><a href="#annotations">Target</a> (type) of the annotations to
+retrieve. By default, it is the union of both types, so all
+annotations are retrieved: <code>Target.GRAPH | Target.LOGO</code>.</span></li>
+
+<li><code class="mkapi-item-name">subset</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">name of the subsets to get, or <code>None</code> to get annotations from
+all subsets.</span></li>
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section returns">
+      <div class="mkapi-section-name returns">
+          <span class="mkapi-section-name-body returns">Returns</span> 
+        </div>
+      <div class="mkapi-section-body returns"><p>a generator that yields selected annotations.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.dataset.Dataset.get_subsets">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedodatasetdatasetget_subsets" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedodatasetdatasetget_subsets">get_subsets</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">target</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Gets information about subsets in the dataset.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">target</code>
+<span class="mkapi-item-type">(AnnotationTarget)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description"><a href="#annotations">Target</a> (type) of the annotation subsets.</span></li>
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section returns">
+      <div class="mkapi-section-name returns">
+          <span class="mkapi-section-name-body returns">Returns</span> 
+        </div>
+      <div class="mkapi-section-body returns"><p>a sorted list of <code>dict</code>, each with the keys <code>name</code> for the name of
+the subset, and <code>count</code> for the number of annotations in it.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.dataset.Dataset.create_subset">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedodatasetdatasetcreate_subset" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedodatasetdatasetcreate_subset">create_subset</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">target</code>, <code class="mkapi-object-signature">name</code>, <code class="mkapi-object-signature">existing=&#39;a&#39;</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Creates the directory for a new subset.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">target</code>
+<span class="mkapi-item-type">(AnnotationTarget)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description"><a href="#annotations">Target</a> (type) of the annotation subset to create.</span></li>
+
+<li><code class="mkapi-item-name">name</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">name for the new subset.</span></li>
+
+<li><code class="mkapi-item-name">existing</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">controls behaviour when the directory already exists.  It
+can be 'a' to abort (the default), 'r' to remove existing
+annotations, or 'm' (merge) to do nothing.</span></li>
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section returns">
+      <div class="mkapi-section-name returns">
+          <span class="mkapi-section-name-body returns">Returns</span> 
+        </div>
+      <div class="mkapi-section-body returns"><p>the path of the created directory.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+  </div>
+
+</div>
+
+<h2 id="annotations">Annotations<a class="headerlink" href="#annotations" title="Permanent link">&para;</a></h2>
+<p>Quevedo annotations are of two types, logograms and graphemes, both derived from
+the parent class <code>Annotation</code>. When it is necessary to distinguish logograms and
+graphemes in a process, there is the enum <code>Target</code>, which can take the values
+<code>Target.GRAPH</code> or <code>Target.LOGO</code>. the values <code>Target.GRAPH</code> or <code>Target.LOGO</code>.</p>
+<p>There is also the <code>BoundGrapheme</code> class, used to represent each of the graphemes
+which make up a logogram.</p>
+<div class="mkapi-node" id="quevedo.annotation.annotation.Annotation">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object class code top">
+    <div class="mkapi-object-kind class top">class</div>
+    <h3 id="quevedoannotationannotationannotation" class="mkapi-object-body class top"><code class="mkapi-object-name"><a href="#quevedoannotationannotationannotation">Annotation</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">path</code><code class="mkapi-object-parenthesis">)</code></h3>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Class representing a single annotation of either a logogram of a
+sign or signs in the dataset or an isolated grapheme.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">path</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">the full path to the annotation files (either source image or tag
+dictionary, which should share path and filename but not extension
+(the annotation dictionary need not exist).</span></li>
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section attributes">
+      <div class="mkapi-section-name attributes">
+          <span class="mkapi-section-name-body attributes">Attributes</span> 
+        </div>
+      <div class="mkapi-section-body attributes"><ul class="mkapi-items">
+
+<li><code class="mkapi-item-name">id</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Number which identifies this annotation in its subset.</span></li>
+
+<li class="readonly-property"><code class="mkapi-item-name">image</code>
+<span class="mkapi-item-type">(PIL.Image.Image)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">image data for this annotation.</span></li>
+
+<li><code class="mkapi-item-name">image_path</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Path to the source image for the annotation. It is the id plus <code>png</code> extension.</span></li>
+
+<li><code class="mkapi-item-name">json_path</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Path to the json annotation file. It is the id plus <code>json</code> extension.</span></li>
+
+<li><code class="mkapi-item-name">meta</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Dictionary of metadata annotations.</span></li>
+
+<li><code class="mkapi-item-name">set</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Train/test split to which the annotation belongs.</span></li>
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section methods">
+      <div class="mkapi-section-name methods">
+          <span class="mkapi-section-name-body methods">Methods</span> 
+        </div>
+      <div class="mkapi-section-body methods"><ul class="mkapi-items">
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.annotation.annotation.Annotation.create_from">create_from</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">image_path</code>, <code class="mkapi-object-signature">binary_data</code>, <code class="mkapi-object-signature">pil_image</code>, <code class="mkapi-object-signature">**kwds</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Initialize an annotation with some source image data.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.annotation.annotation.Annotation.save">save</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Persist the information to the filesystem.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.annotation.annotation.Annotation.to_dict">to_dict</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Get the annotation data as a dictionary.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.annotation.annotation.Annotation.update">update</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">meta</code>, <code class="mkapi-object-signature">set</code>, <code class="mkapi-object-signature">**kwds</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Update the content of the annotation.</span></li>
+
+
+</ul></div>
+    </div>
+  </div>
+
+  <div class="mkapi-members">
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.annotation.annotation.Annotation.update">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedoannotationannotationannotationupdate" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedoannotationannotationannotationupdate">update</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">meta=None</code>, <code class="mkapi-object-signature">set=None</code>, <code class="mkapi-object-signature">**kwds</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Update the content of the annotation.</p>
+<p>This method should be overriden by the specific annotation classes to
+add their specific annotation information.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">meta</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">dictionary of metadata values to set.</span></li>
+
+<li><code class="mkapi-item-name">set</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">train/test split to which the annotation will belong.</span></li>
+
+
+
+</ul></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.annotation.annotation.Annotation.to_dict">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedoannotationannotationannotationto_dict" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedoannotationannotationannotationto_dict">to_dict</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Get the annotation data as a dictionary.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.annotation.annotation.Annotation.save">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedoannotationannotationannotationsave" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedoannotationannotationannotationsave">save</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Persist the information to the filesystem.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.annotation.annotation.Annotation.create_from">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedoannotationannotationannotationcreate_from" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedoannotationannotationannotationcreate_from">create_from</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">image_path=None</code>, <code class="mkapi-object-signature">binary_data=None</code>, <code class="mkapi-object-signature">pil_image=None</code>, <code class="mkapi-object-signature">**kwds</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Initialize an annotation with some source image data.</p>
+<p>One of <code>image_path</code>, <code>binary_data</code> or <code>pil_image</code> must be provided.
+Other arguments will be passed to
+<a href="#quevedo.annotation.annotation.Annotation.update"><code>update</code></a> so metadata
+or tags can also be set.</p>
+<p>The annotation will be persisted with a call to <code>save</code> too.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">image_path</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">path to an image in the filesystem to use as image for
+this annotation. The image will be <strong>copied</strong> into the dataset.</span></li>
+
+<li><code class="mkapi-item-name">binary_data</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">bytes array which encodes the source image. The
+contents will be dumped to the appropriate image file in the
+dataset.</span></li>
+
+<li><code class="mkapi-item-name">pil_image</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">[PIL.Image.Image] object to be stored as image file for
+this annotation in the dataset.</span></li>
+
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section returns">
+      <div class="mkapi-section-name returns">
+          <span class="mkapi-section-name-body returns">Returns</span> 
+        </div>
+      <div class="mkapi-section-body returns"><p>self to allow chaining.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+  </div>
+
+</div>
+
+<div class="mkapi-node" id="quevedo.annotation.grapheme.Grapheme">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object class code top">
+    <div class="mkapi-object-kind class top">class</div>
+    <h3 id="quevedoannotationgraphemegrapheme" class="mkapi-object-body class top"><code class="mkapi-object-name"><a href="#quevedoannotationgraphemegrapheme">Grapheme</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">*args</code><code class="mkapi-object-parenthesis">)</code></h3>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section bases">
+      <div class="mkapi-section-name bases">
+          <span class="mkapi-section-name-body bases">Bases</span> 
+        </div>
+      <div class="mkapi-section-body bases">
+<span class="mkapi-base">quevedo.annotation.annotation.Annotation</span>
+</div>
+    </div>
+  <div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Annotation for an isolated grapheme.</p></div>
+    </div>
+  <div class="mkapi-section attributes">
+      <div class="mkapi-section-name attributes">
+          <span class="mkapi-section-name-body attributes">Attributes</span> 
+        </div>
+      <div class="mkapi-section-body attributes"><ul class="mkapi-items">
+
+<li><code class="mkapi-item-name">id</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Number which identifies this annotation in its subset.</span></li>
+
+<li class="readonly-property"><code class="mkapi-item-name">image</code>
+<span class="mkapi-item-type">(PIL.Image.Image)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">image data for this annotation.</span></li>
+
+<li><code class="mkapi-item-name">image_path</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Path to the source image for the annotation. It is the id plus <code>png</code> extension.</span></li>
+
+<li><code class="mkapi-item-name">json_path</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Path to the json annotation file. It is the id plus <code>json</code> extension.</span></li>
+
+<li><code class="mkapi-item-name">meta</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Dictionary of metadata annotations.</span></li>
+
+<li><code class="mkapi-item-name">set</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Train/test split to which the annotation belongs.</span></li>
+
+<li><code class="mkapi-item-name">tags</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">list of values for this grapheme's tags in the dataset's <code>tag_schema</code>.</span></li>
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section methods">
+      <div class="mkapi-section-name methods">
+          <span class="mkapi-section-name-body methods">Methods</span> 
+        </div>
+      <div class="mkapi-section-body methods"><ul class="mkapi-items">
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.annotation.annotation.Annotation.create_from">create_from</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">image_path</code>, <code class="mkapi-object-signature">binary_data</code>, <code class="mkapi-object-signature">pil_image</code>, <code class="mkapi-object-signature">**kwds</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Initialize an annotation with some source image data.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.annotation.annotation.Annotation.save">save</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Persist the information to the filesystem.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.annotation.grapheme.Grapheme.to_dict">to_dict</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Get the annotation data as a dictionary.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.annotation.grapheme.Grapheme.update">update</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">tags</code>, <code class="mkapi-object-signature">**kwds</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Extends base
+<a href="#quevedo.annotation.annotation.Annotation.update"><code>update</code></a>, other
+arguments will be passed through.</span></li>
+
+
+</ul></div>
+    </div>
+  </div>
+
+  <div class="mkapi-members">
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.annotation.annotation.Annotation.save">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedoannotationannotationannotationsave_1" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedoannotationannotationannotationsave_1">save</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Persist the information to the filesystem.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.annotation.annotation.Annotation.create_from">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedoannotationannotationannotationcreate_from_1" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedoannotationannotationannotationcreate_from_1">create_from</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">image_path=None</code>, <code class="mkapi-object-signature">binary_data=None</code>, <code class="mkapi-object-signature">pil_image=None</code>, <code class="mkapi-object-signature">**kwds</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Initialize an annotation with some source image data.</p>
+<p>One of <code>image_path</code>, <code>binary_data</code> or <code>pil_image</code> must be provided.
+Other arguments will be passed to
+<a href="#quevedo.annotation.annotation.Annotation.update"><code>update</code></a> so metadata
+or tags can also be set.</p>
+<p>The annotation will be persisted with a call to <code>save</code> too.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">image_path</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">path to an image in the filesystem to use as image for
+this annotation. The image will be <strong>copied</strong> into the dataset.</span></li>
+
+<li><code class="mkapi-item-name">binary_data</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">bytes array which encodes the source image. The
+contents will be dumped to the appropriate image file in the
+dataset.</span></li>
+
+<li><code class="mkapi-item-name">pil_image</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">[PIL.Image.Image] object to be stored as image file for
+this annotation in the dataset.</span></li>
+
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section returns">
+      <div class="mkapi-section-name returns">
+          <span class="mkapi-section-name-body returns">Returns</span> 
+        </div>
+      <div class="mkapi-section-body returns"><p>self to allow chaining.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.annotation.grapheme.Grapheme.update">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedoannotationgraphemegraphemeupdate" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedoannotationgraphemegraphemeupdate">update</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">tags=None</code>, <code class="mkapi-object-signature">**kwds</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Extends base
+<a href="#quevedo.annotation.annotation.Annotation.update"><code>update</code></a>, other
+arguments will be passed through.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+
+<li><code class="mkapi-item-name">tags</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">new tags for this grapheme (replaces all).</span></li>
+
+
+</ul></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.annotation.grapheme.Grapheme.to_dict">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedoannotationgraphemegraphemeto_dict" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedoannotationgraphemegraphemeto_dict">to_dict</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Get the annotation data as a dictionary.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+  </div>
+
+</div>
+
+<div class="mkapi-node" id="quevedo.annotation.logogram.Logogram">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object class code top">
+    <div class="mkapi-object-kind class top">class</div>
+    <h3 id="quevedoannotationlogogramlogogram" class="mkapi-object-body class top"><code class="mkapi-object-name"><a href="#quevedoannotationlogogramlogogram">Logogram</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">*args</code><code class="mkapi-object-parenthesis">)</code></h3>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section bases">
+      <div class="mkapi-section-name bases">
+          <span class="mkapi-section-name-body bases">Bases</span> 
+        </div>
+      <div class="mkapi-section-body bases">
+<span class="mkapi-base">quevedo.annotation.annotation.Annotation</span>
+</div>
+    </div>
+  <div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Annotation for a logogram, with its contained graphemes.</p></div>
+    </div>
+  <div class="mkapi-section attributes">
+      <div class="mkapi-section-name attributes">
+          <span class="mkapi-section-name-body attributes">Attributes</span> 
+        </div>
+      <div class="mkapi-section-body attributes"><ul class="mkapi-items">
+
+<li><code class="mkapi-item-name">graphemes</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">list of <a href="#quevedoannotationlogogramboundgrapheme">bound graphemes</a> found within this logogram.</span></li>
+
+<li><code class="mkapi-item-name">id</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Number which identifies this annotation in its subset.</span></li>
+
+<li class="readonly-property"><code class="mkapi-item-name">image</code>
+<span class="mkapi-item-type">(PIL.Image.Image)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">image data for this annotation.</span></li>
+
+<li><code class="mkapi-item-name">image_path</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Path to the source image for the annotation. It is the id plus <code>png</code> extension.</span></li>
+
+<li><code class="mkapi-item-name">json_path</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Path to the json annotation file. It is the id plus <code>json</code> extension.</span></li>
+
+<li><code class="mkapi-item-name">meta</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Dictionary of metadata annotations.</span></li>
+
+<li><code class="mkapi-item-name">set</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Train/test split to which the annotation belongs.</span></li>
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section methods">
+      <div class="mkapi-section-name methods">
+          <span class="mkapi-section-name-body methods">Methods</span> 
+        </div>
+      <div class="mkapi-section-body methods"><ul class="mkapi-items">
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.annotation.annotation.Annotation.create_from">create_from</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">image_path</code>, <code class="mkapi-object-signature">binary_data</code>, <code class="mkapi-object-signature">pil_image</code>, <code class="mkapi-object-signature">**kwds</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Initialize an annotation with some source image data.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.annotation.annotation.Annotation.save">save</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Persist the information to the filesystem.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.annotation.logogram.Logogram.to_dict">to_dict</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Get the annotation data as a dictionary.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.annotation.logogram.Logogram.update">update</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">graphemes</code>, <code class="mkapi-object-signature">**kwds</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Extends base
+<a href="#quevedo.annotation.annotation.Annotation.update"><code>update</code></a>, other
+arguments will be passed through.</span></li>
+
+
+</ul></div>
+    </div>
+  </div>
+
+  <div class="mkapi-members">
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.annotation.annotation.Annotation.save">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedoannotationannotationannotationsave_2" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedoannotationannotationannotationsave_2">save</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Persist the information to the filesystem.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.annotation.annotation.Annotation.create_from">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedoannotationannotationannotationcreate_from_2" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedoannotationannotationannotationcreate_from_2">create_from</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">image_path=None</code>, <code class="mkapi-object-signature">binary_data=None</code>, <code class="mkapi-object-signature">pil_image=None</code>, <code class="mkapi-object-signature">**kwds</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Initialize an annotation with some source image data.</p>
+<p>One of <code>image_path</code>, <code>binary_data</code> or <code>pil_image</code> must be provided.
+Other arguments will be passed to
+<a href="#quevedo.annotation.annotation.Annotation.update"><code>update</code></a> so metadata
+or tags can also be set.</p>
+<p>The annotation will be persisted with a call to <code>save</code> too.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">image_path</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">path to an image in the filesystem to use as image for
+this annotation. The image will be <strong>copied</strong> into the dataset.</span></li>
+
+<li><code class="mkapi-item-name">binary_data</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">bytes array which encodes the source image. The
+contents will be dumped to the appropriate image file in the
+dataset.</span></li>
+
+<li><code class="mkapi-item-name">pil_image</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">[PIL.Image.Image] object to be stored as image file for
+this annotation in the dataset.</span></li>
+
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section returns">
+      <div class="mkapi-section-name returns">
+          <span class="mkapi-section-name-body returns">Returns</span> 
+        </div>
+      <div class="mkapi-section-body returns"><p>self to allow chaining.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.annotation.logogram.Logogram.update">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedoannotationlogogramlogogramupdate" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedoannotationlogogramlogogramupdate">update</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">graphemes=None</code>, <code class="mkapi-object-signature">**kwds</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Extends base
+<a href="#quevedo.annotation.annotation.Annotation.update"><code>update</code></a>, other
+arguments will be passed through.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+
+<li><code class="mkapi-item-name">graphemes</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">a list of dicts with the grapheme information for this logogram.
+The dicts must have the keys necessary to initialize a
+<a href="quevedoannotationlogogramboundgrapheme">BoundGrapheme</a>.</span></li>
+
+
+</ul></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.annotation.logogram.Logogram.to_dict">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedoannotationlogogramlogogramto_dict" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedoannotationlogogramlogogramto_dict">to_dict</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Get the annotation data as a dictionary.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+  </div>
+
+</div>
+
+<div class="mkapi-node" id="quevedo.annotation.logogram.BoundGrapheme">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object class code top">
+    <div class="mkapi-object-kind class top">class</div>
+    <h3 id="quevedoannotationlogogramboundgrapheme" class="mkapi-object-body class top"><code class="mkapi-object-name"><a href="#quevedoannotationlogogramboundgrapheme">BoundGrapheme</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">logogram</code>, <code class="mkapi-object-signature">box=[0, 0, 0, 0]</code>, <code class="mkapi-object-signature">tags=[]</code><code class="mkapi-object-parenthesis">)</code></h3>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>A grapheme which is not isolated, but rather forms part of a logogram.</p>
+<p>To promote this bound grapheme to an isolated grapheme with its own
+annotation, create a grapheme object using
+<a href="#quevedo.annotation.annotation.Annotation.create_from"><code>create_from</code></a>,
+passing this object's <code>image</code> to the argument <code>pil_image</code>.</p></div>
+    </div>
+  <div class="mkapi-section attributes">
+      <div class="mkapi-section-name attributes">
+          <span class="mkapi-section-name-body attributes">Attributes</span> 
+        </div>
+      <div class="mkapi-section-body attributes"><ul class="mkapi-items">
+
+<li><code class="mkapi-item-name">box</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Coordinates (x, y, w, h) of this grapheme's bounding box within the logogram. x and y are the coordinates of the <strong>center</strong>. Values are relative to the logogram size, in the range <code>[0, 1]</code>.</span></li>
+
+<li class="readonly-property"><code class="mkapi-item-name">image</code>
+<span class="mkapi-item-type">(PIL.Image.Image)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">image data for only this grapheme, cropped out of
+the parent logogram's image.</span></li>
+
+<li><code class="mkapi-item-name">logogram</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Logogram where this grapheme is found.</span></li>
+
+<li><code class="mkapi-item-name">tags</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">list of values for this grapheme's tags in the dataset's <code>tag_schema</code>.</span></li>
+
+
+</ul></div>
+    </div>
+  </div>
+
+</div>
+
+<h2 id="networks">Networks<a class="headerlink" href="#networks" title="Permanent link">&para;</a></h2>
+<p>Network objects in Quevedo represent the network itself, but also their
+configuration, training and testing process, and use. There are two types of
+networks, <a href="../nets/#detector">Detector</a> networks and
+<a href="../nets/#classifier">Classifier</a> networks, which work on logograms and graphemes
+respectively.</p>
+<p>The Network base class documented here is a base class that defines general
+behaviour, but code specific to each type of network lives in its own class.
+Therefore, you should get the network from a Quevedo dataset's method
+<a href="#quevedodatasetdatasetget_network"><code>get_network</code></a> so that the proper instance
+is built.</p>
+<div class="mkapi-node" id="quevedo.network.network.Network">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object class code top">
+    <div class="mkapi-object-kind class top">class</div>
+    <h3 id="quevedonetworknetworknetwork" class="mkapi-object-body class top"><code class="mkapi-object-name"><a href="#quevedonetworknetworknetwork">Network</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">dataset</code>, <code class="mkapi-object-signature">name</code><code class="mkapi-object-parenthesis">)</code></h3>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Class representing a neural net to train and predict logograms or
+graphemes.</p></div>
+    </div>
+  <div class="mkapi-section attributes">
+      <div class="mkapi-section-name attributes">
+          <span class="mkapi-section-name-body attributes">Attributes</span> 
+        </div>
+      <div class="mkapi-section-body attributes"><ul class="mkapi-items">
+
+<li><code class="mkapi-item-name">config</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Dictionary with the network configuration</span></li>
+
+<li><code class="mkapi-item-name">dataset</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Parent dataset</span></li>
+
+<li><code class="mkapi-item-name">get_tag</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">function to get the relevant tag/label/class for the network from a list of tags according to the dataset's <code>tag_schema</code></span></li>
+
+<li><code class="mkapi-item-name">name</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Name of the network</span></li>
+
+<li><code class="mkapi-item-name">path</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Path to the network directory</span></li>
+
+<li><code class="mkapi-item-name">prediction_to_tag</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">function to get the <code>tag_schema</code> values from the tag/label/class predicted by the network</span></li>
+
+
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section methods">
+      <div class="mkapi-section-name methods">
+          <span class="mkapi-section-name-body methods">Methods</span> 
+        </div>
+      <div class="mkapi-section-body methods"><ul class="mkapi-items">
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.network.network.Network.auto_annotate">auto_annotate</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">annotation</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Use the network to automatically annotate a real instance.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.network.network.Network.get_annotations">get_annotations</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">set</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Get the annotations configured for use with this network.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.network.network.Network.is_prepared">is_prepared</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Checks whether the neural network configuration files have been
+made.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.network.network.Network.is_trained">is_trained</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Checks whether the neural network has been trained and can be used to
+predict.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.network.network.Network.predict">predict</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">image_path</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Use the trained neural network to predict results from an image.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.network.network.Network.prepare">prepare</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Creates the files needed for training (and later using) darknet.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.network.network.Network.test">test</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">annotation</code>, <code class="mkapi-object-signature">stats</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Method to test the network on an annotation.</span></li>
+
+<li class="method"><code class="mkapi-item-name"><a href="#quevedo.network.network.Network.train">train</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">initial</code><code class="mkapi-object-parenthesis">)</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">Trains the neural network.</span></li>
+
+
+</ul></div>
+    </div>
+  </div>
+
+  <div class="mkapi-members">
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.network.network.Network.is_prepared">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedonetworknetworknetworkis_prepared" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedonetworknetworknetworkis_prepared">is_prepared</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Checks whether the neural network configuration files have been
+made.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.network.network.Network.is_trained">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedonetworknetworknetworkis_trained" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedonetworknetworknetworkis_trained">is_trained</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Checks whether the neural network has been trained and can be used to
+predict.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.network.network.Network.get_annotations">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedonetworknetworknetworkget_annotations" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedonetworknetworknetworkget_annotations">get_annotations</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">set=&#39;train&#39;</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Get the annotations configured for use with this network.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">set</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">retrieve either train or test annotations.</span></li>
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section returns">
+      <div class="mkapi-section-name returns">
+          <span class="mkapi-section-name-body returns">Returns</span> 
+        </div>
+      <div class="mkapi-section-body returns"><p>a list of relevant <a href="#annotations">Annotations</a>.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.network.network.Network.prepare">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedonetworknetworknetworkprepare" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedonetworknetworknetworkprepare">prepare</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Creates the files needed for training (and later using) darknet.</p>
+<p>Stores the files in the network directory so they can be reused or
+tracked by a version control system. Must be called before training, and
+files not deleted (except maybe the "train" directory) before
+testing or predicting with the net.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.network.network.Network.train">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedonetworknetworknetworktrain" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedonetworknetworknetworktrain">train</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">initial=None</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Trains the neural network.</p>
+<p>When finished, removes partial weights and keeps only the last. Can be
+interrupted and optionally resumed later.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">initial</code>
+<span class="mkapi-item-type">(optional)</span>
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">path to the weights from which to resume training.</span></li>
+
+
+</ul></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.network.network.Network.predict">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedonetworknetworknetworkpredict" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedonetworknetworknetworkpredict">predict</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">image_path</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Use the trained neural network to predict results from an image.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">image_path</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description">path to the image in the file system.</span></li>
+
+
+</ul></div>
+    </div>
+  <div class="mkapi-section returns">
+      <div class="mkapi-section-name returns">
+          <span class="mkapi-section-name-body returns">Returns</span> 
+        </div>
+      <div class="mkapi-section-body returns"><p>a list of dictionaries with the predictions. Each prediction has a
+<code>confidence</code> value. Classify networks have a <code>tag</code> key for the
+predicted class, each entry is a possible classification of the
+image. Detector networks results are possible graphemes found, each
+with a <code>name</code> (predicted class) and <code>box</code> (bounding box).</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.network.network.Network.test">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedonetworknetworknetworktest" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedonetworknetworknetworktest">test</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">annotation</code>, <code class="mkapi-object-signature">stats</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Method to test the network on an annotation.</p>
+<p>This method is intended for internal library use, you probably want to
+use <code>predict</code> instead.</p>
+<p>Uses the network to get the prediction for a real annotation, compare
+results and update stats. See <code>test.py</code> for <code>stats</code>.</p></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+    <div class="mkapi-member">
+      <div class="mkapi-node" id="quevedo.network.network.Network.auto_annotate">
+<div class='mkapi-object-container'>
+  <div class="mkapi-object method code">
+    <div class="mkapi-object-kind method">method</div>
+    <h4 id="quevedonetworknetworknetworkauto_annotate" class="mkapi-object-body method"><code class="mkapi-object-name"><a href="#quevedonetworknetworknetworkauto_annotate">auto_annotate</a></code><code class="mkapi-object-parenthesis">(</code><code class="mkapi-object-signature">annotation</code><code class="mkapi-object-parenthesis">)</code></h4>
+  </div>
+  
+</div>
+<div class="mkapi-docstring">
+<div class="mkapi-section">
+      <div class="mkapi-section-body"><p>Use the network to automatically annotate a real instance.</p>
+<p>In detector networks, existing bound graphemes will be removed. In
+classify networks, tags which are not relevant to this network won't be
+modified, so it can be used incrementally.</p></div>
+    </div>
+  <div class="mkapi-section parameters">
+      <div class="mkapi-section-name parameters">
+          <span class="mkapi-section-name-body parameters">Parameters</span> 
+        </div>
+      <div class="mkapi-section-body parameters"><ul class="mkapi-items">
+<li><code class="mkapi-item-name">annotation</code>
+
+<span class="mkapi-item-dash">&mdash;</span> <span class="mkapi-item-description"><a href="#annotations">Annotation</a> to automatically tag using
+this network's predictions.</span></li>
+
+
+</ul></div>
+    </div>
+  </div>
+
+</div>
+    </div>
+  
+  </div>
+
+</div>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../dev/" class="btn btn-neutral" title="Quevedo as a library"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/agarsev/quevedo" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../dev/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../js/mkapi.js" defer></script>
+      <script src="../js/version-select.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>
