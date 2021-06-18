@@ -18,6 +18,7 @@ Options:
   -D, --dataset PATH  Path to the dataset to use, by default use current
                       directory
   -N, --network TEXT  Neural network configuration to use
+  --version           Show the version and exit.
   --help              Show this message and exit.
 
 Commands:
@@ -212,9 +213,10 @@ Usage: quevedo test [OPTIONS]
   Compute evaluation metrics for a trained neural network.
 
   By default annotations marked as "test" (see train/test split) are used.
-  Precision, recall and f-score are computed for each class, as well as global
-  metrics (macro average). For more detailed statistics, the full predictions
-  can be printed into a csv to be loaded into other software (like R).
+  Precision, recall and f-score are computed for each class, as well as their
+  average (micro) and global metrics (macro average). For more detailed
+  statistics, the full predictions can be printed into a csv to be loaded into
+  other software (like R).
 
 Options:
   -p, --print / --no-print        Show results in the command line
@@ -258,13 +260,15 @@ Options:
 ## `run_script`
 
 ```txt
-Usage: quevedo run_script [OPTIONS]
+Usage: quevedo run_script [OPTIONS] [EXTRA_ARGS]...
 
   Run a data processing script on dataset objects.
 
   The script should be in the 'scripts' directory of the dataset, and have a
   "process" method which will be called by Quevedo on each grapheme or
-  logogram in the selected subsets.
+  logogram in the selected subsets. If it has an "init" method, it will be
+  called once and firstmost, with any extra arguments that have been passed to
+  this command.
 
 Options:
   -s, --scriptname TEXT    Name of the script to run, without path or
