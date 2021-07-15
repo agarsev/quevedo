@@ -38,8 +38,11 @@ function GraphemeList ({ id, graphemes, columns }) {
         // on mouse up, we stop drawing but keep selected box
         document.addEventListener('mouseup', () =>
             setEditing(es => es!=null?({ idx: es.idx }):null))
+        document.addEventListener('touchend', () =>
+            setEditing(es => es!=null?({ idx: es.idx }):null))
         // on mouse down outside the annotation, we stop drawing
         document.addEventListener('mousedown', () => setEditing(null));
+        document.addEventListener('touchstart', () => setEditing(null));
     }, []);
 
     const removeGrapheme = i => {
@@ -138,8 +141,9 @@ function Annotation ({ id, graphemes, colors, editing_grapheme, setEditing }) {
             editing_grapheme = { ...editing_grapheme }; // should be cloned
         }
         const { left, top } = image_rect.current.getBoundingClientRect();
-        editing_grapheme.start_x = e.clientX - left;
-        editing_grapheme.start_y = e.clientY - top;
+        const pos = e.type == 'touchstart' ? e.touches[0] : e;
+        editing_grapheme.start_x = pos.clientX - left;
+        editing_grapheme.start_y = pos.clientY - top;
         graphemes.update_fn(editing_grapheme.idx, s => ({ ...s, box: [
             editing_grapheme.start_x/image_width, editing_grapheme.start_y/image_height,
             0,0] }), `GRAPH_${editing_grapheme.idx}_UPD_BOX`);
@@ -151,8 +155,9 @@ function Annotation ({ id, graphemes, colors, editing_grapheme, setEditing }) {
         if (editing_grapheme === null) return;
         if (editing_grapheme.start_x === undefined) return;
         const { left, top } = image_rect.current.getBoundingClientRect();
-        const mx = e.clientX - left;
-        const my = e.clientY - top;
+        const pos = e.type == 'touchmove' ? e.touches[0] : e;
+        const mx = pos.clientX - left;
+        const my = pos.clientY - top;
         const bw = mx - editing_grapheme.start_x;
         const bh = my - editing_grapheme.start_y;
         graphemes.update_fn(editing_grapheme.idx, s => ({ ...s, box: [
@@ -169,6 +174,8 @@ function Annotation ({ id, graphemes, colors, editing_grapheme, setEditing }) {
             ref=${image_rect}
             onmousedown=${mouse_down}
             onmousemove=${mouse_move}
+            ontouchstart=${mouse_down}
+            ontouchmove=${mouse_move}
         />
         ${graphemes.list.map((s, i) => html`<${BBox}
                 x=${s.box[0]} y=${s.box[1]}

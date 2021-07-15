@@ -26,8 +26,9 @@ Version 1.1 + Dataset version 1 (not compatible with 0)
     git/dvc. A directory for "splits", these splits list annotations, can be
     shared by different nets.
 - [ ] Web interface improvements
+    - [X] Allow using touch in mobile devices
     - [ ] Filter/search annotations in listing according to some tag(s).
-    - [ ] Autosuggest values for tagging.
+    - [ ] Autosuggest values for tagging, maybe use https://developer.mozilla.org/en-US/docs/Web/HTML/Element/datalist
     - [ ] Remove "saved" message when doing changes (inconsistent)
     - [ ] Instead of a "check" for annotated/not annotated, custom "flags" in
         config.toml that are checkboxes in meta and can be toggled in web interface.
