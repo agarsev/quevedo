@@ -2,7 +2,7 @@
 // Licensed under the Open Software License version 3.0
 
 import Text from './i18n.js';
-import { useChangeStack, useList } from './common_state.js';
+import { useChangeStack, useList, useDict } from './common_state.js';
 import { LogogramEditor } from './logo.js';
 import { GraphemeEditor } from './graph.js';
 
@@ -16,23 +16,13 @@ function App ({ title, target, id, annotation_help, links, anot,
     columns, functions, meta_tags }) {
 
     const changes = useChangeStack();
-
-    const [ meta, _setMeta ] = useState(anot.meta);
-    const setAllMeta = (nu_meta) => {
-        changes.push(() => _setMeta(meta), `UPD_META_ALL`);
-        _setMeta(nu_meta);
-    };
-    const setMeta = (k, v) => {
-        changes.push(() => _setMeta(meta), `UPD_META_${k}`);
-        _setMeta({ ...meta, [k]: v });
-    };
-
+    const meta = useDict(anot.meta, changes);
     const is_logo = target == 'logograms';
 
     if (is_logo) {
         var graphemes = useList(anot.graphemes, changes)
     } else {
-        var tags = useList(anot.tags, changes);
+        var tags = useDict(anot.tags, changes);
     }
 
     const [ message, setMessage ] = useState('');
@@ -48,9 +38,9 @@ function App ({ title, target, id, annotation_help, links, anot,
         changes.setSaving();
         setMessage(Text['saving']);
         if (is_logo) {
-            var body = { meta, graphemes: graphemes.list }
+            var body = { meta: meta.dict, graphemes: graphemes.list }
         } else {
-            var body = { meta, tags: tags.list }
+            var body = { meta: meta.dict, tags: tags.dict }
         }
         fetch(`api/save/${id.full}`, {
             method: 'POST',
@@ -75,7 +65,7 @@ function App ({ title, target, id, annotation_help, links, anot,
                 return r.json();
             } else throw r;
         }).then(data => {
-            setAllMeta(data.meta);
+            meta.set(data.meta, 'UPD_META_ALL');
             if (is_logo) {
                 // sort graphemes left-to-right (roughly) and top-to-bottom (strict)
                 data.graphemes.sort((a, b) => {
@@ -89,7 +79,7 @@ function App ({ title, target, id, annotation_help, links, anot,
                 });
                 graphemes.set(data.graphemes);
             } else {
-                tags.set(data.tags);
+                tags.set(data.tags, 'UPD_TAGS_ALL');
             }
         }).catch(setError);
     };
@@ -98,7 +88,7 @@ function App ({ title, target, id, annotation_help, links, anot,
         <${Header} ...${{title, id, links, saveChanges,
             message, show_save: changes.dirty>0, runFunction,
             functions, changes }} />
-        <${MetaEditor} ...${{meta_tags, meta, setMeta}} />
+        <${MetaEditor} ...${{meta_tags, meta }} />
         ${is_logo?
             html`<${LogogramEditor} ...${{id, graphemes, columns}} />`
             :html`<${GraphemeEditor} ...${{id, tags, columns}} />`}
@@ -129,14 +119,14 @@ function Header ({ title, id, links, saveChanges, message, show_save,
     </header>`;
 }
 
-function MetaEditor ({ meta_tags, meta, setMeta }) {
+function MetaEditor ({ meta_tags, meta }) {
     return html`<div class="MetaEditor">
         <h2>${Text['meta']}</h2>
         <table>${meta_tags.map(k => html`<tr>
             <th>${k}:</th>
             <td><textarea rows="1" autocomplete="off"
-                oninput=${e => setMeta(k, e.target.value)}
-                value=${meta[k] || ''} />
+                oninput=${e => meta.update(k, e.target.value, `UPD_META_${k}`)}
+                value=${meta.dict[k] || ''} />
             </td>
         </tr>`)}</table>
     </div>`;

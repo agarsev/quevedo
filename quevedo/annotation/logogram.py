@@ -44,13 +44,13 @@ class BoundGrapheme():
     passing this object's `image` to the argument `pil_image`.
     '''
 
-    def __init__(self, logogram, box=[0, 0, 0, 0], tags=[]):
+    def __init__(self, logogram, box=[0, 0, 0, 0], tags={}):
         #: Logogram where this grapheme is found.
         self.logogram = logogram
         #: Coordinates (x, y, w, h) of this grapheme's bounding box within the logogram. x and y are the coordinates of the **center**. Values are relative to the logogram size, in the range `[0, 1]`.
         self.box = box  # type: list[float]
-        #: list of values for this grapheme's tags in the dataset's `tag_schema`.
-        self.tags = tags  # type: list[str]
+        #: annotated tags for this grapheme.
+        self.tags = tags  # type: dict[str,str]
 
     def to_dict(self):
         return {'box': self.box, 'tags': self.tags}

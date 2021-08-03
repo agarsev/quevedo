@@ -82,3 +82,14 @@ export function useList (initial_value, change_stack) {
         }
     };
 }
+
+export function useDict (initial_value, change_stack) {
+    const [ dict, setDict ] = useState(initial_value);
+    const set = (d, action) => {
+        change_stack.push(() => setDict(dict), action);
+        setDict(d);
+    };
+    return { dict, set,
+        update: (k, v, action) => set({...dict, [k]: v}, action)
+    };
+}

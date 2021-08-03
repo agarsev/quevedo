@@ -19,12 +19,12 @@ export function GraphemeEditor ({ id, tags, columns }) {
 
 function TagEditor ({ tags, columns }) {
     return html`<div><table><tbody>
-        ${columns.map((c, i) => html`<tr>
+        ${columns.map(c => html`<tr>
             <th>${c}:</th>
             <td><input type=text
-                value=${tags.list[i] || ''}
-                oninput=${v => tags.update(i, 
-                    v.target.value, `TAG_${i}_UPD`)}
+                value=${tags.dict[c] || ''}
+                oninput=${v => tags.update(c,
+                    v.target.value, `TAG_${c}_UPD`)}
             /></td>
         </tr>`)}
     </tbody></table></div>`

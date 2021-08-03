@@ -30,7 +30,7 @@ class Dataset:
     # We lazy load the dataset path to allow the "create" command to create the
     # directory but other commands to fail if it doesn't exist. This is due to
     # how click works, and unlikely to be fixed.
-    def __init__(self, path = '.'):
+    def __init__(self, path='.'):
         self._path = Path(path)
         self.logogram_path = self._path / 'logograms'
         self.grapheme_path = self._path / 'graphemes'
@@ -396,12 +396,12 @@ def info(obj):
     click.echo('Annotated: {}/{}'.format(
         style(num_annot == num_logos, num_annot), num_logos))
 
-    graphemes = list(dataset.get_annotations(Target.GRAPH))
+    graphemes = list(dataset.get_annotations(Target.GRAPH))  # type: list[Grapheme]
     num_graph = count(graphemes)
     click.echo('\nGraphemes: {}'.format(style(num_graph > 0, num_graph)))
     click.echo('Subsets: {}'.format(
         ', '.join(s['name'] for s in dataset.get_subsets(Target.GRAPH))))
-    num_annot = sum(len(s.tags) > 0 for s in graphemes)
+    num_annot = sum(len(s.tags.keys()) > 0 for s in graphemes)
     click.echo('Annotated: {}/{}'.format(
         style(num_annot == num_graph, num_annot), num_graph))
 
@@ -439,5 +439,5 @@ def config_edit(obj, editor):
     This command is a simple convenience to launch an editor open at the
     configuration file (config.toml).'''
     dataset = obj['dataset']
-    _ = dataset.config # Ensure valid dataset
+    _ = dataset.config  # Ensure valid dataset
     click.edit(filename=str(dataset.config_path), editor=editor)

@@ -136,8 +136,7 @@ def generate(obj, dir_from, dir_to, existing):
 
     config.update(dataset.config.get('generate', {}))
     random.seed(config['seed'])
-
-    tag_index = dataset.config['tag_schema'].index(config['tag'])
+    tag_name = config['tag']
 
     for param in config['params']:
         param['match'] = re.compile(param['match'])
@@ -148,27 +147,27 @@ def generate(obj, dir_from, dir_to, existing):
         if g.set != 'train':
             continue
         tags = g.tags
-        name = tags[tag_index]
-        if name in graphemes:
-            graphemes[name]['files'].append({
+        tag_value = g.tags[tag_name]
+        if tag_value in graphemes:
+            graphemes[tag_value]['files'].append({
                 'filename': g.image_path,
                 'tags': tags,
             })
         else:
             s = {}
             for param in config['params']:
-                if param['match'].match(name):
+                if param['match'].match(tag_value):
                     s.update(param)
                     break
             else:
-                raise SystemExit("Configuration not found for grapheme {}".format(name))
+                raise SystemExit("Configuration not found for grapheme {}".format(tag_value))
             s['files'] = [{
                 'filename': g.image_path,
                 'tags': tags,
             }]
-            graphemes[name] = s
+            graphemes[tag_value] = s
 
     # Generate as many logograms as requested
-    for i in range(config['count']):
+    for _ in range(config['count']):
         img, gs = create_logogram(graphemes)
         dataset.new_single(Target.LOGO, dir_to, pil_image=img, graphemes=gs)

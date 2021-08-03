@@ -10,8 +10,8 @@ class Grapheme(Annotation):
     target = Target.GRAPH
 
     def __init__(self, *args):
-        #: list of values for this grapheme's tags in the dataset's `tag_schema`.
-        self.tags = []
+        #: annotated tags for this grapheme.
+        self.tags = {}  # type: dict[str,str]
         super().__init__(*args)
 
     def update(self, *, tags=None, **kwds):

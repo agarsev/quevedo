@@ -32,16 +32,10 @@ def string_to_target(t):
 def annotation_info(a: Annotation):
     title_tag = app_data['meta_tags'][0]
     if a.target == Target.GRAPH:
-        tags = a.tags
-        if len(tags) > 0:
-            annotated = True
-            title = tags[0]
-        else:
-            annotated = False
-            title = '?'
+        annotated = len(a.tags.keys())
     else:
         annotated = len(a.graphemes)
-        title = a.meta.get(title_tag, '')
+    title = a.meta.get(title_tag, '')
     return {
         'id': a.id, 'annotated': annotated,
         'set': a.set, 'title': title

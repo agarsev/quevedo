@@ -17,7 +17,7 @@ def _migrate_one(dataset: Dataset):
     # Change annotation tags from list to dict.
     def list_to_dict(a: Grapheme):
         old_tags = a.tags
-        a.tags = {tag: old_tags[i] 
+        a.tags = {tag: old_tags[i]
             for (i, tag) in schema.enumerate()}
     for a in dataset.get_annotations():
         if a.target == Target.LOGO:
@@ -44,7 +44,7 @@ def migrate(obj):
 
     if version < 1:
         _migrate_one(dataset)
-        
+
     dataset.config_path.write_text("# This file is a Quevedo dataset configuration file. Find more at:\n" +
                                    "# https://www.github.com/agarsev/quevedo\n\n" +
                                    toml.dumps(dataset.config))

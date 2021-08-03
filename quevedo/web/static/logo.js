@@ -60,13 +60,10 @@ function GraphemeList ({ id, graphemes, columns }) {
             </tr></thead>
             <tbody>${graphemes.list.map((s, i) => {
                 const current = editing_grapheme !== null && editing_grapheme.idx === i;
-                return html`<${GraphemeEntry} tags=${s.tags || []}
-                    changeTag=${(t_id, t_val) => {
-                        let ntags = s.tags?s.tags.slice():[];
-                        ntags[t_id] = t_val;
-                        graphemes.update_fn(i, s => ({ ...s, tags: ntags }),
-                            `GRAPH_${i}_UPD_TAG_${t_id}`);
-                    }}
+                return html`<${GraphemeEntry} tags=${s.tags || {}}
+                    changeTag=${(k, v) => graphemes.update_fn(i,
+                            s => ({ ...s, tags: {...s.tags, [k]: v}}),
+                            `GRAPH_${i}_UPD_TAG_${k}`)}
                     columns=${columns}
                     color=${colors.list[i]} changeColor=${c => colors.update(i, c)}
                     remove=${() => removeGrapheme(i)}
@@ -106,9 +103,9 @@ function GraphemeEntry ({ tags, changeTag, columns, remove,
         onmousedown=${markEditing}>
         <td><input type=color value=${color}
             oninput=${e => changeColor(e.target.value)} /></td>
-        ${columns.map((c, i) => html`<td><input type=text
-            placeholder=${c} tabIndex=1 value=${tags[i]}
-            oninput=${e => changeTag(i, e.target.value)}
+        ${columns.map(c => html`<td><input type=text
+            placeholder=${c} tabIndex=1 value=${tags[c]}
+            oninput=${e => changeTag(c, e.target.value)}
             onkeydown=${navigate}
             onfocus=${markEditing} /></td>`)}
         <td><button onclick=${remove}>🗑️</button></td>
@@ -134,7 +131,7 @@ function Annotation ({ id, graphemes, colors, editing_grapheme, setEditing }) {
     const mouse_down = e => {
         if (editing_grapheme === null) {
             editing_grapheme = { idx: graphemes.list.length };
-            graphemes.add({ box: [0,0,0,0], tags: [] },
+            graphemes.add({ box: [0,0,0,0], tags: {} },
                 `GRAPH_${editing_grapheme.idx}_UPD_BOX`);
             colors.add(getNextColor());
         } else {

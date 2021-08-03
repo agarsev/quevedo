@@ -20,10 +20,17 @@ Version field in config.toml, Dataset config.toml without version is version 0
 Move tags from a list to a (default)dict
 
 - [X] Migrate json files
-- [ ] Grapheme
-- [ ] BoundGrapheme
-- [ ] Web interface
+- [X] Grapheme
+- [X] BoundGrapheme
+- [X] CLI (generate, dataset, extract)
+- [X] Web interface
 - [ ] Nets
+
+*** TODO Test & Doc
+
+- [ ] Test with real corpus
+- [ ] Documentation
+- [ ] Examples
 
 ** TODO Net config improvements
 *** TODO Configure max epochs, size, etc. More params in general.
