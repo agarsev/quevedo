@@ -1,0 +1,52 @@
+# 2021-08-03 Antonio F. G. Sevilla <afgs@ucm.es>
+# Licensed under the Open Software License version 3.0
+
+import click
+import toml
+
+from quevedo.dataset import Dataset, CURRENT_CONFIG_VERSION
+from quevedo.annotation import Grapheme, Target
+
+
+def _migrate_one(dataset: Dataset):
+    '''Migrate dataset from version 0 to 1.'''
+    # Add version field to config
+    dataset.config['config_version'] = 1
+    schema = dataset.config['tag_schema']
+
+    # Change annotation tags from list to dict.
+    def list_to_dict(a: Grapheme):
+        old_tags = a.tags
+        a.tags = {tag: old_tags[i] 
+            for (i, tag) in schema.enumerate()}
+    for a in dataset.get_annotations():
+        if a.target == Target.LOGO:
+            for g in a.graphemes:
+                list_to_dict(g)
+        else:
+            list_to_dict(a)
+        a.save()
+
+
+@click.command('migrate')
+@click.pass_obj
+def migrate(obj):
+    '''Upgrades a dataset config and data to the latest version.
+
+    DANGER! This will change your annotations. Please have a backup of your data
+    in case something goes wrong.'''
+    dataset = obj['dataset']
+    dataset._config = toml.loads(dataset.config_path.read_text())
+    version = dataset.config.get('config_version', 0)
+
+    if version == CURRENT_CONFIG_VERSION:
+        raise SystemExit("This dataset is already at the latest config version ({})".format(CURRENT_CONFIG_VERSION))
+
+    if version < 1:
+        _migrate_one(dataset)
+        
+    dataset.config_path.write_text("# This file is a Quevedo dataset configuration file. Find more at:\n" +
+                                   "# https://www.github.com/agarsev/quevedo\n\n" +
+                                   toml.dumps(dataset.config))
+    click.echo("Upgraded dataset from version {} to {}".format(
+        version, CURRENT_CONFIG_VERSION))

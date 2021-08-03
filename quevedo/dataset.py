@@ -14,6 +14,9 @@ from quevedo.network import create_network
 from quevedo.annotation import Target, Logogram, Grapheme
 
 
+CURRENT_CONFIG_VERSION = 1
+
+
 class Dataset:
     '''Class representing a Quevedo dataset.
 
@@ -51,6 +54,11 @@ class Dataset:
             if not self.config_path.exists():
                 raise SystemExit("Path '{}' is not a valid dataset".format(self._path))
             self._config = toml.loads(self.config_path.read_text())
+            version = self._config.get('config_version', 0)
+            if version != CURRENT_CONFIG_VERSION:
+                raise SystemExit("Dataset '{}' uses an outdated configuration version ({}).\n"
+                                 "Please use the 'migrate' command to update.".format(
+                                     self._path, version))
             if self.local_config_path.exists():
                 self._config.update(**toml.loads(self.local_config_path.read_text()))
         return self._config
@@ -373,7 +381,6 @@ def info(obj):
     '''Get general status information about a dataset.'''
     dataset: Dataset = obj['dataset']
 
-    path = dataset.path
     config = dataset.config
     click.secho('{}\n{}'.format(config["title"], '▔' * len(config['title'])),
                 nl=False, bold=True)
@@ -432,5 +439,5 @@ def config_edit(obj, editor):
     This command is a simple convenience to launch an editor open at the
     configuration file (config.toml).'''
     dataset = obj['dataset']
-    info = dataset.config # Ensure valid dataset
+    _ = dataset.config # Ensure valid dataset
     click.edit(filename=str(dataset.config_path), editor=editor)

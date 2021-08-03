@@ -4,11 +4,12 @@
 import click
 from os import getcwd
 
-from quevedo import darknet, web, dataset as ds
+from quevedo import web, dataset as ds
 import quevedo.network.cli as network
 from quevedo.extract_graphemes import extract_graphemes
 from quevedo.generate import generate
 from quevedo.run_script import run_script
+from quevedo.migrate import migrate
 
 
 @click.group(commands=[
@@ -17,7 +18,7 @@ from quevedo.run_script import run_script
     extract_graphemes, generate,
     network.prepare, network.train,
     network.predict_image, network.test,
-    web.launcher, run_script,
+    web.launcher, run_script, migrate,
 ], chain=True, invoke_without_command=True)
 @click.option('-D', '--dataset', type=click.Path(), default=getcwd(),
               help="Path to the dataset to use, by default use current directory")

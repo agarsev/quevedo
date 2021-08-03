@@ -9,14 +9,17 @@ Next version: 1.1
 
 ** TODO Dataset version 1 (not compatible with 0)
 
-*** TODO Dataset versioning
+*** DONE Dataset versioning
+    CLOSED: [2021-08-03 Tue 12:57]
 Version field in config.toml, Dataset config.toml without version is version 0
 
-*** TODO migration command / automigration
+*** DONE migration command
+    CLOSED: [2021-08-03 Tue 12:57]
 
 *** TODO Dict of tags
 Move tags from a list to a (default)dict
 
+- [X] Migrate json files
 - [ ] Grapheme
 - [ ] BoundGrapheme
 - [ ] Web interface
@@ -29,12 +32,17 @@ Joining with underscore problem if tags have underscores. Maybe format strings?
 Choose joining char? Use exotic unicode?
 
 ** TODO Improve train/test set
-~Instead of "set", "slice"/"division", and it's an integer. Orthogonal dimension
-to subsets. Slices to include can be chosen somehow, as params or something
-(think DVC). This enables cross-validation while preserving "slice" through
-extract etc.~ Or maybe use lists of files (ala darknet) that can be tracked by
+
+Use lists of files (ala darknet) that can be tracked by
 git/dvc. A directory for "splits", these splits list annotations, can be shared
 by different nets.
+
+*** TODO Remove "set" from annotation
+
+- [ ] Code
+- [ ] Migration
+
+*** TODO Rest
 
 ** TODO Web interface improvements
 

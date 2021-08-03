@@ -24,6 +24,8 @@ instructions. For example:
 Make boxes slightly larger than the graphemes, not too tight.
 """
 
+config_version = 1 # Version of quevedo dataset schema, not of dataset data
+
 [darknet]
 path = "darknet/darknet" 
 library = "darknet/libdarknet.so"
