@@ -20,8 +20,7 @@ class ClassifyNet(Network):
         filt = self.config.get('filter', None)
         if filt:
             try:
-                tag_schema = self.dataset.config['tag_schema']
-                crit = tag_schema.index(filt['criterion'])
+                crit = filt['criterion']
                 if 'include' in filt:
                     tags = set(filt['include'])
                     self._filter = lambda a: a.tags[crit] in tags

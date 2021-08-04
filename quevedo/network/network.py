@@ -7,6 +7,9 @@ from pathlib import Path
 from shutil import rmtree
 
 
+TAG_JOIN_CHAR = '_'
+
+
 class Network:
     ''' Class representing a neural net to train and predict logograms or
     graphemes.'''
@@ -26,25 +29,27 @@ class Network:
         self.path = dataset.path / 'networks' / name
         self.path.mkdir(exist_ok=True, parents=True)
 
-        if 'tag' not in self.config:
-            #: function to get the relevant tag/label/class for the network from a list of tags according to the dataset's `tag_schema`
-            self.get_tag = lambda tags: get_tag_by_index(tags, 0)
-            #: function to get the `tag_schema` values from the tag/label/class predicted by the network
-            self.prediction_to_tag = lambda tags, tag: update_tag(tags, 0, tag)
-        else:
-            tag = self.config['tag']
-            tag_schema = dataset.config['tag_schema']
-            try:
-                if isinstance(tag, str):
-                    i = tag_schema.index(tag)
-                    self.get_tag = lambda tags, i=i: get_tag_by_index(tags, i)
-                    self.prediction_to_tag = lambda tags, tag, i=i: update_tag(tags, i, tag)
-                else:
-                    i = [tag_schema.index(t) for t in self.config['tag']]
-                    self.get_tag = lambda tags, i=i: get_multitag(tags, i)
-                    self.prediction_to_tag = lambda tags, tag, i=i: update_multitag(tags, i, tag)
-            except ValueError:
-                raise SystemExit("Tag value '{}' (for network '{}') invalid".format(tag, name))
+        which_tag = self.config.get('tag', dataset.config['tag_schema'][0])
+        try:
+            if isinstance(which_tag, str):
+                #: function to get the relevant label for the network from a list of tags according to `tag_schema`
+                self.get_tag = lambda tags, which_tag=which_tag: tags.get(which_tag)
+                #: function to get the `tag_schema` values from the tag/label/class predicted by the network
+                self.prediction_to_tag = lambda tags, pred, which_tag=which_tag: tags.update({which_tag: pred})
+            else:
+                def get_multitag(tags, which_tag=which_tag):
+                    try:
+                        return TAG_JOIN_CHAR.join(tags[w] for w in which_tag)
+                    except (IndexError, TypeError):
+                        return None
+                self.get_tag = get_multitag
+
+                def update_multitag(tags, pred, which_tag=which_tag):
+                    for i, val in enumerate(pred.split(TAG_JOIN_CHAR)):
+                        tags[which_tag[i]] = val
+                self.prediction_to_tag = update_multitag
+        except ValueError:
+            raise SystemExit("Tag value '{}' (for network '{}') invalid".format(which_tag, name))
 
     def is_prepared(self):
         '''Checks whether the neural network configuration files have been
@@ -250,33 +255,3 @@ class Network:
                 this network's predictions.
         '''
         raise NotImplementedError
-
-
-def get_tag_by_index(tags, index):
-    try:
-        return tags[index]
-    except IndexError:
-        return None
-
-
-def update_tag(tags, index, new_tag):
-    while len(tags) <= index:
-        tags.append(None)
-    tags[index] = new_tag
-
-
-def get_multitag(tags, indices):
-    try:
-        all_tags = (tags[i] if len(tags) > i else None for i in indices)
-        all_tags = [t for t in all_tags if t is not None]
-        if len(all_tags) < 1:
-            return None
-        else:
-            return '_'.join(all_tags)
-    except (IndexError, TypeError):
-        return None
-
-
-def update_multitag(tags, indices, result):
-    for i, tag in enumerate(result.split('_')):
-        update_tag(tags, indices[i], tag)

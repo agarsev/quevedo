@@ -16,7 +16,8 @@ Version field in config.toml, Dataset config.toml without version is version 0
 *** DONE migration command
     CLOSED: [2021-08-03 Tue 12:57]
 
-*** TODO Dict of tags
+*** DONE Dict of tags
+    CLOSED: [2021-08-04 Wed 13:03]
 Move tags from a list to a (default)dict
 
 - [X] Migrate json files
@@ -24,7 +25,7 @@ Move tags from a list to a (default)dict
 - [X] BoundGrapheme
 - [X] CLI (generate, dataset, extract)
 - [X] Web interface
-- [ ] Nets
+- [X] Nets
 
 *** TODO Test & Doc
 
@@ -32,13 +33,9 @@ Move tags from a list to a (default)dict
 - [ ] Documentation
 - [ ] Examples
 
-** TODO Net config improvements
-*** TODO Configure max epochs, size, etc. More params in general.
-*** TODO Improve multi tags
-Joining with underscore problem if tags have underscores. Maybe format strings?
-Choose joining char? Use exotic unicode?
-
 ** TODO Improve train/test set
+
+Also for dataset version 1
 
 Use lists of files (ala darknet) that can be tracked by
 git/dvc. A directory for "splits", these splits list annotations, can be shared
@@ -50,6 +47,12 @@ by different nets.
 - [ ] Migration
 
 *** TODO Rest
+
+** TODO Net config improvements
+*** TODO Configure max epochs, size, etc. More params in general.
+*** TODO Improve multi tags
+Joining with underscore problem if tags have underscores. Maybe format strings?
+Choose joining char? Use exotic unicode?
 
 ** TODO Web interface improvements
 
