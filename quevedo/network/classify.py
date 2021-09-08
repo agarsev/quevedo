@@ -23,10 +23,10 @@ class ClassifyNet(Network):
                 crit = filt['criterion']
                 if 'include' in filt:
                     tags = set(filt['include'])
-                    self._filter = lambda a: a.tags[crit] in tags
+                    self._filter = lambda a: a.tags.get(crit) in tags
                 else:
                     tags = set(filt['exclude'])
-                    self._filter = lambda a: a.tags[crit] not in tags
+                    self._filter = lambda a: a.tags.get(crit) not in tags
             except KeyError:
                 raise RuntimeError("Incorrect filter config for network '{}'".format(
                     self.name)) from None

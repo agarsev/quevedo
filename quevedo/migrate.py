@@ -16,9 +16,12 @@ def _migrate_one(dataset: Dataset):
 
     # Change annotation tags from list to dict.
     def list_to_dict(a: Grapheme):
+        if (not isinstance(a.tags, list)):
+            return
         old_tags = a.tags
-        a.tags = {tag: old_tags[i]
-            for (i, tag) in schema.enumerate()}
+        a.tags = {}
+        for i in range(min(len(schema), len(old_tags))):
+            a.tags[schema[i]] = old_tags[i]
     for a in dataset.get_annotations():
         if a.target == Target.LOGO:
             for g in a.graphemes:

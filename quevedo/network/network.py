@@ -40,7 +40,7 @@ class Network:
                 def get_multitag(tags, which_tag=which_tag):
                     try:
                         return TAG_JOIN_CHAR.join(tags[w] for w in which_tag)
-                    except (IndexError, TypeError):
+                    except (KeyError, TypeError):
                         return None
                 self.get_tag = get_multitag
 

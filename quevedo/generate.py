@@ -147,7 +147,7 @@ def generate(obj, dir_from, dir_to, existing):
         if g.set != 'train':
             continue
         tags = g.tags
-        tag_value = g.tags[tag_name]
+        tag_value = g.tags.get(tag_name)
         if tag_value in graphemes:
             graphemes[tag_value]['files'].append({
                 'filename': g.image_path,

@@ -29,9 +29,9 @@ Move tags from a list to a (default)dict
 
 *** TODO Test & Doc
 
-- [ ] Test with real corpus
+- [X] Test with real corpus
 - [ ] Documentation
-- [ ] Examples
+- [ ] Fix Examples
 
 ** TODO Improve train/test set
 
