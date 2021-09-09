@@ -97,7 +97,7 @@ class DetectNet(Network):
     def auto_annotate(self, a):
         graphemes = []
         for pred in self.predict(a.image):
-            g = {'box': pred['box'], 'tags': []}
+            g = {'box': pred['box'], 'tags': {}}
             self.prediction_to_tag(g['tags'], pred['name'])
             graphemes.append(g)
         a.update(graphemes=graphemes)

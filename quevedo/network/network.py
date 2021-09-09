@@ -7,7 +7,7 @@ from pathlib import Path
 from shutil import rmtree
 
 
-TAG_JOIN_CHAR = '_'
+TAG_JOIN_CHAR = ';'
 
 
 class Network:
