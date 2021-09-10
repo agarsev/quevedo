@@ -35,18 +35,38 @@ Move tags from a list to a (default)dict
 
 ** TODO Improve train/test set
 
-Also for dataset version 1
+Also for dataset version 1.
 
-Use lists of files (ala darknet) that can be tracked by
-git/dvc. A directory for "splits", these splits list annotations, can be shared
-by different nets.
+Lists of files in 'lists' directory. New top level flag '-L' that restricts
+files to that list. e.g:
+
+quevedo -L train -N detect train
+
+You can compose them, eg. for k-fold cross val:
+
+quevedo -L fold1 -L fold2 train
+quevedo -L fold3 test
+
+*** DONE Generate lists
+    CLOSED: [2021-09-10 Fri 21:09]
+
+`split` command creates the lists.
+
+*** TODO Use lists
+
+- [ ] Top level flag in cli
+
+Dataset get annotations filters by list. Use as a library, how?
 
 *** TODO Remove "set" from annotation
 
 - [ ] Code
 - [ ] Migration
 
-*** TODO Rest
+*** TODO Test and doc
+
+- [ ] Test (check no name duplicate in split, check no name missing)
+- [ ] Doc
 
 ** TODO Net config improvements
 *** TODO Configure max epochs, size, etc. More params in general.
@@ -90,3 +110,7 @@ that are checkboxes in meta and can be toggled in web interface.
     channels) and some might be better to do ourselves (eg letterboxing and
     resizing). Maybe migrate to tensorflow and keras if we get hardware where to
     test it.
+- [ ] Add the possibility to the split command to do homogeneous splits taking
+    into account annotation values, so that sparse classes are not removed from
+    the training set.
+

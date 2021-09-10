@@ -10,12 +10,12 @@ from quevedo.extract_graphemes import extract_graphemes
 from quevedo.generate import generate
 from quevedo.run_script import run_script
 from quevedo.migrate import migrate
+from quevedo.split import split
 
 
 @click.group(commands=[
-    ds.train_test_split, ds.config_edit,
-    ds.info, ds.create, ds.add_images,
-    extract_graphemes, generate,
+    ds.config_edit, ds.info, ds.create, ds.add_images,
+    split, extract_graphemes, generate,
     network.prepare, network.train,
     network.predict_image, network.test,
     web.launcher, run_script, migrate,

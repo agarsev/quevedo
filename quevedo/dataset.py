@@ -5,7 +5,6 @@ import click
 from itertools import chain
 from os import listdir
 from pathlib import Path
-import random
 from string import Template
 from subprocess import run
 import toml
@@ -34,6 +33,7 @@ class Dataset:
         self._path = Path(path)
         self.logogram_path = self._path / 'logograms'
         self.grapheme_path = self._path / 'graphemes'
+        self.lists_path = self._path / 'lists'
         self.config_path = self._path / 'config.toml'
         self.local_config_path = self._path / 'config.local.toml'
         self.script_path = self._path / 'scripts'
@@ -70,6 +70,7 @@ class Dataset:
             raise SystemExit("Directory '{}' not empty, aborting".format(p.resolve()))
         (self.logogram_path).mkdir(parents=True)
         (self.grapheme_path).mkdir()
+        (self.lists_path).mkdir()
         (self.path / 'networks').mkdir()
 
     def run_darknet(self, *args):
@@ -325,50 +326,6 @@ def add_images(obj, image_dir, grapheme_set, logogram_set, existing, sort):
             num = num + 1
         click.echo("imported {}".format(style(num > 0, num)))
     click.echo("\n")
-
-
-@click.command('split')
-@click.option('--grapheme-set', '-g', multiple=True, help="Grapheme set(s) to split.")
-@click.option('--logogram-set', '-l', multiple=True, help="Logogram set(s) to split.")
-@click.option('--percentage', '-p', type=click.IntRange(0, 100), default=60)
-@click.option('--seed', type=click.INT, help='A seed for the random split algorithm.')
-@click.pass_obj
-def train_test_split(obj, grapheme_set, logogram_set, percentage, seed):
-    '''Split files into train and test groups.
-
-    The annotations in the given subsets will be split into two groups, one for
-    training and one for test.  This split will not be done physically but
-    rather as a mark stored on the annotation file.
-
-    If no subsets are given, all annotations will be marked. If homogeneous
-    split is required, call this command once for each set.'''
-    dataset = obj['dataset']
-
-    random.seed(seed)
-
-    if len(grapheme_set) > 0:
-        if len(logogram_set) > 0:
-            raise click.UsageError("Grapheme and logogram sets can't be split "
-                                   "at the same time")
-        an = list(dataset.get_annotations(Target.GRAPH, grapheme_set))
-    elif len(logogram_set) > 0:
-        an = list(dataset.get_annotations(Target.LOGO, logogram_set))
-    else:
-        raise click.UsageError("Either grapheme or logogram sets to split are required")
-
-    random.shuffle(an)
-    split_point = round(len(an) * percentage / 100)
-
-    for t in an[:split_point]:
-        t.set = 'train'
-        t.save()
-
-    for t in an[split_point:]:
-        t.set = 'test'
-        t.save()
-
-    click.echo("Dataset split into train ({} files) and test ({} files)".format(
-               split_point, len(an) - split_point))
 
 
 def count(l):
