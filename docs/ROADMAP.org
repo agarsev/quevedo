@@ -37,35 +37,46 @@ Move tags from a list to a (default)dict
 
 Also for dataset version 1.
 
-Lists of files in 'lists' directory. New top level flag '-L' that restricts
-files to that list. e.g:
+Instead of train/test "sets", now a "fold" value for annotations. `split`
+command assigns this value (a number) randomly. The fold is tracked through
+extract and generate commands.
 
-quevedo -L train -N detect train
+Train and test sets are configured in config.toml as sets of folds to include in
+each. Changing this can be useful for k-fold cross-validation. Also the
+proportions of training and test annotations can be changed without having to
+modify annotations or re-run processess. Finally, some folds can be held out,
+not included in either train or test.
 
-You can compose them, eg. for k-fold cross val:
+This is better than "lists" of annotations because we need to keep track where
+extracted graphemes come from, and generated logograms, so test sets are not
+cross-contaminated.
 
-quevedo -L fold1 -L fold2 train
-quevedo -L fold3 test
+*** DONE Change "set" to "fold" in annotation
+    CLOSED: [2021-09-11 Sat 19:31]
 
-*** DONE Generate lists
-    CLOSED: [2021-09-10 Fri 21:09]
+- [X] Code
+- [X] Migration
 
-`split` command creates the lists.
+*** DONE Fix split command
+    CLOSED: [2021-09-11 Sat 20:03]
 
-*** TODO Use lists
+*** TODO Use folds
 
-- [ ] Top level flag in cli
+- [X] config.toml
+- [X] default_config
+- [ ] migration of config
+- [ ] dataset get annotations use this
 
-Dataset get annotations filters by list. Use as a library, how?
+*** TODO Conserve folds
 
-*** TODO Remove "set" from annotation
-
-- [ ] Code
-- [ ] Migration
+- [ ] extract
+- [ ] generate
 
 *** TODO Test and doc
 
-- [ ] Test (check no name duplicate in split, check no name missing)
+- [X] Test correct numbers
+- [ ] Test correct train/test usage
+- [ ] Test conserve
 - [ ] Doc
 
 ** TODO Net config improvements

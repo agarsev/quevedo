@@ -31,12 +31,13 @@ class Annotation:
         self.image_path = path.with_suffix('.png')
         #: Dictionary of metadata annotations.
         self.meta = {}
-        #: Train/test split to which the annotation belongs.
-        self.set = 'train'
+        #: fold to which the annotation belongs.
+        # "-1" fold is special, it means no fold assigned so only use for train.
+        self.fold = -1
         if self.json_path.exists():
             self.update(**json.loads(self.json_path.read_text()))
 
-    def update(self, *, meta=None, set=None, **kwds):
+    def update(self, *, meta=None, fold=None, **kwds):
         '''Update the content of the annotation.
 
         This method should be overriden by the specific annotation classes to
@@ -44,16 +45,16 @@ class Annotation:
 
         Args:
             meta: dictionary of metadata values to set.
-            set: train/test split to which the annotation will belong.
+            fold: fold to which the annotation will belong.
         '''
         if meta:
             self.meta = meta
-        if set:
-            self.set = set
+        if fold:
+            self.fold = fold
 
     def to_dict(self):
         '''Get the annotation data as a dictionary.'''
-        return {'meta': self.meta, 'set': self.set}
+        return {'meta': self.meta, 'fold': self.fold}
 
     def save(self):
         '''Persist the information to the filesystem.'''

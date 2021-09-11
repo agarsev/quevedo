@@ -26,6 +26,12 @@ Make boxes slightly larger than the graphemes, not too tight.
 
 config_version = 1 # Version of quevedo dataset schema, not of dataset data
 
+# Number of folds to split annotations into, and which to use for training and
+# which to use for testing
+folds = 10
+train_folds = [0,1,2,3,4,5,6,7]
+test_folds = [8,9]
+
 [darknet]
 path = "darknet/darknet" 
 library = "darknet/libdarknet.so"

@@ -29,6 +29,8 @@ def _migrate_one(dataset: Dataset):
         else:
             list_to_dict(a)
         a.save()
+    click.echo("Train/test splits no longer apply, now folds are used. Please"
+        " read the documentation, and run the `split` command again")
 
 
 @click.command('migrate')

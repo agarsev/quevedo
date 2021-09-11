@@ -33,7 +33,6 @@ class Dataset:
         self._path = Path(path)
         self.logogram_path = self._path / 'logograms'
         self.grapheme_path = self._path / 'graphemes'
-        self.lists_path = self._path / 'lists'
         self.config_path = self._path / 'config.toml'
         self.local_config_path = self._path / 'config.local.toml'
         self.script_path = self._path / 'scripts'
@@ -70,7 +69,6 @@ class Dataset:
             raise SystemExit("Directory '{}' not empty, aborting".format(p.resolve()))
         (self.logogram_path).mkdir(parents=True)
         (self.grapheme_path).mkdir()
-        (self.lists_path).mkdir()
         (self.path / 'networks').mkdir()
 
     def run_darknet(self, *args):
