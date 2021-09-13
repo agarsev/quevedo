@@ -38,7 +38,7 @@ def annotation_info(a: Annotation):
     title = a.meta.get(title_tag, '')
     return {
         'id': a.id, 'annotated': annotated,
-        'set': a.set, 'title': title
+        'set': a.fold, 'title': title
     }
 
 

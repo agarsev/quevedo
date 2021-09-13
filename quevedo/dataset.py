@@ -36,6 +36,7 @@ class Dataset:
         self.config_path = self._path / 'config.toml'
         self.local_config_path = self._path / 'config.local.toml'
         self.script_path = self._path / 'scripts'
+        self._networks = {}
 
     @property
     def path(self):
@@ -94,10 +95,15 @@ class Dataset:
         Returns:
             a [Network](#quevedonetworknetworknetwork) object.
         '''
-        if name is None:
-            return next(n for n in self.list_networks() if n.config['default'])
-        else:
-            return create_network(self, name)
+        try:
+            return self._networks[name]
+        except KeyError:
+            if name is None:
+                ret = next(n for n in self.list_networks() if n.config['default'])
+            else:
+                ret = create_network(self, name)
+            self._networks[name] = ret
+            return ret
 
     def get_single(self, target: Target, subset, id):
         '''Retrieve a single annotation.

@@ -67,11 +67,13 @@ cross-contaminated.
 - [X] default_config
 - [X] migration of config
 - [X] is_train/is_test methods, networks use this
+- [X] web app
 
-*** TODO Conserve folds
+*** DONE Conserve folds
+    CLOSED: [2021-09-13 Mon 18:59]
 
 - [X] extract
-- [ ] generate
+- [X] generate
 
 *** TODO Test and doc
 
@@ -102,6 +104,15 @@ Remove "saved" message when doing changes (inconsistent), maybe load indicator
 
 Instead of a "check" for annotated/not annotated, custom "flags" in config.toml
 that are checkboxes in meta and can be toggled in web interface.
+
+** Other
+
+*** DONE Memoize networks
+    CLOSED: [2021-09-13 Mon 21:36]
+
+`dataset.get_network` stores the network, so you can call it as many times as
+you want without memory leaks and no overhead, no need to memoize the `Network`
+yourself.
 
 * Backlog
 

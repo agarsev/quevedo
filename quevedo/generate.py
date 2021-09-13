@@ -7,7 +7,7 @@ from PIL.ImageOps import invert
 import random
 import re
 
-from quevedo.annotation import Annotation, Target
+from quevedo.annotation import Target
 
 # Used only if force layout
 try:
@@ -129,7 +129,8 @@ def generate(obj, dir_from, dir_to, existing):
     somewhat controlled in the configuration file.
 
     Since the goal of this process is to perform data augmentation for
-    training, only graphemes in the "train" group will be used.'''
+    training, only graphemes in "train" folds will be used. Generated logograms
+    will have the first fold use for training set as their fold.'''
 
     dataset = obj['dataset']
     dataset.create_subset(Target.LOGO, dir_to, existing)
@@ -144,7 +145,7 @@ def generate(obj, dir_from, dir_to, existing):
     # Find the different graphemes to use
     graphemes = {}
     for g in dataset.get_annotations(Target.GRAPH, subset=dir_from):
-        if g.set != 'train':
+        if not dataset.is_train(g):
             continue
         tags = g.tags
         tag_value = g.tags.get(tag_name)
@@ -168,6 +169,8 @@ def generate(obj, dir_from, dir_to, existing):
             graphemes[tag_value] = s
 
     # Generate as many logograms as requested
+    fold = dataset.config['train_folds'][0]
     for _ in range(config['count']):
         img, gs = create_logogram(graphemes)
-        dataset.new_single(Target.LOGO, dir_to, pil_image=img, graphemes=gs)
+        dataset.new_single(Target.LOGO, dir_to, pil_image=img,
+            graphemes=gs, fold=fold)
