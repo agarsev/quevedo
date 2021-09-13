@@ -47,9 +47,9 @@ class Annotation:
             meta: dictionary of metadata values to set.
             fold: fold to which the annotation will belong.
         '''
-        if meta:
+        if meta is not None:
             self.meta = meta
-        if fold:
+        if fold is not None:
             self.fold = fold
 
     def to_dict(self):

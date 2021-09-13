@@ -30,7 +30,7 @@ def extract_graphemes(obj, dir_from, dir_to, existing):
     for logo in dataset.get_annotations(Target.LOGO, subset=dir_from):
         for g in logo.graphemes:
             dataset.new_single(Target.GRAPH, dir_to, pil_image=g.image,
-                               set=logo.set, tags=g.tags)
+                               fold=logo.fold, tags=g.tags)
 
     (graph_d / 'README.md').write_text(
         'Graphemes extracted automatically from "{}" logograms'.format(dir_from))

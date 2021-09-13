@@ -7,7 +7,7 @@ from pathlib import Path
 from shutil import rmtree
 
 
-TAG_JOIN_CHAR = ';'
+TAG_JOIN_CHAR = ''
 
 
 class Network:
@@ -63,18 +63,19 @@ class Network:
         weights = self.path / 'darknet_final.weights'
         return weights.exists()
 
-    def get_annotations(self, set='train'):
+    def get_annotations(self, test=False):
         '''Get the annotations configured for use with this network.
 
         Args:
-            set: retrieve either train or test annotations.
+            test: get test annotations instead of train
 
         Returns:
             a list of relevant [Annotations](#annotations).
         '''
         subsets = self.config.get('subsets')
         annotations = self.dataset.get_annotations(self.target, subsets)
-        return [a for a in annotations if a.set == set and self._filter(a)]
+        correct_split = self.dataset.is_train if not test else self.dataset.is_test
+        return [a for a in annotations if correct_split(a) and self._filter(a)]
 
     def _filter(self, annotation):
         '''Override to control the annotations included in training by checking
@@ -102,7 +103,7 @@ class Network:
         tracked by a version control system. Must be called before training, and
         files not deleted (except maybe the "train" directory) before
         testing or predicting with the net.'''
-        annotations = self.get_annotations('train')
+        annotations = self.get_annotations()
 
         self.train_path = self.path / 'train'
         try:

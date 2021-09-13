@@ -32,6 +32,11 @@ def _migrate_one(dataset: Dataset):
     click.echo("Train/test splits no longer apply, now folds are used. Please"
         " read the documentation, and run the `split` command again")
 
+    # Add split configuration to config
+    dataset.config['folds'] = 10
+    dataset.config['train_folds'] = [0, 1, 2, 3, 4, 5, 6, 7]
+    dataset.config['test_folds'] = [8, 9]
+
 
 @click.command('migrate')
 @click.pass_obj

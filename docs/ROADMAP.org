@@ -60,22 +60,23 @@ cross-contaminated.
 *** DONE Fix split command
     CLOSED: [2021-09-11 Sat 20:03]
 
-*** TODO Use folds
+*** DONE Use folds
+    CLOSED: [2021-09-13 Mon 15:36]
 
 - [X] config.toml
 - [X] default_config
-- [ ] migration of config
-- [ ] dataset get annotations use this
+- [X] migration of config
+- [X] is_train/is_test methods, networks use this
 
 *** TODO Conserve folds
 
-- [ ] extract
+- [X] extract
 - [ ] generate
 
 *** TODO Test and doc
 
 - [X] Test correct numbers
-- [ ] Test correct train/test usage
+- [X] Test correct train/test usage
 - [ ] Test conserve
 - [ ] Doc
 
@@ -104,6 +105,8 @@ that are checkboxes in meta and can be toggled in web interface.
 
 * Backlog
 
+- [ ] Try again to do train-time testing with darknet to see when overfitting
+    starts.
 - [ ] When scripts modify images, don't save them, but return that it has been
     modified (ie return modified_tags, modified_img) and then it is `run_script`
     that saves the image to the appropriate path. Coversely, in the web

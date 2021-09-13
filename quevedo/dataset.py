@@ -243,6 +243,14 @@ class Dataset:
                 raise click.Abort()
         return path
 
+    def is_train(self, annotation):
+        '''Checks if an annotation belongs to the training split.'''
+        return annotation.fold in self.config['train_folds']
+
+    def is_test(self, annotation):
+        '''Checks if an annotation belongs to the training split.'''
+        return annotation.fold in self.config['test_folds']
+
 
 @click.command('create')
 @click.pass_context

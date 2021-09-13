@@ -120,8 +120,7 @@ def test(obj, do_print, results_csv, results_json, predictions_csv, on_train):
         record = open(record_path, 'w')
     stats = Stats(record)
 
-    test_set = 'train' if on_train else 'test'
-    for an in network.get_annotations(test_set):
+    for an in network.get_annotations(not on_train):
         network.test(an, stats)
     results = stats.get_results()
 
