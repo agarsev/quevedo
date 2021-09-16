@@ -75,7 +75,8 @@ cross-contaminated.
 - [X] extract
 - [X] generate
 
-*** TODO Use subsets for split
+*** DONE Use different range for split
+    CLOSED: [2021-09-16 Thu 20:25]
 
 Allow the split command to use only some of the values for fold, so that more
 sophisticated splits can be done, eg assign fold 1 to some subset that you
