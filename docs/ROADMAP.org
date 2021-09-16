@@ -103,12 +103,14 @@ the character.
 *** DONE Configure max epochs and size for YOLO
     CLOSED: [2021-09-16 Thu 20:06]
 
-** TODO Annotation flags
+** DONE Annotation flags
+   CLOSED: [2021-09-16 Thu 21:42]
 
 In `config.toml`, an option map for "flags". This flags are tags in metadata
 that can only be true/false. In the web interface, they are presented as
 checkboxes with an icon with is an emoji/other unicode character. This icon is
-the value in the option map in config.
+the value in the option map in config, and it is shown in the list too for quick
+detection of problems/TODOs.
 
 ** Other
 

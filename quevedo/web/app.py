@@ -31,13 +31,12 @@ def string_to_target(t):
 
 def annotation_info(a: Annotation):
     title_tag = app_data['meta_tags'][0]
-    if a.target == Target.GRAPH:
-        annotated = len(a.tags.keys())
-    else:
-        annotated = len(a.graphemes)
     title = a.meta.get(title_tag, '')
+    flags = app_data['flags']
+    flag_icons = [icon for f, icon in flags.items()
+                  if a.meta.get(f, False)]
     return {
-        'id': a.id, 'annotated': annotated,
+        'id': a.id, 'flags': flag_icons,
         'set': a.fold, 'title': title
     }
 
@@ -46,6 +45,7 @@ def load_dataset(dataset, language):
     app_data['dataset'] = dataset
     app_data['lang'] = language
     app_data['meta_tags'] = dataset.config['meta_tags']
+    app_data['flags'] = dataset.config['flags']
     resolved = dataset.path.resolve()
     app_data['path'] = resolved
     app_data['config'] = dataset.config['web']
@@ -286,6 +286,7 @@ def edit(target, dir, idx):
         'annotation_help': ds.config['annotation_help'],
         'functions': functions,
         'meta_tags': app_data['meta_tags'],
+        'flags': app_data['flags'],
         'columns': ds.config['tag_schema'],
         'anot': a.to_dict(),
     }

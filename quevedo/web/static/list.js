@@ -122,7 +122,7 @@ function NewEntry ({ upload }) {
     </li>`;
 }
 
-function AnnoEntry ({ id, title, set, annotated }) {
+function AnnoEntry ({ id, title, set, flags }) {
     const { target, dir_name } = window.quevedo_data;
     const dir = `${target}/${dir_name}`;
     const edit_link = `edit/${dir}/${id}`;
@@ -130,13 +130,13 @@ function AnnoEntry ({ id, title, set, annotated }) {
         title.substring(0, MAX_ANNO_TITLE-1)+'…':
         title;
     return html`<li class="Entry LogoEntry">
-        <h2>${id} — ${title} <span class="set">(${set})</span></h2>
+        <h2>${id} — ${title}</h2>
         <a href="${edit_link}">
             <img src="img/${dir}/${id}.png" />
         </a>
         <p>
-            <a href="${edit_link}">📝</a>
-            ${annotated>0?`✔️ (${annotated})`:null}
+            ${flags.map(f => html`<span class="flag">${f}</span>`)}
+            <span class="set">(${set})</span>
         </p>
     </li>`;
 }

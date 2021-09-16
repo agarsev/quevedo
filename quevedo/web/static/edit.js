@@ -13,7 +13,7 @@ const { useState, useRef } = preactHooks;
 preact.render(html`<${App} ...${window.quevedo_data} />`, document.body);
 
 function App ({ title, target, id, annotation_help, links, anot,
-    columns, functions, meta_tags }) {
+    columns, functions, meta_tags, flags }) {
 
     const changes = useChangeStack();
     const meta = useDict(anot.meta, changes);
@@ -88,7 +88,7 @@ function App ({ title, target, id, annotation_help, links, anot,
         <${Header} ...${{title, id, links, saveChanges,
             message, show_save: changes.dirty>0, runFunction,
             functions, changes }} />
-        <${MetaEditor} ...${{meta_tags, meta }} />
+        <${MetaEditor} ...${{meta_tags, flags, meta }} />
         ${is_logo?
             html`<${LogogramEditor} ...${{id, graphemes, columns}} />`
             :html`<${GraphemeEditor} ...${{id, tags, columns}} />`}
@@ -119,15 +119,22 @@ function Header ({ title, id, links, saveChanges, message, show_save,
     </header>`;
 }
 
-function MetaEditor ({ meta_tags, meta }) {
+function MetaEditor ({ meta_tags, meta, flags }) {
+    const text_tags = meta_tags.filter(t => flags[t]==undefined);
     return html`<div class="MetaEditor">
         <h2>${Text['meta']}</h2>
-        <table>${meta_tags.map(k => html`<tr>
+        <table>${text_tags.map(k => html`<tr>
             <th>${k}:</th>
             <td><textarea rows="1" autocomplete="off"
                 oninput=${e => meta.update(k, e.target.value, `UPD_META_${k}`)}
                 value=${meta.dict[k] || ''} />
             </td>
-        </tr>`)}</table>
+        </tr>`)}
+        <tr><th></th><td>${Object.keys(flags).map(f => html`<span class="flag">
+            <input type="checkbox"
+                onchange=${() => meta.update(f, !meta.dict[f], `UPD_META_${f}`)}
+                checked=${!!meta.dict[f]} /> ${flags[f]}
+        </span>`)}</td></tr>
+        </table>
     </div>`;
 }

@@ -17,6 +17,10 @@ tag_schema = [ "tag" ]
 # first one will be used as title for the annotation in the web listing.
 meta_tags = [ "filename", "meaning" ]
 
+# Flags are also meta tags, but can only be true/false. They are displayed in
+# the web interface as checkboxes with the icon set here.
+flags = { done = "✔️", problem = "⚠️", notes = "📝" }
+
 annotation_help = """
 Write here any help for annotators, like lists of graphemes or other
 instructions. For example:
@@ -43,6 +47,7 @@ task = "detect"
 # tag = "tag" # Uncomment and choose a tag name from tag_schema to use
 # subsets = [ "default" ] # If not specified, all subsets will be used
 subject = "Focus on grapheme type learning and recognition"
+# max_batches = 2000  # Uncomment and change to run training for longer/shorter
 
 [network.two]
 task = "classify"
