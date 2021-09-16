@@ -75,35 +75,39 @@ cross-contaminated.
 - [X] extract
 - [X] generate
 
+*** TODO Use subsets for split
+
+Allow the split command to use only some of the values for fold, so that more
+sophisticated splits can be done, eg assign fold 1 to some subset that you
+always want to be in `train`, etc.
+
 *** TODO Test and doc
 
 - [X] Test correct numbers
 - [X] Test correct train/test usage
-- [ ] Test conserve
+- [X] Test conserve
 - [ ] Doc
 
-** TODO Net config improvements
-*** TODO Configure max epochs, size, etc. More params in general.
-*** TODO Improve multi tags
-Joining with underscore problem if tags have underscores. Maybe format strings?
-Choose joining char? Use exotic unicode?
+** DONE Net config improvements
+   CLOSED: [2021-09-16 Thu 20:07]
 
-** TODO Web interface improvements
+*** DONE Improve multi tags
+    CLOSED: [2021-09-13 Mon 14:01]
 
-*** DONE Allow using touch in mobile devices
+We now join using FS ASCII (`^_`, u+001F, ). It is ASCII, so plays well with
+C, and hopefully no compat problems, but is a control character so users' tags
+shouldn't contain it. And additionally, it is the actual correct semantics for
+the character.
 
-*** TODO Filter/search annotations in listing according to some tag(s).
-
-*** TODO Autosuggest values for tagging
-maybe use https://developer.mozilla.org/en-US/docs/Web/HTML/Element/datalist
-
-*** TODO Improve messaging
-Remove "saved" message when doing changes (inconsistent), maybe load indicator
+*** DONE Configure max epochs and size for YOLO
+    CLOSED: [2021-09-16 Thu 20:06]
 
 ** TODO Annotation flags
 
-Instead of a "check" for annotated/not annotated, custom "flags" in config.toml
-that are checkboxes in meta and can be toggled in web interface.
+In `config.toml`, an option map for "flags". This flags are tags in metadata
+that can only be true/false. In the web interface, they are presented as
+checkboxes with an icon with is an emoji/other unicode character. This icon is
+the value in the option map in config.
 
 ** Other
 
@@ -114,28 +118,35 @@ that are checkboxes in meta and can be toggled in web interface.
 you want without memory leaks and no overhead, no need to memoize the `Network`
 yourself.
 
+*** DONE Allow using touch in mobile devices
+
 * Backlog
 
-- [ ] Try again to do train-time testing with darknet to see when overfitting
-    starts.
-- [ ] When scripts modify images, don't save them, but return that it has been
-    modified (ie return modified_tags, modified_img) and then it is `run_script`
-    that saves the image to the appropriate path. Coversely, in the web
-    interface the updated image can be sent to the frontend to be previewed, and
-    if they want to save it send it back to the server on "save". The
-    complication is that the image is now frontend state, not just a src link.
-- [ ] Allow deleting entries in web (just move the last to the hole). Maybe
-    add `delete` in cli too?
-- [ ] Mobile interface for the web app. Maybe integrate with camera/scan app,
-    make quevedo a target for "sharing" (uploading) images.
-- [ ] Web user improvements: groups and recording annotator in json.
-- [ ] Improve nets. Try again with grayscale images now that we use AlexeyAB
-    fork, check letterboxing, try different configs, etc. Some of this can be
-    done by improving the python code that access the darknet dll (eg the
-    channels) and some might be better to do ourselves (eg letterboxing and
-    resizing). Maybe migrate to tensorflow and keras if we get hardware where to
-    test it.
-- [ ] Add the possibility to the split command to do homogeneous splits taking
-    into account annotation values, so that sparse classes are not removed from
-    the training set.
+** TODO Web interface improvements
 
+*** TODO Filter/search annotations in listing according to some tag(s).
+
+*** TODO Autosuggest values for tagging
+maybe use https://developer.mozilla.org/en-US/docs/Web/HTML/Element/datalist
+
+*** TODO Improve messaging
+Remove "saved" message when doing changes (inconsistent), maybe load indicator
+
+*** TODO Allow deleting entries
+Maybe just move the last to the hole?
+
+*** TODO Better mobile interface
+Maybe integrate with camera/scan app, make quevedo a target for "sharing"
+(uploading) images.
+
+*** TODO Web user improvements
+User groups, record annotator in json.
+
+** TODO Improve use of scripts when modifing images
+
+When scripts modify images, don't save them, but return that it has been
+modified (ie return modified_tags, modified_img) and then it is `run_script`
+that saves the image to the appropriate path. Coversely, in the web interface
+the updated image can be sent to the frontend to be previewed, and if they want
+to save it send it back to the server on "save". The complication is that the
+image is now frontend state, not just a src link.

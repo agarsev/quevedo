@@ -36,11 +36,17 @@ class DetectNet(Network):
         return link_name
 
     def _get_net_config(self, num_classes):
-        num_max_batches = num_classes * 400  # 2000, 400 only for testing
         template = Template((Path(__file__).parent.parent /
                              'darknet/yolo.cfg').read_text())
+        config = self.config
         augment = self.config.get('augment', {})
+
+        num_max_batches = config.get('max_batches',
+            num_classes * 1000)
+
         return template.substitute(
+            height=config.get('height', 416),  # Important! multiple of 32
+            width=config.get('width', 416),    # Important! multiple of 32
             flip=augment.get('flip', 0),
             angle=augment.get('angle', 0),
             exposure=augment.get('exposure', 0),

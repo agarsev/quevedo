@@ -48,14 +48,20 @@ class ClassifyNet(Network):
         # FIXME: Choose these params better and allow user customisation
         template = Template((Path(__file__).parent.parent /
                              'darknet/alexnet.cfg').read_text())
-        augment = self.config.get('augment', {})
+        config = self.config
+        augment = config.get('augment', {})
+
+        num_max_batches = config.get('max_batches',
+                    1000 + num_classes * 20)
+
         return template.substitute(
             flip=augment.get('flip', 0),
             angle=augment.get('angle', 0),
             exposure=augment.get('exposure', 0),
             aspect=augment.get('aspect', 0),
+            num_max_batches=num_max_batches,
+
             num_classes=num_classes,
-            num_max_batches=1000 + num_classes * 40,  # maybe?
             num_connected=num_classes * 10)
 
     def predict(self, image):
