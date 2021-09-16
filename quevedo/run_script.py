@@ -16,6 +16,8 @@ def module_from_file(module_name, file_path):
         module_name, file, submodule_search_locations=[str(file_path)])
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
+    if file_path not in sys.path:
+        sys.path.append(str(file_path))
     spec.loader.exec_module(module)
     return module
 
