@@ -37,6 +37,9 @@ def _migrate_one(dataset: Dataset):
     dataset.config['train_folds'] = [0, 1, 2, 3, 4, 5, 6, 7]
     dataset.config['test_folds'] = [8, 9]
 
+    # Add "flags"
+    dataset.config['flags'] = {"done": "✔️", "problem": "⚠️", "notes": "📝"}
+
 
 @click.command('migrate')
 @click.pass_obj
