@@ -11,17 +11,23 @@ from quevedo import Annotation, Dataset, Target
 # Our custom logic to get tags from the filename
 def tags_from_filename(filename: str):
 
+    tags = dict()
+
     # We know that the file names of our source data are arranged like this
-    tags = filename.split('_')
+    tag1, tag2 = filename.split('_')
 
     # We can change some of the values to fit our annotation schema
-    if tags[0] == 'something':
-        tags[0] = 'some other thing'
+    if tag1 == 'wrong value':
+        tag1 = 'fixed value'
+
+    tags['TAG1'] = tag1
+    tags['TAG2'] = tag2
 
     return tags
 
 
-# The process function allows this script to be used by Quevedo
+# The process function allows this script to be used by Quevedo with the command
+# `run_script`
 def process(a: Annotation, ds: Dataset):
 
     if a.meta['author'] is not None:

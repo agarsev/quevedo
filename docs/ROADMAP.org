@@ -31,7 +31,7 @@ Move tags from a list to a (default)dict
 
 - [X] Test with real corpus
 - [ ] Documentation
-- [ ] Fix Examples
+- [X] Fix Examples
 
 ** TODO Improve train/test set
 

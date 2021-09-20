@@ -8,15 +8,11 @@
 from PIL import Image
 from quevedo import Dataset, Grapheme
 
-# ROTATION is the 3rd tag in our annotation schema (list indexing is 0-based in
-# python)
-ROTATION = 2
-
 
 # The process function allows this script to be used by Quevedo
 def process(a: Grapheme, ds: Dataset):
 
-    angles = a.tags[ROTATION]
+    angles = a.tags.get('ROTATION', 0)
 
     if angles == 0:
         return False  # Nothing to change
@@ -25,5 +21,5 @@ def process(a: Grapheme, ds: Dataset):
         image: Image = a.image
         image.rotate(angles, expand=True)
         image.save()
-        a.tags[ROTATION] = 0
+        a.tags['ROTATION'] = 0
         return True  # Save the new rotation

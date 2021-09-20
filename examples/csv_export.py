@@ -7,6 +7,7 @@
 from quevedo import Dataset, Grapheme, Logogram
 import sys
 
+# semicolon separated values
 SEPARATOR = ';'
 
 if __name__ == '__main__':
@@ -16,12 +17,17 @@ if __name__ == '__main__':
         exit(0)
 
     ds = Dataset(sys.argv[1])
+    schema = ds.config['tag_schema']
 
-    print(SEPARATOR.join(ds.config['tag_schema']))
+    # Print the CSV header
+    print(*schema, sep=SEPARATOR)
+
+    def print_tags(tags):
+        print(*(tags.get(k, '') for k in schema), sep=SEPARATOR)
 
     for a in ds.get_annotations():
         if isinstance(a, Logogram):
             for g in a.graphemes:
-                print(SEPARATOR.join(g.tags))
+                print_tags(g.tags)
         elif isinstance(a, Grapheme):
-            print(SEPARATOR.join(a.tags))
+            print_tags(a.tags)
