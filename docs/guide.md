@@ -124,22 +124,43 @@ $ dvc run -n extract \
           quevedo extract -f logogram_set -t extracted_set
 ```
 
-## Split
+## Splits and folds
 
-For experimentation, we often need to divide our files into a **train** test on
-which to train the algorithms, and a **test** or evaluation set which acts as a
-stand-in for "new" or "unknown" data. To have Quevedo perform this split
-randomly, use the [`split`](cli.md#split) command:
+!!! note "New in v1.1"
+    In previous versions of Quevedo, train and test splits worked differently.
+    If your dataset is from one of these versions, please use the
+    [`migrate`](cli.md#migrate) command to upgrade, and do the partitioning
+    again.
+
+For experimentation, we often need to divide our files into a **train** split on
+which to train the algorithms, and a **test** or evaluation split which acts as
+a stand-in for "new" or "unknown" data. We may also want to do cross-validation,
+in which evaluation is done on different runs of the experiment using different
+train/test partitions. Or in other cases, we may want to exclude some data from
+all training and testing, making a **heldout** set which is only looked at in
+the very end to really evaluate performance.
+
+To support different needs from the researchers, the strategy adopted by Quevedo
+is to assign annotations to "folds". Then, groups of folds can be defined either
+as being used for training, testing, or none. What folds to use, and which to
+assign to training or testing is set in the [configuration
+file](config.md#other-options).
+
+Quevedo can assign the folds to your annotations randomly so that different
+folds have the approximate same number of annotations using the
+[`split`](cli.md#split) command:
+
+- Split all logograms into the default folds:
 
 ```shell
-$ quevedo split -l logogram_set -p 70
+$ quevedo split -l _ALL_
 ```
 
-This will split the annotations in logogram_set into roughly 70% train files and
-30% test files. Depending on your needs, you might want to store this
-permanently with DVC by using `dvc add`, or add it as a procedural step in a
-pipeline. If you choose this last option, the split command understands a `seed`
-parameter so you can make your experiments reproducible.
+- Assign all graphemes in "some_set" to either fold 0 or 1:
+
+```shell
+$ quevedo split -g some_set -s 0 -e 1
+```
 
 ## Train and test the neural network
 

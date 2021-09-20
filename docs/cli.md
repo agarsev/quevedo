@@ -28,35 +28,14 @@ Commands:
   extract     Extract graphemes from annotated logograms.
   generate    Generate artificial logograms from existing graphemes.
   info        Get general status information about a dataset.
+  migrate     Upgrades a dataset config and data to the latest version.
   predict     Get predictions for an image using the trained neural network.
   prepare     Create the files needed for training and using this network.
   run_script  Run a data processing script on dataset objects.
-  split       Split files into train and test groups.
+  split       Assign annotations randomly to different folds.
   test        Compute evaluation metrics for a trained neural network.
   train       Train the neural network.
   web         Run a web interface to the dataset.
-```
-
-## `split`
-
-```txt
-Usage: quevedo split [OPTIONS]
-
-  Split files into train and test groups.
-
-  The annotations in the given subsets will be split into two groups, one for
-  training and one for test.  This split will not be done physically but
-  rather as a mark stored on the annotation file.
-
-  If no subsets are given, all annotations will be marked. If homogeneous
-  split is required, call this command once for each set.
-
-Options:
-  -g, --grapheme-set TEXT         Grapheme set(s) to split.
-  -l, --logogram-set TEXT         Logogram set(s) to split.
-  -p, --percentage INTEGER RANGE  [0<=x<=100]
-  --seed INTEGER                  A seed for the random split algorithm.
-  --help                          Show this message and exit.
 ```
 
 ## `config`
@@ -118,6 +97,39 @@ Options:
   --help                   Show this message and exit.
 ```
 
+## `split`
+
+```txt
+Usage: quevedo split [OPTIONS]
+
+  Assign annotations randomly to different folds.
+
+  By default, the annotations will be split into a number of folds configured
+  in the dataset configuration file, starting from 0. To override this, use
+  the `-s` and `-e` option to change the range of values for the folds.  This
+  can be used to ensure some particular subset of annotations is always
+  assigned to some fold, for example one that will always be used for train or
+  test.
+
+  Which folds are to be used for training and which for testing can be
+  configured in the dataset configuration file.
+
+  If neither `-g` nor `-l` are used, all annotations in the dataset will be
+  split, and if the special value "_ALL_" for either grapheme or logogram sets
+  is given, all sets for the chosen target will be split. In the cases before,
+  annotations will be assigned randomly, so no proportions of
+  graphemes/logograms/sets can be guaranteed for any fold. If the same fold
+  proportions in each set are desired, run the command once for each of them.
+
+Options:
+  -g, --grapheme-set TEXT   Grapheme set(s) to split.
+  -l, --logogram-set TEXT   Logogram set(s) to split.
+  -s, --start-fold INTEGER  Minimum number to use for the folds.
+  -e, --end-fold INTEGER    Maximum number to use for the folds.
+  --seed INTEGER            A seed for the random split algorithm.
+  --help                    Show this message and exit.
+```
+
 ## `extract`
 
 ```txt
@@ -150,7 +162,8 @@ Usage: quevedo generate [OPTIONS]
   controlled in the configuration file.
 
   Since the goal of this process is to perform data augmentation for training,
-  only graphemes in the "train" group will be used.
+  only graphemes in "train" folds will be used. Generated logograms will have
+  the first fold use for training set as their fold.
 
 Options:
   -f, --from TEXT  Grapheme subset to use
@@ -276,4 +289,18 @@ Options:
   -g, --grapheme-set TEXT  Process graphemes from these sets
   -l, --logogram-set TEXT  Process logograms from these sets
   --help                   Show this message and exit.
+```
+
+## `migrate`
+
+```txt
+Usage: quevedo migrate [OPTIONS]
+
+  Upgrades a dataset config and data to the latest version.
+
+  DANGER! This will change your annotations. Please have a backup of your data
+  in case something goes wrong.
+
+Options:
+  --help  Show this message and exit.
 ```

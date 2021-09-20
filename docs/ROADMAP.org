@@ -7,7 +7,8 @@ populate the changelog.
 
 Next version: 1.1
 
-** TODO Dataset version 1 (not compatible with 0)
+** DONE Dataset version 1 (not compatible with 0)
+   CLOSED: [2021-09-20 Mon 19:33]
 
 *** DONE Dataset versioning
     CLOSED: [2021-08-03 Tue 12:57]
@@ -27,13 +28,15 @@ Move tags from a list to a (default)dict
 - [X] Web interface
 - [X] Nets
 
-*** TODO Test & Doc
+*** DONE Test & Doc
+    CLOSED: [2021-09-20 Mon 19:33]
 
 - [X] Test with real corpus
-- [ ] Documentation
+- [X] Documentation
 - [X] Fix Examples
 
-** TODO Improve train/test set
+** DONE Improve train/test set
+   CLOSED: [2021-09-20 Mon 20:01]
 
 Also for dataset version 1.
 
@@ -82,12 +85,13 @@ Allow the split command to use only some of the values for fold, so that more
 sophisticated splits can be done, eg assign fold 1 to some subset that you
 always want to be in `train`, etc.
 
-*** TODO Test and doc
+*** DONE Test and doc
+    CLOSED: [2021-09-20 Mon 20:01]
 
 - [X] Test correct numbers
 - [X] Test correct train/test usage
 - [X] Test conserve
-- [ ] Doc
+- [X] Doc
 
 ** DONE Net config improvements
    CLOSED: [2021-09-16 Thu 20:07]
@@ -144,6 +148,11 @@ Maybe integrate with camera/scan app, make quevedo a target for "sharing"
 
 *** TODO Web user improvements
 User groups, record annotator in json.
+
+*** TODO Documentation
+
+- [ ] "flags" (from v1.1)
+- [ ] changes from v1.2
 
 ** TODO Improve use of scripts when modifing images
 

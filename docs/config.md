@@ -27,25 +27,26 @@ hashed).
 ## Annotation schema
 
 Two important options in the configuration file are `tag_schema` and
-`meta_tags`. These describe the schema of the dataset annotation, and are a list
-of strings with the names of the different tags.
+`meta_tags`. These describe the schema of the dataset annotation, and are lists
+of strings with the names of the different tags (features) to annotate.
 
 The `meta_tags` are used to add information to each annotation file, such as
 filename, author of the annotation, but also maybe meaning of the transcription,
-etc. They are common to both logograms and graphemes. They are stored as a
-dictionary in the annotation file and the annotation objects in the code.
+etc. They are common to both logograms and graphemes.  The tags in `tag_schema`
+is a list of the different tags or features that each grapheme, either isolated
+or bound, can have. Both meta tags and grapheme tags are represented as
+dictionary objects both in the annotation files (in `json` format) and in the
+code (python `dict`s).
 
-The `tag_schema` is a list of the different tags that each grapheme, either
-isolated or bound, can have. The tags are then stored as lists themselves both
-in the files and the code.  Therefore, if the tag schema of a dataset is
-`tag_schema = [ "COARSE", "FINE" ]`, and a grapheme has
-`tags = [ "symbol", "character" ]` this means that for this grapheme, the
-`COARSE` tag has value `symbol`, and the `FINE` tag has value `character`.
+!!! warning
+    In older versions of Quevedo (before v1.1), tags were stored as a list instead of
+    a dictionary. If your dataset is using this old structure, Quevedo will warn
+    you. Please run the [`migrate`](cli.md#migrate) command to upgrade the dataset.
 
-Isolated graphemes (in the `graphemes` directory) have a single list of tags
-associated with the transcription. Conversely, logograms have a list of
+Isolated graphemes (in the `graphemes` directory) have a single dictionary of
+tags associated with the transcription. Conversely, logograms have a list of
 graphemes that can be found in them. This list includes the grapheme position,
-and also the tag list in the same format and with the same meaning as for
+and also the tag dictionary in the same format and with the same meaning as for
 isolated graphemes.
 
 ## Other options
@@ -58,6 +59,11 @@ isolated graphemes.
     [`Web interface configuration`](web.md#configuration).
 - `generate`: These options guide the process of artificial logogram generation
     used for data augmentation. See [`generate`](cli.md#generate).
+- `folds`, `train_folds`, `test_folds`: The `folds` option sets the default
+    folds that the [`split`](cli.md#split) will use to partition annotations.
+    The `train_folds` option is a list of fold values that will be used to
+    train, and the `test_folds` option respectively for testing.
+    See [`Splits and folds`](guide.md#splits-and-folds) for more.
 
 ## Default configuration
 
@@ -85,12 +91,24 @@ tag_schema = [ "tag" ]
 # first one will be used as title for the annotation in the web listing.
 meta_tags = [ "filename", "meaning" ]
 
+# Flags are also meta tags, but can only be true/false. They are displayed in
+# the web interface as checkboxes with the icon set here.
+flags = { done = "✔️", problem = "⚠️", notes = "📝" }
+
 annotation_help = """
 Write here any help for annotators, like lists of graphemes or other
 instructions. For example:
 
 Make boxes slightly larger than the graphemes, not too tight.
 """
+
+config_version = 1 # Version of quevedo dataset schema, not of dataset data
+
+# Number of folds to split annotations into, and which to use for training and
+# which to use for testing
+folds = 10
+train_folds = [0,1,2,3,4,5,6,7]
+test_folds = [8,9]
 
 [darknet]
 path = "darknet/darknet" 

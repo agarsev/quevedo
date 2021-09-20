@@ -38,7 +38,7 @@ Or directly from the wheel in the [release
 file](https://github.com/agarsev/quevedo/releases):
 
 ```shell
-$ pip install quevedo-1.0.0-py3-none-any.whl[web]
+$ pip install quevedo-1.1.0-py3-none-any.whl[web]
 ```
 
 To use the neural network module, you will also need [to install

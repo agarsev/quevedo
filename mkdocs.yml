@@ -24,6 +24,8 @@ plugins:
   - mkapi:
       src_dirs: [ quevedo ]
   - mike
+  - search:
+      prebuild_index: true
 markdown_extensions:
   - footnotes
   - admonition

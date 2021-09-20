@@ -47,12 +47,12 @@ compositional structure.
 One of the characteristics of visual writing systems is that they can encode
 multiple meanings within a single symbol, taking advantage of the possibilities
 offered by the visual medium. In Quevedo, annotation consist not of a single
-tag, but rather of an ordered list of tags. This allows different systems to
-peruse different aspects of the symbols' meaning, and also lets researchers
-experiment with different, simultaneous and possibly overlapping annotation
-schemas for the dataset.
+tag, but rather of a dictionary of tag names and values. This allows different
+systems to peruse different aspects of the symbols' meaning, and also lets
+researchers experiment with different, simultaneous and possibly overlapping
+annotation schemas for the dataset.
 
-Each grapheme in the dataset has one such list of tags associated, manually
+Each grapheme in the dataset has one such dictionary of tags associated, manually
 entered by an annotator or automatically filled by some process. Logograms, on
 the other hand, don't have these tags directly, but rather in the graphemes they
 contain. Logograms are annotated by marking the different graphemes contained
