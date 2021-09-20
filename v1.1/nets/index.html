@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Neural networks - Quevedo Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="//use.fontawesome.com/releases/v5.8.1/css/all.css" rel="stylesheet" />
+  <link href="//use.fontawesome.com/releases/v5.8.1/css/v4-shims.css" rel="stylesheet" />
+  <link href="../css/mkapi-common.css" rel="stylesheet" />
+  <link href="../css/mkapi-readthedocs.css" rel="stylesheet" />
+  <link href="../css/version-select.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Neural networks";
+    var mkdocs_page_input_path = "nets.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Quevedo Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Concepts</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../concepts/">Quevedo Datasets</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Neural networks</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#darknet">Darknet</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#network-configuration">Network configuration</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#classifier">Classifier</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#detector">Detector</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#tag-selection">Tag selection</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#annotation-selection">Annotation selection</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#data-augmentation">Data augmentation</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#at-the-command-line">At the command line</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#at-the-web-interface">At the web interface</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#example-configuration">Example Configuration</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Admin Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../config/">Dataset Configuration</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../cli/">Command Line Interface</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../web/">Web Interface</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">User Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../guide/">Building a Dataset</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../web_use/">Using the web interface</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../dev/">Quevedo as a library</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../api/">Reference</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Quevedo Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Concepts &raquo;</li>
+        
+      
+    
+    <li>Neural networks</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="neural-networks">Neural networks<a class="headerlink" href="#neural-networks" title="Permanent link">&para;</a></h1>
+<p>One of the difficulties of processing visual languages automatically is input,
+when it is presented in the form of images. Images are represented digitally as
+collections of pixels, arrayed in memory in a way that makes sense for display
+and storage, but which is completely disconnected to the meaning these images
+have to humans. Additionally, if input is hand written, graphemes can present
+variations which don't affect human understanding but which mean completely
+different pixel patterns are present. And positioning of objects is again not
+based on hard rules, but rather on visual interpretation.</p>
+<p>For these reasons, machine learning techniques developed in the field of
+computer vision are necessary to adequately process logograms and graphemes.
+While the researcher can use any toolkit and algorithm they prefer, Quevedo
+includes a module to facilitate using neural networks with Quevedo datasets.</p>
+<h2 id="darknet">Darknet<a class="headerlink" href="#darknet" title="Permanent link">&para;</a></h2>
+<p><a href="http://pjreddie.com/darknet/">Darknet</a> is "an open source neural network framework written in C and CUDA",
+developed by the inventor of the <a href="https://pjreddie.com/darknet/yolo/">YOLO</a> algorithm, Joseph Redmon. This framework
+includes a binary and linked library which make configuring, training, and using
+neural networks for computer vision straightforward and efficient.</p>
+<p>The neural network module included with Quevedo needs darknet to be available.
+This module automatically prepares network configuration and training files from
+the metadata in the dataset, and can manage the training and prediction
+process.</p>
+<h3 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h3>
+<p>We recommend using <a href="https://github.com/AlexeyAB/darknet">this fork by Alexey
+Bochkovskiy</a>. Installation can vary
+depending on your environment, including the CUDA and OpenCV (optional)
+libraries installed, but with luck, the following will work:</p>
+<pre><code class="language-shell">$ git clone https://github.com/AlexeyAB/darknet
+$ cd darknet
+&lt;edit the Makefile&gt;
+$ make
+</code></pre>
+<p>In the Makefile, you probably want to enable <code>GPU=1</code> and <code>CUDNN=1</code>, otherwise
+training will be too slow. Depending on the GPU available and CUDA installation,
+you might need to change the <code>ARCH</code> and <code>NVCC</code> variables. For Quevedo to use
+Darknet, it is also necessary to set <code>LIBSO=1</code> so the linked library is built.
+Finally, if you want to use Darknet's data augmentation, you probably want to
+set <code>OPENCV=1</code> to make it faster.</p>
+<p>After darknet is compiled, a binary (named <code>darknet</code>) and library
+(<code>libdarknet.so</code> in linux) will be built. Quevedo needs to know where these
+files are, so in the <code>[darknet]</code> section of the configuration, the path to the
+binary and library must be set. By default, these point to a darknet
+directory in the current directory. Some additional arguments to the darknet
+binary for training can be set in the <code>options</code> key.</p>
+<h2 id="network-configuration">Network configuration<a class="headerlink" href="#network-configuration" title="Permanent link">&para;</a></h2>
+<p>Neural networks are ideal to deal with image data, due to their ability to
+find patterns and their combinations. Quevedo can help with preparing the
+configuration and training files to train darknet neural networks, can launch
+the actual training, and can compute evaluation metrics on the resulting network
+weights. It can also be used as a library to peruse the trained network in an
+application, not only for research.</p>
+<p>But no net is a silver bullet for every kind problem, and Quevedo datasets deal
+with different types of data with complex annotations. Therefore, Quevedo allows
+different network configurations to be kept in the configuration file, aiding
+both ensemble applications and exploration of the problem space.</p>
+<p>To add a neural network configuration to Quevedo, add a section to the
+<code>config.toml</code> file with the heading <code>[network.&lt;network_name&gt;]</code>. The initial
+configuration file that Quevedo creates for every dataset contains some examples
+that can be commented out and modified.</p>
+<p>Under this heading, different options can be set, like a <code>subject</code> key that
+gives a brief description of the purpose of the network. The most important
+configuration option is <code>task</code>, which can take the values <code>classify</code> or
+<code>detect</code>.</p>
+<h3 id="classifier">Classifier<a class="headerlink" href="#classifier" title="Permanent link">&para;</a></h3>
+<p>Classifier networks can be used with individual graphemes, and therefore use the
+data in the grapheme subsets of the dataset. Classify networks see the image as
+a whole, and try to find the best matching "class" from the classes they have
+been trained in. In Quevedo, classify networks are built with the
+AlexNet<sup id="fnref:AlexNet"><a class="footnote-ref" href="#fn:AlexNet">1</a></sup>
+architecture , a CNN well suited to the task.</p>
+<h3 id="detector">Detector<a class="headerlink" href="#detector" title="Permanent link">&para;</a></h3>
+<p>Detector networks try to find objects in an image, and therefore are well suited
+for finding the different graphemes that make up a logogram. Apart from
+detecting the boundary boxes of the different objects, they can also do
+classification of the objects themselves. Depending on the nature and complexity
+of the data, classification of graphemes can be performed by the same network
+that detects them within a logogram, or can be better split into a different (or
+many) classifier networks. The detector network architecture used by Quevedo is
+YOLOv3<sup id="fnref:YOLOv3"><a class="footnote-ref" href="#fn:YOLOv3">2</a></sup>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>After the prepare step of network use, a network configuration file is
+produced that can be edited to fine-tune the network architecture.</p>
+</div>
+<h3 id="tag-selection">Tag selection<a class="headerlink" href="#tag-selection" title="Permanent link">&para;</a></h3>
+<p>Since Quevedo datasets support a multi-tag annotation schema, a single
+"class"/"label" has to be selected for the networks in order to perform
+classification (including detector networks, since they have a classification
+step). By default the first tag of the tag schema will be used, but other tags
+can be selected by writing <code>tag = "some_tag_in_the_schema"</code>. A combination of
+the tags can be used by listing them, for example
+<code>tag = [ "some_tag", "some_other_tag" ]</code>. This will produce a single label for
+each grapheme by combining the values of the tags with an underscore in between,
+and train and evaluate the network with that single label.</p>
+<h3 id="annotation-selection">Annotation selection<a class="headerlink" href="#annotation-selection" title="Permanent link">&para;</a></h3>
+<p>To specify what subsets of data to use for training and testing of a neural
+network, we can list the names in the <code>subsets</code> option.  Additionally, we might
+want to select some logograms or graphemes to use for a particular network based
+on the tag values. We can do this by leaving the relevant tags for that network
+empty, in which case Quevedo will skip the annotation.</p>
+<p>In classify networks, finer control can also be achieved using a "filter"
+section for the network configuration. This filter accepts a key <code>criterion</code>
+which determines what tag from the annotation schema to use to select
+annotations. Then, an <code>include</code> or <code>exclude</code> key can be set to the list of
+values to filter. When <code>include</code> is used, if a grapheme is tagged with any of
+the values in the list, it is included for training and test, otherwise it is
+ignored. With <code>exclude</code>, the reverse happens.</p>
+<h3 id="data-augmentation">Data augmentation<a class="headerlink" href="#data-augmentation" title="Permanent link">&para;</a></h3>
+<p>Recent versions of darknet include automatic data augmentation that happens "on
+the fly", while the network is being trained. This data augmentation is not
+based on semantics of the images, but on image properties like contrast or
+rotation. By slightly and randomly modifying the images that the network is
+trained on, overfitting can be avoided and better generalization achieved. Some
+relevant options for grapheme and logogram recognition are supported by Quevedo,
+and if set in the network configuration will be written into the Darknet
+configuration file.</p>
+<p>The header to use is <code>[network.&lt;network_name&gt;.augment]</code>, and
+the options supported are <code>angle</code> (randomly rotate images up to this amount of
+degrees), <code>exposure</code> (change brightness of the image), <code>flip</code> (if set to <code>1</code>,
+images are sometimes flipped), and, only for classify networks <code>aspect</code>, which
+modifies the grapheme width/height relation.</p>
+<p>In visual writing systems, not all of this transformations are without meaning,
+so by default they are disabled so that the user can choose which options make
+sense for their particular use case and data.</p>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<h3 id="at-the-command-line">At the command line<a class="headerlink" href="#at-the-command-line" title="Permanent link">&para;</a></h3>
+<p>Once the network has been configured, the files necessary for training it can be
+created by running <a href="../cli/#prepare"><code>prepare</code></a>. This will create a directory in
+the dataset, under <code>networks</code>, with the name of the neural network. By default,
+Quevedo will use the neural network marked with <code>default = True</code>, so to change
+to a different one use the option <code>-N &lt;network&gt;</code> (since this is an option common
+too many commands, it must be used after the <code>quevedo</code> binary name but <em>before</em>
+the command).</p>
+<p>Once the directory with all the files needed for training has been created, a
+simple invocation of <a href="../cli/#train"><code>train</code></a> will launch the darknet executable to
+train the neural network. This command can be interrupted, and if enough time
+has passed that some partial training weights have been found, it can be later
+resumed by calling <code>train</code> again (to train from zero, use <code>--no-resume</code>).</p>
+<p>The weights obtained by the training process will be stored in the network
+directory with the name <code>darknet_final.weights</code>. This is a darknet file that can
+be used independently of Quevedo.</p>
+<p>To evaluate the results, the <a href="../cli/#test"><code>test</code></a> command can be used, which will
+get the predictions from the net for the annotations marked as "test" (see
+<a href="../cli/#split"><code>split</code></a>) and output some metrics, and optionally the full
+predictions as a <strong>csv</strong> file so that fine metrics or visualizations can be
+computed with something else (like <a href="https://www.r-project.org/">R</a>). The <a href="../cli/#predict"><code>predict</code></a> command
+can be used to directly get the predictions from the neural network for some
+image, not necessarily one in the dataset.</p>
+<p>Since commands can be chained, a full pipeline of training and testing the net
+can be written as:</p>
+<pre><code class="language-shell">$ quevedo -D path/to/dataset -N network_name prepare train test
+</code></pre>
+<h3 id="at-the-web-interface">At the web interface<a class="headerlink" href="#at-the-web-interface" title="Permanent link">&para;</a></h3>
+<p>Trained neural networks can also be used on the <a href="../web_use/#trained-networks">web
+interface</a>. Networks for detection will be
+available for logograms, and classifier ones will be available for graphemes.
+They will be listed at the top right of the interface. When running them, the
+current annotation image will be fed to the neural network, and the predictions
+applied (but not saved until the user presses the <strong>save</strong> button). This can be
+used to visualize the neural network results, or to bootstrap manual annotation
+of logograms and graphemes.</p>
+<h2 id="example-configuration">Example Configuration<a class="headerlink" href="#example-configuration" title="Permanent link">&para;</a></h2>
+<pre><code class="language-toml"># Annotations for each grapheme
+tag_schema = [ &quot;COARSE&quot;, &quot;FINE&quot;, &quot;ALTERATION&quot; ]
+
+# Configuration for the darknet binary and library
+[darknet]
+path = &quot;darknet/darknet&quot; 
+library = &quot;darknet/libdarknet.so&quot;
+# By passing the -mjpeg_port argument to darknet, a live image of training
+# progress can be seen at that port (in localhost)
+options = [ &quot;-mjpeg_port&quot;, &quot;8090&quot; ]
+
+# Detect graphemes in logograms, and also assign a coarse-grained tag
+[network.logograms]
+subject = &quot;Detect and classify coarse grain graphemes in a logogram&quot;
+default = true
+task = &quot;detect&quot;
+tag = &quot;COARSE&quot;
+subsets = [ &quot;italian&quot;, &quot;spanish&quot; ]
+
+[network.shapes]
+subject = &quot;Classify grapheme shapes&quot;
+task = &quot;classify&quot;
+tag = [ &quot;FINE&quot; ]
+subsets = [ &quot;simple&quot;, &quot;complicated&quot; ]
+
+# When training grapheme classification, augment the data
+[network.shapes.augment]
+angle = 10
+exposure = 0.5
+
+# Some graphemes present alterations, annotated in the &quot;ALTERATION&quot; tag. We want
+# to train a specific classifier for these graphemes
+[network.altered]
+subject = &quot;Classify the alterations of 'complicated' graphemes&quot;
+task = &quot;classify&quot;
+# The label to train will be a concatenation of the &quot;fine&quot; tag and the
+# &quot;alteration&quot;
+tag = [ &quot;FINE&quot;, &quot;ALTERATION&quot; ]
+# We have stored the graphemes with these alterations in the &quot;complicated&quot;
+# subset
+subsets = [ &quot;complicated&quot; ]
+
+# Only graphemes with the values &quot;multifaceted&quot; or &quot; accentuated&quot; for the
+# &quot;FINE&quot; tag will be used
+[network.altered.filter]
+criterion = &quot;FINE&quot;
+include = [ &quot;multifaceted&quot;, &quot;accentuated&quot; ]
+</code></pre>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:AlexNet">
+<p>Krizhevsky, Alex; Sutskever, Ilya; Hinton, Geoffrey E.
+(2017). <a href="https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf">"ImageNet classification with deep convolutional neural
+networks"</a>.
+<em>Communications of the ACM. 60 (6): 84–90. doi:10.1145/3065386. ISSN 0001-0782.
+S2CID 195908774.</em>&#160;<a class="footnote-backref" href="#fnref:AlexNet" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:YOLOv3">
+<p>Redmon, Joseph and Farhadi, Ali (2018). <a href="https://arxiv.org/pdf/1804.02767.pdf;">"YOLOv3: An Incremental
+Improvement"</a>. <em>arXiv preprint
+arXiv:1804.02767.</em>&#160;<a class="footnote-backref" href="#fnref:YOLOv3" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../config/" class="btn btn-neutral float-right" title="Dataset Configuration">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../concepts/" class="btn btn-neutral" title="Quevedo Datasets"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/agarsev/quevedo" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../concepts/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../config/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../js/mkapi.js" defer></script>
+      <script src="../search/main.js" defer></script>
+      <script src="../js/version-select.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
