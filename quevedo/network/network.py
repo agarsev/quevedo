@@ -31,23 +31,24 @@ class Network:
 
         which_tag = self.config.get('tag', dataset.config['tag_schema'][0])
         try:
-            if isinstance(which_tag, str):
-                #: function to get the relevant label for the network from a list of tags according to `tag_schema`
-                self.get_tag = lambda tags, which_tag=which_tag: tags.get(which_tag)
-                #: function to get the `tag_schema` values from the tag/label/class predicted by the network
-                self.prediction_to_tag = lambda tags, pred, which_tag=which_tag: tags.update({which_tag: pred})
-            else:
+            if not isinstance(which_tag, str):
                 def get_multitag(tags, which_tag=which_tag):
-                    try:
-                        return TAG_JOIN_CHAR.join(tags[w] for w in which_tag)
-                    except (KeyError, TypeError):
-                        return None
+                    return TAG_JOIN_CHAR.join(tags.get(w, '') for w in which_tag)
+                #: function to get the relevant label for the network from a list of tags according to `tag_schema`
                 self.get_tag = get_multitag
 
                 def update_multitag(tags, pred, which_tag=which_tag):
                     for i, val in enumerate(pred.split(TAG_JOIN_CHAR)):
-                        tags[which_tag[i]] = val
+                        if val != '':
+                            tags[which_tag[i]] = val
+                #: function to get the `tag_schema` values from the tag/label/class predicted by the network
                 self.prediction_to_tag = update_multitag
+            elif which_tag == '':
+                self.get_tag = lambda tags, which_tag=which_tag: ''
+                self.prediction_to_tag = lambda tags, which_tag=which_tag: None
+            else:
+                self.get_tag = lambda tags, which_tag=which_tag: tags.get(which_tag)
+                self.prediction_to_tag = lambda tags, pred, which_tag=which_tag: tags.update({which_tag: pred})
         except ValueError:
             raise SystemExit("Tag value '{}' (for network '{}') invalid".format(which_tag, name))
 

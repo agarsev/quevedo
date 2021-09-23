@@ -69,7 +69,7 @@ class Stats():
         for r in results.values():
             mprec += r['precision']
             mrec += r['recall']
-            mf += r['recall']
+            mf += r['fscore']
         results['macro'] = {
             'count': n_cls,
             'precision': safe_divide(mprec, n_cls),

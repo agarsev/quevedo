@@ -2,6 +2,32 @@
 
 * Next
 
+Version 1.2
+
+** TODO Data augmentation
+
+Incorporate VISSE code of data augmentation to replace the existing module. The
+idea is to use user code to generate examples, because they know how their tags
+work. We can still provide the image generation and grapheme placement with
+force simulation for logogram generation.
+
+- [ ] Generate graphemes
+- [ ] Generate logograms
+
+** DONE Improve detector network use of tags
+
+- [X] Allow detector networks to train without any classification, only detecting
+bounding boxes. Set `tag` option in the network config to the empty string for
+that.
+- [X] Allow using "empty" tags in training, don't skip unnanotated objects
+  WARN: BREAKING!
+
+** Bugfixes
+
+*** DONE Macro F-score calculation was using recall value.
+
+* Backlog
+
 ** TODO Web interface improvements
 
 *** TODO Filter/search annotations in listing according to some tag(s).
@@ -35,3 +61,24 @@ that saves the image to the appropriate path. Coversely, in the web interface
 the updated image can be sent to the frontend to be previewed, and if they want
 to save it send it back to the server on "save". The complication is that the
 image is now frontend state, not just a src link.
+
+** TODO Migrate to alternative ML library
+
+Study migrating to a python-based ML library.
+
+** TODO Grapheme dependency trees
+
+*** TODO Code representation
+
+A "parent" field for BoundGraphemes, and some kind of ID (better not use
+indices, arrays are always problematic).
+
+*** TODO Web annotation
+
+A tab that presents an alternative interface. In the drag and drop, drag from
+object to object to establish the child-parent link (visualized as an arrow). In
+the table side, how to visualize?
+
+*** TODO Logogram use
+
+Access the tree from the logogram.
