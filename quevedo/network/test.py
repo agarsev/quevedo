@@ -6,33 +6,38 @@ from collections import Counter
 import json
 
 
+from quevedo.annotation import Target
+
+
 def safe_divide(a, b):
     return a / b if b else 0
 
 
 class Stats():
 
-    def __init__(self, record=None):
+    def __init__(self, record=None, other_variables=()):
         self.record = record
+        self.other = other_variables
         if record is not None:
-            print('Prediction,Truth',
-                  file=record)
+            print('prediction', 'truth', *other_variables,
+                  sep=',', file=record)
         self.observations = Counter()
         self.true_positives = Counter()
         self.false_positives = Counter()
         self.false_negatives = Counter()
 
-    def register(self, prediction, ground_truth):
-        self.observations[ground_truth] += 1
+    def register(self, prediction, truth, **other_variables):
+        self.observations[truth] += 1
         if prediction is None:
-            self.false_negatives[ground_truth] += 1
-        elif prediction == ground_truth:
+            self.false_negatives[truth] += 1
+        elif prediction == truth:
             self.true_positives[prediction] += 1
         else:
             self.false_positives[prediction] += 1
         if self.record is not None:
-            print('{},{}'.format(prediction, ground_truth),
-                  file=self.record)
+            print(prediction, truth,
+                  *[other_variables[k] for k in self.other],
+                  sep=',', file=self.record)
 
     def get_results(self):
         '''Get a dictionary of computed statistics.'''
@@ -118,7 +123,11 @@ def test(obj, do_print, results_csv, results_json, predictions_csv, on_train):
     if predictions_csv:
         record_path = network.path / 'predictions.csv'
         record = open(record_path, 'w')
-    stats = Stats(record)
+
+    if network.target == Target.GRAPH:
+        stats = Stats(record, other_variables=('image', 'confidence'))
+    else:
+        stats = Stats(record, other_variables=('image', 'confidence', 'iou'))
 
     for an in network.get_annotations(not on_train):
         network.test(an, stats)

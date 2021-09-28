@@ -18,6 +18,8 @@ class ClassifyNet(Network):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         filt = self.config.get('filter', None)
+        #: Confidence threshold for returning a classification instead of None
+        self.threshold = self.config.get('threshold', 0.2)
         if filt:
             try:
                 crit = filt['criterion']
@@ -45,7 +47,6 @@ class ClassifyNet(Network):
         return "{}_{}.png".format(self.tag_map[tag], num)
 
     def _get_net_config(self, num_classes):
-        # FIXME: Choose these params better and allow user customisation
         template = Template((Path(__file__).parent.parent /
                              'darknet/alexnet.cfg').read_text())
         config = self.config
@@ -76,9 +77,11 @@ class ClassifyNet(Network):
             return
         predictions = self.predict(annotation.image_path)
         best = predictions[0]
-        # FIXME thresholds should be configuration, in detect too
-        stats.register(best['tag'] if best['confidence'] >= 0.5 else None,
-                       true_tag)
+        if best['confidence'] < self.threshold:
+            best = {'tag': None, 'confidence': 0}
+        stats.register(truth=true_tag, prediction=best['tag'],
+            image=annotation.image_path.relative_to(self.dataset.path),
+            confidence=best['confidence'])
 
     def auto_annotate(self, a):
         preds = self.predict(a.image)

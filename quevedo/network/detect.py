@@ -17,6 +17,11 @@ class DetectNet(Network):
     names_file_name = 'names'  # Darknet is not very consistent
     network_type = 'detector'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        #: IOU threshold for matching a prediction to a grapheme
+        self.threshold = self.config.get('threshold', 0.2)
+
     def _update_tag_set(self, tag_set, annotation):
         try:
             tag_set.update(set(self.get_tag(g.tags)
@@ -81,24 +86,19 @@ class DetectNet(Network):
 
     def test(self, annotation, stats):
         predictions = self.predict(annotation.image_path)
-        for g in annotation.graphemes:
-            tag = self.get_tag(g.tags)
-            if tag is None:
-                continue
-            logo = {'box': g.box, 'name': tag}
-            if len(predictions) > 0:
-                similarities = sorted(((box_similarity(p, logo), i) for (i, p) in
-                                      enumerate(predictions)), reverse=True)
-                (sim, idx) = similarities[0]
-                if sim > 0.7:
-                    predictions.pop(idx)
-                    # Tag equality is checked in the similarity computation
-                    stats.register(tag, tag)
-                    continue
-            stats.register(None, tag)
-        # Unassigned predictions are false positives
-        for pred in predictions:
-            stats.register(pred['name'], None)
+        image = annotation.image_path.relative_to(self.dataset.path)
+        truths = [{'name': self.get_tag(g.tags), 'box': g.box} for g in
+                  annotation.graphemes]
+        for (pred, truth, iou) in match(predictions, truths, self.threshold):
+            if pred is None:
+                stats.register(prediction=None, truth=truth['name'],
+                    image=image, confidence=0, iou=0)
+            elif truth is None:
+                stats.register(prediction=pred['name'], truth=None,
+                    image=image, confidence=pred['confidence'], iou=0)
+            else:
+                stats.register(prediction=pred['name'], truth=truth['name'],
+                    image=image, confidence=pred['confidence'], iou=iou)
 
     def auto_annotate(self, a):
         graphemes = []
@@ -131,12 +131,7 @@ def box(xc, yc, w, h):
     }
 
 
-def box_similarity(a, b):
-    '''Similarity of grapheme boxes.'''
-    return iou(a['box'], b['box']) if (a['name'] == b['name']) else 0
-
-
-def iou(a, b):
+def calc_iou(a, b):
     '''Intersection over union for boxes in x, y, w, h format'''
     a = box(*a)
     b = box(*b)
@@ -151,3 +146,38 @@ def iou(a, b):
     # Sum (union = sum - inters)
     s = a['w'] * a['h'] + b['w'] * b['h']
     return safe_divide(i, (s - i))
+
+
+def match(x, y, threshold=0):
+    '''Match elements of two lists according to best box fit.
+
+    Receives two lists of objects which must be dicts with a 'box' entry, and
+    returns a list of 3-tuples, where the first element is from the first input
+    list, the second element from the second input list, and the third element
+    is the IOU measure between their boxes. Each element of either list will
+    appear only once. If the IOU between elements is less than the threshold, it
+    won't be considered a match. Unmatched elements will still appear in the
+    return list, but their counterpart object in the tuple will be `None`.'''
+    x = [a for a in x]
+    nx = len(x)
+    y = [b for b in y]
+    ny = len(y)
+    matches = [(i, j, calc_iou(x[i]['box'], y[j]['box']))
+               for i in range(nx)
+               for j in range(ny)]
+    matches.sort(reverse=True, key=lambda m: m[2])
+    ret = []
+    while len(matches) > 0 and nx > 0 and ny > 0:
+        i, j, iou = matches.pop(0)
+        if x[i] is None or y[j] is None:
+            continue
+        if iou <= threshold:
+            break
+        ret.append((x[i], y[j], iou))
+        x[i] = None
+        nx -= 1
+        y[j] = None
+        ny -= 1
+    ret += ((a, None, 0) for a in x if a is not None)
+    ret += ((None, b, 0) for b in y if b is not None)
+    return ret

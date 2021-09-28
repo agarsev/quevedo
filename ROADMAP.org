@@ -22,6 +22,14 @@ that.
 - [X] Allow using "empty" tags in training, don't skip unnanotated objects
   WARN: BREAKING!
 
+** DONE Improve test command
+   CLOSED: [2021-09-28 Tue 19:46]
+
+- The predictions csv now has more info, like image path and confidence of
+  prediction, and IOU of box for detection
+- Improved the match algorithm for graphemes and predictions
+- Networks now have an optional 'threshold' config param for testing
+
 ** Bugfixes
 
 *** DONE Macro F-score calculation was using recall value.
