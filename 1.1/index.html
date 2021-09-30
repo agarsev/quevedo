@@ -59,12 +59,10 @@
     <li class="toctree-l2"><a class="reference internal" href="#features">Features</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#development">Development</a>
-    </li>
-        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#development">Development</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a>
     </li>
@@ -170,14 +168,6 @@ file</a>:</p>
 </code></pre>
 <p>To use the neural network module, you will also need <a href="https://agarsev.github.io/quevedo/latest/nets/#installation">to install
 darknet</a>.</p>
-<h3 id="development">Development<a class="headerlink" href="#development" title="Permanent link">&para;</a></h3>
-<p>To develop on quevedo, we use <a href="https://python-poetry.org/">poetry</a> as our environment, dependency and build
-management tool. In the quevedo code directory, run:</p>
-<pre><code class="language-shell">$ poetry install
-</code></pre>
-<p>Then you can run quevedo with</p>
-<pre><code class="language-shell">$ poetry run quevedo
-</code></pre>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
 <p>To create a dataset:</p>
 <pre><code class="language-shell">$ quevedo -D path/to/new/dataset create
@@ -192,6 +182,14 @@ needed.</p>
 </code></pre>
 <p>For more information, and the list of commands, run <code>quevedo --help</code> or <code>quevedo
 &lt;command&gt; --help</code> or see <a href="https://agarsev.github.io/quevedo/latest/cli/">here</a>.</p>
+<h2 id="development">Development<a class="headerlink" href="#development" title="Permanent link">&para;</a></h2>
+<p>To develop on quevedo, we use <a href="https://python-poetry.org/">poetry</a> as our environment, dependency and build
+management tool. In the quevedo code directory, run:</p>
+<pre><code class="language-shell">$ poetry install
+</code></pre>
+<p>Then you can run quevedo with</p>
+<pre><code class="language-shell">$ poetry run quevedo
+</code></pre>
 <h2 id="dependencies">Dependencies<a class="headerlink" href="#dependencies" title="Permanent link">&para;</a></h2>
 <p>Quevedo makes use of the following open source projects:</p>
 <ul>
@@ -209,8 +207,9 @@ documentation with <a href="https://www.mkdocs.org/">mkdocs</a>.</p>
 3.0</a>.</p>
 <p>The web interface includes a copy of <a href="https://preactjs.com/">preactjs</a> for ease of offline use, distributed
 under the <a href="https://github.com/preactjs/preact/blob/master/LICENSE">MIT License</a>.</p>
-<p>Quevedo is part of the project "Visualizando la SignoEscritura" (Proyecto VisSE,
-Facultad de Informática, Universidad Complutense de Madrid) as part of the
+<p>Quevedo is part of the project <a href="https://www.ucm.es/visse">"Visualizando la SignoEscritura" (Proyecto VisSE,
+Facultad de Informática, Universidad Complutense de
+Madrid)</a> as part of the
 program for funding of research projects on Accesible Technologies financed by
 INDRA and Fundación Universia.</p>
 <h3 id="visse-team">VisSE team<a class="headerlink" href="#visse-team" title="Permanent link">&para;</a></h3>
@@ -276,5 +275,5 @@ INDRA and Fundación Universia.</p>
 
 <!--
 MkDocs version : 1.1.2
-Build Date UTC : 2021-09-20 19:20:22.361588+00:00
+Build Date UTC : 2021-09-30 15:39:07.840835+00:00
 -->

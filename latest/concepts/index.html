@@ -1,16 +1,304 @@
 <!DOCTYPE html>
-<html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Redirecting</title>
-  <noscript>
-    <meta http-equiv="refresh" content="1; url=../../1.1/concepts/" />
-  </noscript>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Quevedo Datasets - Quevedo Documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  <link href="//use.fontawesome.com/releases/v5.8.1/css/all.css" rel="stylesheet" />
+  <link href="//use.fontawesome.com/releases/v5.8.1/css/v4-shims.css" rel="stylesheet" />
+  <link href="../css/mkapi-common.css" rel="stylesheet" />
+  <link href="../css/mkapi-readthedocs.css" rel="stylesheet" />
+  <link href="../css/version-select.css" rel="stylesheet" />
+  
   <script>
-    window.location.replace("../../1.1/concepts/");
+    // Current page data
+    var mkdocs_page_name = "Quevedo Datasets";
+    var mkdocs_page_input_path = "concepts.md";
+    var mkdocs_page_url = null;
   </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
 </head>
-<body>
-  Redirecting to <a href="../../1.1/concepts/">../../1.1/concepts/</a>...
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Quevedo Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Concepts</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Quevedo Datasets</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#logograms-and-graphemes">Logograms and Graphemes</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#annotation-of-logograms-and-graphemes">Annotation of logograms and graphemes</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dataset-structure">Dataset structure</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#interaction-with-git-and-dvc">Interaction with git and DVC</a>
+    </li>
+    </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../nets/">Neural networks</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Admin Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../config/">Dataset Configuration</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../cli/">Command Line Interface</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../web/">Web Interface</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">User Guides</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../guide/">Building a Dataset</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../web_use/">Using the web interface</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../dev/">Quevedo as a library</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../api/">Reference</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Quevedo Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Concepts &raquo;</li>
+        
+      
+    
+    <li>Quevedo Datasets</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="quevedo-datasets">Quevedo Datasets<a class="headerlink" href="#quevedo-datasets" title="Permanent link">&para;</a></h1>
+<p>Quevedo datasets consist of source images, annotations on those images, and
+other metadata that can help with their interpretation. While it can be used for
+less complex images, Quevedo's focus is on <strong>images with compositional
+meaning</strong>, such as constitute visual languages, like <a href="https://www.uml.org/">UML</a>, or complex 
+writing systems, like <a href="https://www.signwriting.org/">SignWriting</a> or <a href="https://en.wikipedia.org/wiki/Musical_notation">musical notation</a>.</p>
+<p><img alt="UML communication diagram" src="../img/UML_Communication_diagram.png" /></p>
+<p><em>Example of an UML communication diagram (source: Oemmler @
+<a href="https://commons.wikimedia.org/wiki/File:UML_Communication_diagram.svg">Wikipedia</a>)</em></p>
+<p><img alt="SignWriting" src="../img/SignWriting_example.png" /></p>
+<p><em>Example of a SignWriting transcription representing the ASL sign for "SignWriting"
+(source: Slevinski @
+<a href="https://commons.wikimedia.org/wiki/File:SignWriting-render.svg">Wikipedia</a>)</em></p>
+<p><img alt="Musical notation" src="../img/musical_notation.png" />
+<em>An example of modern musical notation: Prelude, Op. 28, No. 7, by Frédéric Chopin
+(source: Prof.rick @ <a href="https://commons.wikimedia.org/wiki/File:Chopin_Prelude_7.png">Wikipedia</a>)</em></p>
+<h2 id="logograms-and-graphemes">Logograms and Graphemes<a class="headerlink" href="#logograms-and-graphemes" title="Permanent link">&para;</a></h2>
+<p>Quevedo recognises two types of source images: <strong>logograms</strong> and <strong>graphemes</strong>.
+Graphemes are atomic, individual symbols that represent some particular meaning
+in the target visual language, while logograms are images made up of graphemes
+in complex and meaningful spatial arrangements. In the UML example above, the
+different boxes, arrows and characters are graphemes. In the SignWriting
+example, the hand symbols along with the arrows indicating movement are the
+graphemes. In the sheet music excerpt, one can identify the notes, accidentals
+and other symbols as graphemes. As for logograms, what constitutes a logogram depends on the
+target language and the goal of the researcher, but to Quevedo, any logogram is an
+image file where graphemes are arranged according to some underlying meaning.</p>
+<p>The names logogram and grapheme come from the original problem for which Quevedo
+has been designed, which is automatic recognition of visual languages, but the
+software imposes little meaning to the terms beyond the fact that graphemes are
+independent and atomic, and logograms are composed of spatially arranged
+graphemes. Therefore, Quevedo can be used to manage datasets for problems of
+varying complexity, as long as the source data are images with some
+compositional structure.</p>
+<h2 id="annotation-of-logograms-and-graphemes">Annotation of logograms and graphemes<a class="headerlink" href="#annotation-of-logograms-and-graphemes" title="Permanent link">&para;</a></h2>
+<p>One of the characteristics of visual writing systems is that they can encode
+multiple meanings within a single symbol, taking advantage of the possibilities
+offered by the visual medium. In Quevedo, annotation consist not of a single
+tag, but rather of a dictionary of tag names and values. This allows different
+systems to peruse different aspects of the symbols' meaning, and also lets
+researchers experiment with different, simultaneous and possibly overlapping
+annotation schemas for the dataset.</p>
+<p>Each grapheme in the dataset has one such dictionary of tags associated, manually
+entered by an annotator or automatically filled by some process. Logograms, on
+the other hand, don't have these tags directly, but rather in the graphemes they
+contain. Logograms are annotated by marking the different graphemes contained
+within them, and then tagging each grapheme with the tags from the tag schema.
+Additionally, both graphemes and logograms can have "meta" tags which represent
+other information. This can be used to store information about the filenames,
+the source of the data, or in the case of logograms, information about the
+logogram itself not associated with any particular grapheme.</p>
+<p><img alt="Logogram annotation" src="../img/web_logogram_anno.png" /></p>
+<p><em>Example of the annotation of a logogram in the web interface</em></p>
+<h2 id="dataset-structure">Dataset structure<a class="headerlink" href="#dataset-structure" title="Permanent link">&para;</a></h2>
+<p>Each Quevedo dataset is a directory on disk, containing a <a href="../config/">configuration
+file</a> named <code>config.toml</code>, and a number of directories. Files which
+Quevedo doesn't recognize will be ignored, so it is safe to add these files that
+other programs (such as <a href="https://git-scm.com/">git</a> or <a href="https://dvc.org/">DVC</a>) may need.</p>
+<p>Annotations are stored in subdirectories of the <code>logograms</code> and <code>graphemes</code>
+directories (depending on their type). Each subdirectory represents a data
+subset, which can be used to perform different experiments on different sets, or
+just to organize data in some meaningful way.</p>
+<p>Annotations in each subset consist of two files: <code>&lt;number&gt;.png</code> and
+<code>&lt;number&gt;.json</code>. The <code>.png</code> file is the source image, in PNG format, and the
+<code>.json</code> file contains the annotations in <a href="https://www.json.org/json-en.html">JSON</a> format. These are standard
+formats, so annotations in a Quevedo dataset can be read and modified by
+external tools and inspected by humans. The annotations are sequentially
+numbered, so corresponding images and json files are easily found.</p>
+<p>There are two additional directories which Quevedo uses: <code>networks</code> and
+<code>scripts</code>. In the <code>networks</code> directory, the training configuration and weight
+files for each different <a href="../nets/#network-configuration">neural network</a> are
+stored. Each network has a name, and its files are all organized in the
+subdirectory of <code>networks</code> with the network name.</p>
+<p>The <code>scripts</code> directory can contain useful scripts for additional management of
+the dataset. For example, a researcher can store the <code>.r</code> scripts used to
+evaluate different metrics on the dataset, or shell scripts to process images or
+extract annotation information. A special case are python files (ending in
+<code>.py</code>) which Quevedo <a href="../dev/#user-scripts">can understand</a>.</p>
+<pre><code class="language-txt">dataset_root
+├─ config.toml
+├─ logograms
+│  ├─ subset_1
+│  │  ├─ 1.png
+│  │  ├─ 1.json
+│  │  ├─ 2.png
+│  │  ├─ 2.json
+│  │  └─ ...
+│  └─ other_subset
+├─ graphemes
+│  ├─ subset_1
+│  │  ├─ 1.png
+│  │  ├─ 1.json
+│  │  └─ ...
+│  └─ other_subset
+├─ networks
+│  ├─ network_1
+│  │  ├─ train
+│  │  ├─ darknet.cfg
+│  │  ├─ darknet_final.weights
+│  │  ├─ results.json
+│  │  └─ ...
+│  └─ network_2
+└─ scripts
+</code></pre>
+<p><em>Example of a Quevedo dataset directory structure</em></p>
+<h2 id="interaction-with-git-and-dvc">Interaction with git and DVC<a class="headerlink" href="#interaction-with-git-and-dvc" title="Permanent link">&para;</a></h2>
+<p>Since Quevedo datasets are directories on disk, and the different files use
+standard formats, Quevedo datasets can interact nicely with other tools, such as
+<a href="https://git-scm.com/">git</a> and <a href="https://dvc.org/">DVC</a>. In particular, a Quevedo dataset can also be a git repository, and
+therefore a DVC repository too. This can help with dataset sharing and
+experiment reproducibility. We recommend using git to track configuration files
+and scripts, and DVC to track source data, annotations, and experiments.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../nets/" class="btn btn-neutral float-right" title="Neural networks">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/agarsev/quevedo" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../nets/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../js/mkapi.js" defer></script>
+      <script src="../search/main.js" defer></script>
+      <script src="../js/version-select.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>
