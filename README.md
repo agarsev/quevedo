@@ -44,21 +44,6 @@ $ pip install quevedo-1.1.0-py3-none-any.whl[web]
 To use the neural network module, you will also need [to install
 darknet](https://agarsev.github.io/quevedo/latest/nets/#installation).
 
-### Development
-
-To develop on quevedo, we use [poetry] as our environment, dependency and build
-management tool. In the quevedo code directory, run:
-
-```shell
-$ poetry install
-```
-
-Then you can run quevedo with
-
-```shell
-$ poetry run quevedo
-```
-
 ## Usage
 
 To create a dataset:
@@ -85,6 +70,21 @@ $ quevedo web
 For more information, and the list of commands, run `quevedo --help` or `quevedo
 <command> --help` or see [here](https://agarsev.github.io/quevedo/latest/cli/).
 
+## Development
+
+To develop on quevedo, we use [poetry] as our environment, dependency and build
+management tool. In the quevedo code directory, run:
+
+```shell
+$ poetry install
+```
+
+Then you can run quevedo with
+
+```shell
+$ poetry run quevedo
+```
+
 ## Dependencies
 
 Quevedo makes use of the following open source projects:
@@ -107,8 +107,9 @@ Quevedo is licensed under the [Open Software License version
 The web interface includes a copy of [preactjs] for ease of offline use, distributed
 under the [MIT License](https://github.com/preactjs/preact/blob/master/LICENSE).
 
-Quevedo is part of the project "Visualizando la SignoEscritura" (Proyecto VisSE,
-Facultad de Informática, Universidad Complutense de Madrid) as part of the
+Quevedo is part of the project ["Visualizando la SignoEscritura" (Proyecto VisSE,
+Facultad de Informática, Universidad Complutense de
+Madrid)](https://www.ucm.es/visse) as part of the
 program for funding of research projects on Accesible Technologies financed by
 INDRA and Fundación Universia.
 
