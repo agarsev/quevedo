@@ -24,10 +24,12 @@ class Grapheme(Annotation):
         '''
         super().update(**kwds)
         if tags is not None:
-            self.tags = tags
+            self.tags = {k: t for k, t in tags.items()
+                         if t is not None and t != ''}
 
     def to_dict(self):
         return {
             **super().to_dict(),
-            'tags': self.tags
+            'tags': {k: t for k, t in self.tags.items()
+                     if t is not None and t != ''}
         }
