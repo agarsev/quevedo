@@ -2,6 +2,7 @@
 # Licensed under the Open Software License version 3.0
 
 from .annotation import Annotation, Target
+from .grapheme import Grapheme
 
 
 class Logogram(Annotation):
@@ -9,10 +10,10 @@ class Logogram(Annotation):
 
     target = Target.LOGO
 
-    def __init__(self, *args):
+    def __init__(self, *args, **kwargs):
         #: list of [bound graphemes](#quevedoannotationlogogramboundgrapheme) found within this logogram.
         self.graphemes = []  # type: list[BoundGrapheme]
-        super().__init__(*args)
+        super().__init__(*args, **kwargs)
 
     def update(self, *, graphemes=None, **kwds):
         '''Extends base
@@ -20,13 +21,15 @@ class Logogram(Annotation):
         arguments will be passed through.
 
         Args:
-            graphemes: a list of dicts with the grapheme information for this logogram.
-                The dicts must have the keys necessary to initialize a
+            graphemes: either a list of Graphemes, BoundGraphemes, or dicts with
+                the keys necessary to initialize a
                 [BoundGrapheme](quevedoannotationlogogramboundgrapheme).
         '''
         super().update(**kwds)
         if graphemes is not None:
-            self.graphemes = [BoundGrapheme(self, **g) for g in graphemes]
+            self.graphemes = [BoundGrapheme(self, **g)
+                              if isinstance(g, dict) else g
+                              for g in graphemes]
 
     def to_dict(self):
         return {
@@ -35,7 +38,7 @@ class Logogram(Annotation):
         }
 
 
-class BoundGrapheme():
+class BoundGrapheme(Grapheme):
     '''A grapheme which is not isolated, but rather forms part of a logogram.
 
     To promote this bound grapheme to an isolated grapheme with its own
@@ -44,16 +47,15 @@ class BoundGrapheme():
     passing this object's `image` to the argument `pil_image`.
     '''
 
-    def __init__(self, logogram, box=[0, 0, 0, 0], tags={}):
+    def __init__(self, logogram, box=[0, 0, 0, 0], *args, **kwargs):
         #: Logogram where this grapheme is found.
         self.logogram = logogram
         #: Coordinates (x, y, w, h) of this grapheme's bounding box within the logogram. x and y are the coordinates of the **center**. Values are relative to the logogram size, in the range `[0, 1]`.
         self.box = box  # type: list[float]
-        #: annotated tags for this grapheme.
-        self.tags = tags  # type: dict[str,str]
+        super().__init__(*args, **kwargs)
 
     def to_dict(self):
-        return {'box': self.box, 'tags': self.tags}
+        return {**super().to_dict(), 'box': self.box}
 
     @property
     def image(self):

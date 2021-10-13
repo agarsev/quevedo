@@ -21,21 +21,25 @@ class Annotation:
 
     target = None  # Should be set by concrete class
 
-    def __init__(self, path):
-        path = Path(path)
-        #: Number which identifies this annotation in its subset.
-        self.id = path.stem
-        #: Path to the json annotation file. It is the id plus `json` extension.
-        self.json_path = path.with_suffix('.json')
-        #: Path to the source image for the annotation. It is the id plus `png` extension.
-        self.image_path = path.with_suffix('.png')
+    def __init__(self, path=None, image=None, **kwds):
         #: Dictionary of metadata annotations.
         self.meta = {}
         #: fold to which the annotation belongs.
         # "-1" fold is special, it means no fold assigned so only use for train.
         self.fold = -1
-        if self.json_path.exists():
-            self.update(**json.loads(self.json_path.read_text()))
+        if path:
+            path = Path(path)
+            #: Number which identifies this annotation in its subset.
+            self.id = path.stem
+            #: Path to the json annotation file. It is the id plus `json` extension.
+            self.json_path = path.with_suffix('.json')
+            #: Path to the source image for the annotation. It is the id plus `png` extension.
+            self.image_path = path.with_suffix('.png')
+            if self.json_path.exists():
+                self.update(**json.loads(self.json_path.read_text()))
+        if image:
+            self._image_data = image
+        self.update(**kwds)
 
     def update(self, *, meta=None, fold=None, **kwds):
         '''Update the content of the annotation.
@@ -90,6 +94,7 @@ class Annotation:
             self.image_path.write_bytes(binary_data)
         elif pil_image is not None:
             pil_image.save(self.image_path)
+            self._image_data = pil_image
         else:
             raise ValueError("At least an image path, binary data or PIL image"
                              " object is needed")
@@ -104,3 +109,6 @@ class Annotation:
             from PIL import Image
             self._image_data = Image.open(self.image_path)
         return self._image_data
+
+    def __repr__(self):
+        return f'{self.__class__.__name__} {self.to_dict().__repr__()}'

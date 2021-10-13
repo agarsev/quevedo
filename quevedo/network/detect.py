@@ -8,6 +8,7 @@ from string import Template
 
 from .network import Network
 from quevedo.annotation import Target
+from quevedo.annotation.logogram import Logogram, BoundGrapheme
 
 
 class DetectNet(Network):
@@ -77,36 +78,26 @@ class DetectNet(Network):
             return [x, y, w, h]
 
         width, height = image.size
-
-        return [{
-            'name': self.tag_map[s],
-            'confidence': c,
-            'box': make_bbox(width, height, *b)
-        } for (s, c, b) in self._darknet.detect(image)]
+        ret = Logogram(image=image)
+        ret.graphemes = [BoundGrapheme(logogram=ret,
+            meta={'confidence': c},
+            tags=self.prediction_to_tag(self.tag_map[s]),
+            box=make_bbox(width, height, *b))
+            for (s, c, b) in self._darknet.detect(image)]
+        return ret
 
     def test(self, annotation, stats):
-        predictions = self.predict(annotation.image_path)
+        prediction = self.predict(annotation.image_path)
         image = annotation.image_path.relative_to(self.dataset.path)
-        truths = [{'name': self.get_tag(g.tags), 'box': g.box} for g in
-                  annotation.graphemes]
-        for (pred, truth, iou) in match(predictions, truths, self.threshold):
-            if pred is None:
-                stats.register(prediction=None, truth=truth['name'],
-                    image=image, confidence=0, iou=0)
-            elif truth is None:
-                stats.register(prediction=pred['name'], truth=None,
-                    image=image, confidence=pred['confidence'], iou=0)
-            else:
-                stats.register(prediction=pred['name'], truth=truth['name'],
-                    image=image, confidence=pred['confidence'], iou=iou)
+        for (pred, truth, iou) in match(prediction, annotation, self.threshold):
+            stats.register(
+                prediction=self.get_tag(pred.tags) if pred is not None else None,
+                truth=self.get_tag(truth.tags) if truth is not None else None,
+                image=image, confidence=pred.meta.get('confidence', 0), iou=iou)
 
     def auto_annotate(self, a):
-        graphemes = []
-        for pred in self.predict(a.image):
-            g = {'box': pred['box'], 'tags': {}}
-            self.prediction_to_tag(g['tags'], pred['name'])
-            graphemes.append(g)
-        a.update(graphemes=graphemes)
+        predicted = self.predict(a.image)
+        a.update(graphemes=predicted.graphemes)
 
 
 # Utilities for YOLO
@@ -149,20 +140,20 @@ def calc_iou(a, b):
 
 
 def match(x, y, threshold=0):
-    '''Match elements of two lists according to best box fit.
+    '''Match the graphemes from two logograms according to best box fit.
 
-    Receives two lists of objects which must be dicts with a 'box' entry, and
-    returns a list of 3-tuples, where the first element is from the first input
-    list, the second element from the second input list, and the third element
-    is the IOU measure between their boxes. Each element of either list will
-    appear only once. If the IOU between elements is less than the threshold, it
-    won't be considered a match. Unmatched elements will still appear in the
-    return list, but their counterpart object in the tuple will be `None`.'''
+    Receives two logograms and returns a list of 3-tuples, where the first
+    element is from the first logogram, the second element from the second
+    logogram, and the third element is the IOU measure between their boxes. Each
+    grapheme of either logogram will appear only once. If the IOU between
+    elements is less than the threshold, it won't be considered a match.
+    Unmatched elements will still appear in the return list, but their
+    counterpart object in the tuple will be `None`.'''
     x = [a for a in x]
     nx = len(x)
     y = [b for b in y]
     ny = len(y)
-    matches = [(i, j, calc_iou(x[i]['box'], y[j]['box']))
+    matches = [(i, j, calc_iou(x[i].box, y[j].box))
                for i in range(nx)
                for j in range(ny)]
     matches.sort(reverse=True, key=lambda m: m[2])

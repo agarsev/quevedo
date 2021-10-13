@@ -30,6 +30,11 @@ that.
 - Improved the match algorithm for graphemes and predictions
 - Networks now have an optional 'threshold' config param for testing
 
+** TODO Add CSS Normalization
+
+Browsers change the styling all the time, use some normalization stylesheet
+eg. http://necolas.github.io/normalize.css/
+
 ** Bugfixes
 
 *** DONE Macro F-score calculation was using recall value.

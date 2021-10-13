@@ -37,18 +37,18 @@ class Network:
                 #: function to get the relevant label for the network from a list of tags according to `tag_schema`
                 self.get_tag = get_multitag
 
-                def update_multitag(tags, pred, which_tag=which_tag):
-                    for i, val in enumerate(pred.split(TAG_JOIN_CHAR)):
-                        if val != '':
-                            tags[which_tag[i]] = val
+                def undo_multitag(pred, which_tag=which_tag):
+                    return {which_tag[i]: val
+                            for i, val in enumerate(pred.split(TAG_JOIN_CHAR))
+                            if val != ''}
                 #: function to get the `tag_schema` values from the tag/label/class predicted by the network
-                self.prediction_to_tag = update_multitag
+                self.prediction_to_tag = undo_multitag
             elif which_tag == '':
                 self.get_tag = lambda tags, which_tag=which_tag: ''
-                self.prediction_to_tag = lambda tags, which_tag=which_tag: None
+                self.prediction_to_tag = lambda pred, which_tag=which_tag: {}
             else:
                 self.get_tag = lambda tags, which_tag=which_tag: tags.get(which_tag)
-                self.prediction_to_tag = lambda tags, pred, which_tag=which_tag: tags.update({which_tag: pred})
+                self.prediction_to_tag = lambda pred, which_tag=which_tag: {which_tag: pred}
         except ValueError:
             raise SystemExit("Tag value '{}' (for network '{}') invalid".format(which_tag, name))
 

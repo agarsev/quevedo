@@ -9,10 +9,10 @@ class Grapheme(Annotation):
 
     target = Target.GRAPH
 
-    def __init__(self, *args):
+    def __init__(self, *args, **kwargs):
         #: annotated tags for this grapheme.
         self.tags = {}  # type: dict[str,str]
-        super().__init__(*args)
+        super().__init__(*args, **kwargs)
 
     def update(self, *, tags=None, **kwds):
         '''Extends base

@@ -5,7 +5,7 @@ from pathlib import Path
 from string import Template
 
 from .network import Network
-from quevedo.annotation import Target
+from quevedo.annotation import Target, Grapheme
 
 
 class ClassifyNet(Network):
@@ -66,24 +66,29 @@ class ClassifyNet(Network):
             num_connected=num_classes * 10)
 
     def predict(self, image):
-        return [{
-            'tag': self.tag_map[tag.decode('utf8')],
-            'confidence': conf
-        } for (tag, conf) in self._darknet.classify(image)]
+        return [Grapheme(
+            tags=self.prediction_to_tag(
+                self.tag_map[tag.decode('utf8')]),
+            meta={'confidence': conf})
+                for (tag, conf) in self._darknet.classify(image)]
 
     def test(self, annotation, stats):
         true_tag = self.get_tag(annotation.tags)
         if true_tag is None:  # Should we allow empty images?
             return
         predictions = self.predict(annotation.image_path)
-        best = predictions[0]
-        if best['confidence'] < self.threshold:
-            best = {'tag': None, 'confidence': 0}
-        stats.register(truth=true_tag, prediction=best['tag'],
+        best_tag = None
+        confidence = 0
+        if len(predictions) > 0:
+            best = predictions[0]
+            if best.meta['confidence'] >= self.threshold:
+                best_tag = self.get_tag(best.tags)
+                confidence = best.meta['confidence']
+        stats.register(truth=true_tag, prediction=best_tag,
             image=annotation.image_path.relative_to(self.dataset.path),
-            confidence=best['confidence'])
+            confidence=confidence)
 
     def auto_annotate(self, a):
         preds = self.predict(a.image)
         if len(preds) > 0:
-            self.prediction_to_tag(a.tags, preds[0]['tag'])
+            a.tags.update(preds[0].tags)
