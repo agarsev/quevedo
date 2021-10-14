@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "quevedo"
 description = "Tool for managing datasets of images with compositional semantics"
-version = "1.1.1"
+version = "1.2.0"
 authors = ["Antonio F. G. Sevilla <afgs@ucm.es>"]
 license = "OSL-3.0"
 readme = "README.md"

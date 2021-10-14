@@ -30,10 +30,10 @@ that.
 - Improved the match algorithm for graphemes and predictions
 - Networks now have an optional 'threshold' config param for testing
 
-** TODO Add CSS Normalization
+** DONE Improve scripts handling
+   CLOSED: [2021-10-14 Thu 21:45]
 
-Browsers change the styling all the time, use some normalization stylesheet
-eg. http://necolas.github.io/normalize.css/
+Handle scripts arguments for them
 
 ** Bugfixes
 
@@ -95,3 +95,6 @@ the table side, how to visualize?
 *** TODO Logogram use
 
 Access the tree from the logogram.
+** TODO Improve CSS
+- Add CSS Normalization/reset
+- Improve the style

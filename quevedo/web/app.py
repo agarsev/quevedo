@@ -181,6 +181,10 @@ def run_net_or_script(function, target, dir, idx):
         script = app_data['scripts'][target][function]
         if script is None:
             script = module_from_file(target[:-1]+'_'+function, ds.script_path)
+            try:
+                script.init(ds, web=True)
+            except AttributeError:
+                pass
             app_data['scripts'][target][function] = script
         script.process(an, ds)
     else:

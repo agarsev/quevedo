@@ -3,6 +3,7 @@
 
 import click
 import importlib.util
+import re
 import sys
 
 from quevedo import Dataset, Target
@@ -39,8 +40,8 @@ def run_script(obj, scriptname, grapheme_set, logogram_set, extra_args):
     The script should be in the 'scripts' directory of the dataset, and have a
     "process" method which will be called by Quevedo on each grapheme or
     logogram in the selected subsets. If it has an "init" method, it will be
-    called once and firstmost, with any extra arguments that have been passed to
-    this command.'''
+    called once and firstmost with the dataset and any extra arguments that have
+    been passed to this command.'''
 
     ds: Dataset = obj['dataset']
 
@@ -49,7 +50,27 @@ def run_script(obj, scriptname, grapheme_set, logogram_set, extra_args):
         raise SystemExit("Error loading script '{}'".format(scriptname))
 
     try:
-        script.init(extra_args)
+        args = []
+        kwargs = {}
+        last_arg = None
+        for s in extra_args:
+            if m := re.match(r'-{,2}(.+)=(.+)', s):
+                if last_arg:
+                    kwargs[last_arg] = True
+                last_arg = False
+                kwargs[m.group(1)] = m.group(2)
+            elif m := re.match(r'-{1,2}(.+)', s):
+                if last_arg:
+                    kwargs[last_arg] = True
+                last_arg = m.group(1)
+            else:
+                if last_arg:
+                    kwargs[last_arg] = s
+                else:
+                    args.append(s)
+        if last_arg:
+            kwargs[last_arg] = True
+        script.init(ds, *args, **kwargs)
     except AttributeError:
         pass
 
