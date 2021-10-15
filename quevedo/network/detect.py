@@ -89,11 +89,15 @@ class DetectNet(Network):
     def test(self, annotation, stats):
         prediction = self.predict(annotation.image_path)
         image = annotation.image_path.relative_to(self.dataset.path)
-        for (pred, truth, iou) in match(prediction, annotation, self.threshold):
-            stats.register(
-                prediction=self.get_tag(pred.tags) if pred is not None else None,
-                truth=self.get_tag(truth.tags) if truth is not None else None,
-                image=image, confidence=pred.meta.get('confidence', 0), iou=iou)
+        for (pred, truth, iou) in match(prediction.graphemes, annotation.graphemes, self.threshold):
+            if truth is not None:
+                truth = self.get_tag(truth.tags)
+            confidence = 0
+            if pred is not None:
+                confidence = pred.meta.get('confidence', 0)
+                pred = self.get_tag(pred.tags)
+            stats.register(prediction=pred, truth=truth,
+                image=image, confidence=confidence, iou=iou)
 
     def auto_annotate(self, a):
         predicted = self.predict(a.image)
@@ -140,15 +144,15 @@ def calc_iou(a, b):
 
 
 def match(x, y, threshold=0):
-    '''Match the graphemes from two logograms according to best box fit.
+    '''Match two lists of graphemes according to best box fit.
 
-    Receives two logograms and returns a list of 3-tuples, where the first
-    element is from the first logogram, the second element from the second
-    logogram, and the third element is the IOU measure between their boxes. Each
-    grapheme of either logogram will appear only once. If the IOU between
-    elements is less than the threshold, it won't be considered a match.
-    Unmatched elements will still appear in the return list, but their
-    counterpart object in the tuple will be `None`.'''
+    Receives two grapheme lists and returns a list of 3-tuples, where the first
+    element is from the first list, the second element from the second list, and
+    the third element is the IOU measure between their boxes. Each grapheme of
+    either list will appear only once. If the IOU between elements is less than
+    the threshold, it won't be considered a match.  Unmatched elements will
+    still appear in the return list, but their counterpart object in the tuple
+    will be `None`.'''
     x = [a for a in x]
     nx = len(x)
     y = [b for b in y]
