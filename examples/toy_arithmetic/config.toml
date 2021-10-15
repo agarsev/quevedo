@@ -1,0 +1,52 @@
+# This file is a Quevedo dataset configuration file. Find more at:
+# https://www.github.com/agarsev/quevedo
+title = "Toy Arithmetic"
+
+description = """ 
+Toy dataset of Spanish-style elementary arithmetic for demonstration purposes.
+"""
+
+tag_schema = [ "type", "value" ]
+
+meta_tags = [ "filename" ]
+
+flags = { done = "✔️", problem = "⚠️", notes = "📝" }
+
+annotation_help = """
+Make boxes slightly larger than the graphemes, not too tight.
+"""
+
+config_version = 1 # Version of quevedo dataset schema, not of dataset data
+
+folds = 4
+train_folds = [0,1,2]
+test_folds = [3]
+
+[darknet]
+path = "darknet/darknet" 
+library = "darknet/libdarknet.so"
+options = [ "-dont_show", "-mjpeg_port", "8090" ]
+
+[network.numbers]
+default = true
+task = "classify"
+subject = "classify the different digits"
+tag = "value"
+
+[network.numbers.filter]
+criterion = "type"
+include = [ "number" ]
+
+[network.numbers.augment]
+angle = 10
+flip = 0
+exposure = 0.9
+aspect = 0.9
+
+[web]
+host = "localhost"
+port = "5000"
+mount_path = ""
+lang = "en"
+public = true
+secret_key = "ce8c9cd0316faac773645648ac827ff6"

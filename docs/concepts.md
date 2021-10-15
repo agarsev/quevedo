@@ -1,5 +1,10 @@
 # Quevedo Datasets
 
+!!! note
+    If you have cloned Quevedo, you can find an example dataset in the folder
+    `examples/toy_arithmetic`. Playing with this dataset might make the
+    explanations below more understandable.
+
 Quevedo datasets consist of source images, annotations on those images, and
 other metadata that can help with their interpretation. While it can be used for
 less complex images, Quevedo's focus is on **images with compositional

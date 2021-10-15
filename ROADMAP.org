@@ -1,8 +1,6 @@
 #+title: Roadmap
 
-* Next
-
-Version 1.2
+* Version 1.2
 
 ** TODO Data augmentation
 
@@ -35,6 +33,12 @@ that.
 
 Handle scripts arguments for them
 
+** DONE Add example dataset
+   CLOSED: [2021-10-15 Fri 14:41]
+
+Added the example toy arithmetic dataset to the repo as suggested by
+@albertodiazatfdi
+
 ** Bugfixes
 
 *** DONE Macro F-score calculation was using recall value.
@@ -60,6 +64,11 @@ Maybe integrate with camera/scan app, make quevedo a target for "sharing"
 
 *** TODO Web user improvements
 User groups, record annotator in json.
+
+*** TODO Improve CSS
+
+- Add CSS Normalization/reset
+- Improve the style
 
 *** TODO Documentation
 
@@ -95,6 +104,3 @@ the table side, how to visualize?
 *** TODO Logogram use
 
 Access the tree from the logogram.
-** TODO Improve CSS
-- Add CSS Normalization/reset
-- Improve the style

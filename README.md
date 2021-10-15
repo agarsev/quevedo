@@ -41,6 +41,8 @@ file](https://github.com/agarsev/quevedo/releases):
 $ pip install quevedo-{version}-py3-none-any.whl[web]
 ```
 
+You can test that quevedo is working
+
 To use the neural network module, you will also need [to install
 darknet](https://agarsev.github.io/quevedo/latest/nets/#installation).
 
@@ -55,7 +57,9 @@ $ quevedo -D path/to/new/dataset create
 Then you can **cd** into the dataset directory so that the `-D` option is not
 needed.
 
-To see information about a downloaded dataset:
+You can also download an example dataset from this repository (`examples/toy_arithmetic`).
+
+To see information about a dataset:
 
 ```shell
 $ quevedo info
