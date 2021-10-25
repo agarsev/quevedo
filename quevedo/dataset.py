@@ -98,12 +98,17 @@ class Dataset:
         try:
             return self._networks[name]
         except KeyError:
-            if name is None:
-                ret = next(n for n in self.list_networks() if n.config['default'])
-            else:
-                ret = create_network(self, name)
-            self._networks[name] = ret
-            return ret
+            pass
+        if name is None:
+            try:
+                ret = next(n for n in self.list_networks() if
+                           n.config.get('default', False))
+            except StopIteration:
+                raise ValueError('No network specified, and no default configured.') from None
+        else:
+            ret = create_network(self, name)
+        self._networks[name] = ret
+        return ret
 
     def get_single(self, target: Target, subset, id):
         '''Retrieve a single annotation.
