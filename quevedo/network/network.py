@@ -196,14 +196,15 @@ class Network:
         if not hasattr(self, '_darknet_weights'):
 
             if not (self.path / 'darknet.cfg').exists():
-                raise SystemExit("Neural network has not been trained")
+                raise SystemExit(f"Neural network {self.name} has not been trained")
 
             if not (self.path / 'darknet_final.weights').exists():
-                raise SystemExit("Neural network has not been trained")
+                raise SystemExit(f"Neural network {self.name} has not been trained")
 
             tag_map = json.loads((self.path / 'tag_map.json').read_text())
             self.tag_map = {v: k for k, v in tag_map.items()}
 
+            lib_path = Path(self.dataset.config['darknet']['library']).resolve()
             oldcwd = os.getcwd()
             os.chdir(self.path)
 
@@ -211,7 +212,7 @@ class Network:
 
             with DarknetShutup():
                 self._darknet_weights = DarknetNetwork(
-                    libraryPath=self.dataset.config['darknet']['library'],
+                    libraryPath=str(lib_path),
                     configPath='darknet.cfg',
                     weightPath='darknet_final.weights',
                     metaPath='darknet.data')
