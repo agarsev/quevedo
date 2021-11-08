@@ -78,6 +78,14 @@ gives a brief description of the purpose of the network. The most important
 configuration option is `task`, which can take the values `classify` or
 `detect`.
 
+!!! note "New in v1.2"
+    A key "extend" has been added that can be used to share network
+    configuration. If a network `net_a` has a key `extend = "net_b"`,
+    parameters from `net_b` will be used when no other value has been set in
+    `net_a`. This can be useful to share common options when testing different
+    networks, or to set a single source of truth for options that must be
+    common.
+
 ### Classifier
 
 Classifier networks can be used with individual graphemes, and therefore use the

@@ -280,8 +280,8 @@ Usage: quevedo run_script [OPTIONS] [EXTRA_ARGS]...
   The script should be in the 'scripts' directory of the dataset, and have a
   "process" method which will be called by Quevedo on each grapheme or
   logogram in the selected subsets. If it has an "init" method, it will be
-  called once and firstmost, with any extra arguments that have been passed to
-  this command.
+  called once and firstmost with the dataset and any extra arguments that have
+  been passed to this command.
 
 Options:
   -s, --scriptname TEXT    Name of the script to run, without path or

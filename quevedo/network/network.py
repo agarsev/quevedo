@@ -14,17 +14,15 @@ class Network:
     ''' Class representing a neural net to train and predict logograms or
     graphemes.'''
 
-    def __init__(self, dataset, name):
+    def __init__(self, dataset, name, config):
+        '''This method shouldn't be called directly, please use the dataset
+        method [get_network](quevedodatasetdatasetget_network).'''
         #: Name of the network
         self.name = name
         #: Parent dataset
         self.dataset = dataset
-        try:
-            #: Dictionary with the network configuration
-            self.config = dataset.config['network'][name]
-        except ValueError:
-            raise SystemExit("No such network: {}".format(name))
-
+        #: Configuration dictionary
+        self.config = config
         #: Path to the network directory
         self.path = dataset.path / 'networks' / name
         self.path.mkdir(exist_ok=True, parents=True)

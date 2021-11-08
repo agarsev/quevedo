@@ -7,10 +7,18 @@ from .classify import ClassifyNet
 
 
 def create_network(dataset, name):
-    config = dataset.config['network'][name]
+    try:
+        config = dataset.config['network'][name]
+    except ValueError:
+        raise SystemExit("No such network: {}".format(name))
+    if 'extend' in config:
+        config = {
+            **dataset.config['network'][config['extend']],
+            **config
+        }
     if config['task'] == 'detect':
-        return DetectNet(dataset, name)
+        return DetectNet(dataset, name, config)
     elif config['task'] == 'classify':
-        return ClassifyNet(dataset, name)
+        return ClassifyNet(dataset, name, config)
     raise ValueError('Unknown task {} for network {}'.format(
         config['task'], name))
