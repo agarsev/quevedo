@@ -2,7 +2,6 @@
 # Licensed under the Open Software License version 3.0
 
 import click
-from collections import Counter
 import json
 
 
@@ -21,107 +20,60 @@ class Stats():
         if record is not None:
             print('prediction', 'truth', *other_variables,
                   sep=',', file=record)
-        self.observations = Counter()
-        self.true_positives = Counter()
-        self.false_positives = Counter()
-        self.false_negatives = Counter()
+        self.observations = 0  # total observations
+        self.hits = 0          # correct predictions (overall accuracy)
+        self.detections = 0    # correct predictions
+        self.true_clas = 0     # correct classifications
 
     def register(self, prediction, truth, **other_variables):
-        self.observations[truth] += 1
-        if prediction is None:
-            self.false_negatives[truth] += 1
-        elif prediction == truth:
-            self.true_positives[prediction] += 1
-        else:
-            self.false_positives[prediction] += 1
+        self.observations += 1
+        if truth == prediction:
+            self.hits += 1
+        if prediction is not None and truth is not None:
+            self.detections += 1
+            if truth == prediction:
+                self.true_clas += 1
         if self.record is not None:
             print(prediction, truth,
                   *[other_variables[k] for k in self.other],
                   sep=',', file=self.record)
 
     def get_results(self):
-        '''Get a dictionary of computed statistics.'''
-        results = {}
-        total_tp = 0
-        total_fp = 0
-        total_fn = 0
-        total_obs = 0
-
-        # Per class
-        for name in sorted(tag for tag in self.observations.keys()
-                           if tag is not None):
-            total_obs += self.observations[name]
-            tp = self.true_positives[name]
-            total_tp += tp
-            fp = self.false_positives[name]
-            total_fp += fp
-            fn = self.false_negatives[name]
-            total_fn += fn
-            prec = safe_divide(tp, tp + fp)
-            rec = safe_divide(tp, tp + fn)
-            results[name] = {
-                'count': self.observations[name],
-                'precision': prec,
-                'recall': rec,
-                'fscore': safe_divide(2 * prec * rec, prec + rec),
-            }
-
-        # Macro average
-        mprec = 0
-        mrec = 0
-        mf = 0
-        n_cls = len(results.items())
-        for r in results.values():
-            mprec += r['precision']
-            mrec += r['recall']
-            mf += r['fscore']
-        results['macro'] = {
-            'count': n_cls,
-            'precision': safe_divide(mprec, n_cls),
-            'recall': safe_divide(mrec, n_cls),
-            'fscore': safe_divide(mf, n_cls)
+        '''Get a dictionary of computed accuracies.'''
+        return {
+            'overall': self.hits / self.observations,
+            'det_acc': self.detections / self.observations,
+            'cls_acc': self.true_clas / self.detections,
         }
-
-        # Micro average
-        prec = safe_divide(total_tp, total_tp + total_fp)
-        rec = safe_divide(total_tp, total_tp + total_fn)
-        results['micro'] = {
-            'count': total_obs,
-            'precision': prec,
-            'recall': rec,
-            'fscore': safe_divide(2 * prec * rec, prec + rec),
-        }
-        return results
 
 
 @click.command('test')
 @click.pass_obj
 @click.option('--print/--no-print', '-p', 'do_print', default=True,
               help='Show results in the command line')
-@click.option('--results-csv/--no-results-csv', default=False,
-              help='Print results into a `results.csv` file in the network directory')
 @click.option('--results-json/--no-results-json', default=False,
               help='Print results into a `results.json` file in the network directory')
 @click.option('--predictions-csv/--no-predictions-csv', default=False,
               help='Print all predictions into a `predictions.csv` file in the network directory')
 @click.option('--on-train', is_flag=True, default=False,
               help='Test the network on the train set instead of the test one')
-def test(obj, do_print, results_csv, results_json, predictions_csv, on_train):
+def test(obj, do_print, results_json, predictions_csv, on_train):
     '''Compute evaluation metrics for a trained neural network.
 
-    By default annotations marked as "test" (see train/test split) are used.
-    Precision, recall and f-score are computed for each class, as well as their
-    average (micro) and global metrics (macro average). For more detailed
-    statistics, the full predictions can be printed into a csv to be loaded into
-    other software (like R).'''
+    By default annotations in test folds (see train/test split) are used.
+    Accuracy is computed, and also separate accuracies for detection and
+    classification. The full predictions can be printed into a csv for further
+    analysis with statistics software.'''
 
     dataset = obj['dataset']
     network = dataset.get_network(obj['network'])
 
+    prefix = 'train_' if on_train else ''
+
     record = None
     record_path = None
     if predictions_csv:
-        record_path = network.path / 'predictions.csv'
+        record_path = network.path / f'{prefix}predictions.csv'
         record = open(record_path, 'w')
 
     if network.target == Target.GRAPH:
@@ -137,23 +89,10 @@ def test(obj, do_print, results_csv, results_json, predictions_csv, on_train):
         record.close()
 
     if do_print:
-        header = "class          count  precision  recall f-score"
-        click.echo("{}\n{}".format(header, "-" * len(header)))
-        for name, r in results.items():
-            click.echo("{:15s} {count:4d} {precision:10.2f} "
-                       "{recall:7.2f} {fscore:7.2f}".format(name, **r))
-        click.echo("\n")
-
-    if results_csv:
-        file_path = network.path / 'results.csv'
-        with open(file_path, 'w') as f:
-            print("class,precision,recall,f-score", file=f)
-            for name, r in results.items():
-                print("{},{},{},{}".format(name, **r), file=f)
-        click.echo("Printed results to '{}'".format(file_path.resolve()))
+        click.echo(json.dumps(results, indent=4))
 
     if results_json:
-        file_path = network.path / 'results.json'
+        file_path = network.path / f'{prefix}results.json'
         file_path.write_text(json.dumps(results))
         click.echo("Printed results to '{}'".format(file_path.resolve()))
 
