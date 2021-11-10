@@ -33,6 +33,30 @@ that.
 
 Handle scripts arguments for them
 
+** TODO Pipeline
+
+*** DONE Pipeline class and factory method
+    CLOSED: [2021-11-10 Wed 20:04]
+
+*** TODO Test and predict with pipeline
+
+- [ ] -P flag for cli alternative to net
+- [ ] predict cli uses pipeline too
+- [ ] test cli uses pipeline too
+
+*** TODO Improve default 
+
+- [X] Remove default as net param
+- [ ] Remove default from default config
+- [ ] make a single dataset param default which is a pipeline (doubles as
+  network)
+
+*** TODO Test
+
+The pipelines from VisSE cover all options to be checked, use them.
+
+*** TODO Documentation
+
 ** DONE Add example dataset
    CLOSED: [2021-10-15 Fri 14:41]
 

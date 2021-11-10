@@ -9,8 +9,9 @@ from string import Template
 from subprocess import run
 import toml
 
-from quevedo.network import create_network
 from quevedo.annotation import Target, Logogram, Grapheme
+from quevedo.network import create_network
+from quevedo.pipeline import create_pipeline
 
 
 CURRENT_CONFIG_VERSION = 1
@@ -89,8 +90,7 @@ class Dataset:
         '''Get a single neural network by name.
 
         Args:
-            name: name of the neural network as specified in the configuration
-                file. If not provided, the default network will be returned.
+            name: name of the neural network as specified in the configuration file.
 
         Returns:
             a [Network](#quevedonetworknetworknetwork) object.
@@ -99,15 +99,25 @@ class Dataset:
             return self._networks[name]
         except KeyError:
             pass
-        if name is None:
-            try:
-                ret = next(n for n in self.list_networks() if
-                           n.config.get('default', False))
-            except StopIteration:
-                raise ValueError('No network specified, and no default configured.') from None
-        else:
-            ret = create_network(self, name)
+        ret = create_network(self, name)
         self._networks[name] = ret
+        return ret
+
+    def get_pipeline(self, name):
+        '''Get a pipeline by name.
+
+        Args:
+            name: name of the pipeline as specified in the configuration file.
+
+        Returns:
+            a [Pipeline](#quevedopipelinepipeline) object.
+        '''
+        try:
+            return self._pipelines[name]
+        except KeyError:
+            pass
+        ret = create_pipeline(self, name)
+        self._pipelines[name] = ret
         return ret
 
     def get_single(self, target: Target, subset, id):
