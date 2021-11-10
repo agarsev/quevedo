@@ -2,9 +2,6 @@
 # Licensed under the Open Software License version 3.0
 
 import click
-from pathlib import Path
-
-from .test import test
 
 
 @click.command('prepare')
@@ -54,21 +51,3 @@ def train(obj, resume):
         if weights != 'darknet_final.weights':
             click.echo("Training interrupted, using partial weights ({})".format(weights))
         click.echo("Neural network '{}' trained".format(network.name))
-
-
-@click.command('predict')
-@click.option('--image', '-i', type=click.Path(exists=True),
-              required=True, help="Image to predict")
-@click.pass_obj
-def predict_image(obj, image):
-    '''Get predictions for an image using the trained neural network.'''
-
-    dataset = obj['dataset']
-    network = dataset.get_network(obj['network'])
-
-    if not network.is_trained():
-        raise SystemExit("Please train neural network '{}' first".format(
-            network.name))
-
-    predictions = network.predict(image)
-    print(predictions)

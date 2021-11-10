@@ -103,6 +103,13 @@ class Dataset:
         self._networks[name] = ret
         return ret
 
+    def list_pipelines(self):
+        '''Get a list of all pipelines for this dataset.
+
+        Returns:
+            list of [Pipelines](#pipeline)'''
+        return [create_pipeline(self, p) for p in self.config['pipeline'].keys()]
+
     def get_pipeline(self, name):
         '''Get a pipeline by name.
 
@@ -397,19 +404,28 @@ def info(obj):
     if len(nets) > 1:
         click.echo('\nNetworks:')
         for n in nets:
-            click.echo('- {}: {}'.format(n.name, n.config['subject']))
+            click.echo('- {}: {}'.format(n.name, n.config.get('subject', '')))
 
-    net = dataset.get_network(obj['network'])
+    pipes = dataset.list_pipelines()
+    if len(pipes) > 1:
+        click.echo('\nPipelines:')
+        for p in pipes:
+            click.echo('- {}: {}'.format(p.name, p.config.get('subject', '')))
 
-    header = "Network: '{}'".format(net.name)
-    click.secho("\n{}\n{}".format(header, '▔' * len(header)), bold=True)
-    click.echo("{}\n".format(net.config['subject']))
+    if 'network' in obj:
+        net = dataset.get_network(obj['network'])
 
-    click.echo('The network {} ready for training'.format(style(
-        net.is_prepared(), 'is', "is not")))
+        header = "Network: '{}'".format(net.name)
+        click.secho("\n{}\n{}".format(header, '▔' * len(header)), bold=True)
+        click.echo("{}\n".format(net.config['subject']))
 
-    click.echo('The network {}'.format(style(
-        net.is_trained(), 'has been trained', "hasn't been trained")))
+        click.echo('The network {} ready for training'.format(style(
+            net.is_prepared(), 'is', "is not")))
+
+        click.echo('The network {}'.format(style(
+            net.is_trained(), 'has been trained', "hasn't been trained")))
+
+    # TODO: add info about the pipeline
 
     click.echo('')
 

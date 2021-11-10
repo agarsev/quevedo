@@ -6,6 +6,7 @@ from os import getcwd
 
 from quevedo import web, dataset as ds
 import quevedo.network.cli as network
+from quevedo.inference import predict_image, test
 from quevedo.extract_graphemes import extract_graphemes
 from quevedo.generate import generate
 from quevedo.run_script import run_script
@@ -17,30 +18,36 @@ from quevedo.split import split
     ds.config_edit, ds.info, ds.create, ds.add_images,
     split, extract_graphemes, generate,
     network.prepare, network.train,
-    network.predict_image, network.test,
+    predict_image, test,
     web.launcher, run_script, migrate,
 ], chain=True, invoke_without_command=True)
 @click.option('-D', '--dataset', type=click.Path(), default=getcwd(),
               help="Path to the dataset to use, by default use current directory")
 @click.option('-N', '--network', help="Neural network configuration to use")
+@click.option('-P', '--pipeline', help="Pipeline configuration to use")
 @click.version_option()
 @click.pass_context
-def cli(ctx, dataset, network):
+def cli(ctx, dataset, network, pipeline):
     '''Quevedo is a tool for managing datasets of images with compositional
     semantics.
 
     This includes file management, annotation of data, and neural network
     training and use.
 
-    The -D and -N flags are global, and affect all commands used afterwards. For
-    example, to run a full experiment for neural network 'one', run:
+    The -D, -N and -P flags are global, and affect all commands used afterwards.
+    -N and -P are exclusive. For example, to run a full experiment for neural
+    network 'one', run:
 
         quevedo -D path/to/dataset -N one split -p 80 prepare train test
     '''
     dataset = ds.Dataset(dataset)
+    if network is not None and pipeline is not None:
+        raise click.UsageError("-N and -P are exclusive")
+
     ctx.obj = {
         'dataset': dataset,
-        'network': network
+        'network': network,
+        'pipeline': pipeline
     }
     if ctx.invoked_subcommand is None:
         ctx.invoke(ds.info)

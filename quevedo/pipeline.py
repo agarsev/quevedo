@@ -1,7 +1,7 @@
 # 2021-11-10 Antonio F. G. Sevilla <afgs@ucm.es>
 # Licensed under the Open Software License version 3.0
 
-from quevedo import Annotation
+from quevedo.annotation import Annotation, Target
 from quevedo.run_script import module_from_file
 
 
@@ -33,8 +33,10 @@ def create_pipeline(dataset, name=None, config=None):
     elif isinstance(config, dict):
         if 'criterion' in config:
             return BranchPipeline(dataset, name, config)
-        else:
+        elif config.get('target') == 'logograms':
             return LogogramPipeline(dataset, name, config)
+        else:
+            raise ValueError("Wrong value for pipeline {}: {}".format(name, config))
     else:
         raise ValueError("Wrong value for pipeline {}: {}".format(name, config))
 
@@ -51,6 +53,8 @@ class Pipeline:
         self.dataset = dataset
         # str: Name of the pipeline
         self.name = name
+        # Target: whether input  is a logogram or a grapheme. Should be set by child classes.
+        self.target = None
 
     def run(a: Annotation):
         '''Run the pipeline on the given annotation.
@@ -62,12 +66,14 @@ class Pipeline:
 
 
 class SequencePipeline(Pipeline):
-    '''A pipeline that runs a sequence of other pipelines.'''
+    '''A pipeline that runs a sequence of other pipelines. All steps should have
+    the same target.'''
 
     def __init__(self, dataset, name, config):
         super().__init__(dataset, name, config)
         self.steps = [create_pipeline(dataset, f'{name}.{str(i)}', step)
                       for i, step in enumerate(config)]
+        self.target = self.steps[0].target
 
     def run(self, a: Annotation):
         for p in self.steps:
@@ -80,6 +86,7 @@ class NetworkPipeline(Pipeline):
     def __init__(self, dataset, name, config):
         super().__init__(dataset, name)
         self.network = dataset.get_network(config)
+        self.target = self.network.target
 
     def run(self, a: Annotation):
         self.network.auto_annotate(a)
@@ -93,6 +100,7 @@ class LogogramPipeline(Pipeline):
         super().__init__(dataset, name)
         self.detect = create_pipeline(dataset, f'{name}.detect', config['detect'])
         self.classify = create_pipeline(dataset, f'{name}.classify', config['classify'])
+        self.target = Target.LOGO
 
     def run(self, a: Annotation):
         self.detect.run(a)
@@ -111,6 +119,8 @@ class BranchPipeline(Pipeline):
     - a lambda expression: the pipeline will run the branch corresponding to
       the result of the lambda expression, which will receive the annotation as
       parameter.
+
+    All branches should have the same target.
     '''
 
     def __init__(self, dataset, name, config):
@@ -131,6 +141,8 @@ class BranchPipeline(Pipeline):
             for branch in config['branches']
         }
 
+        self.target = self.branches[list(self.branches.keys())[0]].target
+
     def run(self, a: Annotation):
         branch = self.get_branch(a)
         if branch is None and '*' in self.branches:
@@ -140,17 +152,30 @@ class BranchPipeline(Pipeline):
 
 
 class FunctionPipeline(Pipeline):
-    '''A pipeline that runs a user-defined function. The config should be
-    a string in the form 'module.py:function'. 'module.py' should be a file
-    in the `scripts` directory of the dataset, and 'function' should be the
-    name of a function in that file, that accepts a dataset and annotation
-    and returns nothing.'''
+    '''A pipeline that runs a user-defined function.
+
+    The config should be a string in the form 'module.py:function'. 'module.py'
+    should be a file in the `scripts` directory of the dataset, and 'function'
+    should be the name of a function in that file, that accepts a dataset and
+    annotation and returns nothing.
+
+    The target of this pipeline is deduced from the signature of the function.
+    This is often inconsequential, but if this network is the first of
+    a sequence or branching, its target will be the target for the whole
+    pipeline. To ensure correct deduction, use a type annotation of Logogram or
+    Grapheme for the second parameter.'''
 
     def __init__(self, dataset, name, config):
         super().__init__(dataset, name)
         module, function = config.split(':')
         module = module_from_file(module, dataset.script_path)
         self.function = getattr(module, function)
+
+        _, a = signature(self.function).parameters.values()
+        try:
+            self.target = a.annotation.target
+        except AttributeError:
+            self.target = Target.LOGO if a.name.startswith('l') else Target.GRAPHEME
 
     def run(self, a: Annotation):
         self.function(self.dataset, a)

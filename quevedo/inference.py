@@ -1,15 +1,37 @@
-# 2020-05-06 Antonio F. G. Sevilla <afgs@ucm.es>
+
+# 2021-11-10 Antonio F. G. Sevilla <afgs@ucm.es>
 # Licensed under the Open Software License version 3.0
 
 import click
 import json
 
+from quevedo.annotation import Logogram, Grapheme, Target
 
-from quevedo.annotation import Target
 
+@click.command('predict')
+@click.option('--image', '-i', type=click.Path(exists=True),
+              required=True, help="Image to predict")
+@click.pass_obj
+def predict_image(obj, image):
+    '''Get predictions for an image using a trained neural network or
+    pipeline.'''
 
-def safe_divide(a, b):
-    return a / b if b else 0
+    dataset = obj['dataset']
+
+    if 'pipeline' in obj:
+        pipeline = dataset.get_pipeline(obj['pipeline'])
+        if Logogram.target in pipeline.target:
+            a = Logogram(image)
+        else:
+            a = Grapheme(image)
+        pipeline.run(a)
+        print(json.dumps(a.to_dict()))
+    else:
+        network = dataset.get_network(obj['network'])
+        if not network.is_trained():
+            raise SystemExit("Please train neural network '{}' first".format(
+                network.name))
+        print(network.predict(image))
 
 
 class Stats():
