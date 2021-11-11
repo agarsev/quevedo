@@ -36,13 +36,16 @@ folds = 10
 train_folds = [0,1,2,3,4,5,6,7]
 test_folds = [8,9]
 
+# Default network or pipeline to use
+default = "one"
+# default = "combined"
+
 [darknet]
 path = "darknet/darknet" 
 library = "darknet/libdarknet.so"
 options = [ "-dont_show", "-mjpeg_port", "8090" ]
 
 [network.one]
-default = true # Network to use if not specified
 task = "detect"
 # tag = "tag" # Uncomment and choose a tag name from tag_schema to use
 # subsets = [ "default" ] # If not specified, all subsets will be used
@@ -75,6 +78,12 @@ subject = "Classify graphemes"
 # tag = "tag"
 # subject = "human readable description"
 # ...
+
+# This pipeline uses the first network to detect graphemes, and the second one
+# to classify them
+[pipeline.combined]
+detect = "one"
+classify = "two"
 
 [web]
 host = "localhost"

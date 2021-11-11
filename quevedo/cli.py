@@ -40,16 +40,23 @@ def cli(ctx, dataset, network, pipeline):
 
         quevedo -D path/to/dataset -N one split -p 80 prepare train test
     '''
+
     dataset = ds.Dataset(dataset)
+    ctx.obj = {'dataset': dataset}
+
     if network is not None and pipeline is not None:
         raise click.UsageError("-N and -P are exclusive")
-
-    ctx.obj = {'dataset': dataset}
 
     if network is not None:
         ctx.obj['network'] = network
     elif pipeline is not None:
         ctx.obj['pipeline'] = pipeline
+    elif 'default' in dataset.config:
+        default = dataset.config['default']
+        if default in dataset.config['network']:
+            ctx.obj['network'] = default
+        elif default in dataset.config['pipeline']:
+            ctx.obj['pipeline'] = default
 
     if ctx.invoked_subcommand is None:
         ctx.invoke(ds.info)

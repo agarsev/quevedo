@@ -47,12 +47,13 @@ Created 'inference' module
 - [X] predict cli uses pipeline too
 - [X] test cli uses pipeline too
 
-*** TODO Improve default 
+*** DONE Improve default
+    CLOSED: [2021-11-11 Thu 19:38]
 
 - [X] Remove default as net param
-- [ ] Remove default from default config
-- [ ] make a single dataset param default which is a pipeline (doubles as
-  network). It is added as param to the click context object in CLI entry point.
+- [X] Remove default from default config
+- [X] make a single dataset param default which is either a pipeline or
+  network. It is added as param to the click context object in CLI entry point.
 
 *** TODO Pipeline in web interface
 
@@ -62,7 +63,7 @@ The pipelines from VisSE cover all options to be checked, use them.
 
 - [X] Test predict
 - [X] Test test
-- [ ] Test default
+- [X] Test default
 - [ ] Test web
 
 *** TODO Documentation

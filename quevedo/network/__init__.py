@@ -10,7 +10,7 @@ def create_network(dataset, name):
     try:
         config = dataset.config['network'][name]
     except KeyError:
-        raise SystemExit("No such network: {}".format(name))
+        raise ValueError("No such network: {}".format(name))
     if 'extend' in config:
         config = {
             **dataset.config['network'][config['extend']],
