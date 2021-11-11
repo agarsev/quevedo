@@ -1,22 +1,25 @@
 # 2021-11-10 Antonio F. G. Sevilla <afgs@ucm.es>
 # Licensed under the Open Software License version 3.0
 
-from quevedo.annotation import Annotation, Target
+from inspect import signature
+
+from quevedo.annotation import Annotation, Logogram, Grapheme
 from quevedo.run_script import module_from_file
 
 
 def create_pipeline(dataset, name=None, config=None):
     '''Factory function to create a pipeline.'''
-    if name is None:
-        name = 'anonymous'
-    else:
-        try:
-            config = dataset.config['pipeline'][name]
-        except ValueError:
-            raise ValueError("No such pipeline: {}".format(name))
+    if config is None and name is None:
+        raise ValueError("Either a pipeline configuration or a name is needed to create a pipeline")
 
     if config is None:
-        raise ValueError("config is an obligatory argument if name is not None")
+        try:
+            config = dataset.config['pipeline'][name]
+        except KeyError:
+            raise ValueError("No such pipeline: {}".format(name))
+
+    if name is None:
+        name = 'anonymous'
 
     if isinstance(config, list):
         return SequencePipeline(dataset, name, config)
@@ -24,7 +27,7 @@ def create_pipeline(dataset, name=None, config=None):
         if config in dataset.config['pipeline']:
             return create_pipeline(dataset, name, dataset.config['pipeline'][config])
         elif config in dataset.config['network']:
-            return NetworkPipeline(dataset, name, dataset.config['network'][config])
+            return NetworkPipeline(dataset, name, config)
         else:
             try:
                 return FunctionPipeline(dataset, name, config)
@@ -33,10 +36,8 @@ def create_pipeline(dataset, name=None, config=None):
     elif isinstance(config, dict):
         if 'criterion' in config:
             return BranchPipeline(dataset, name, config)
-        elif config.get('target') == 'logograms':
-            return LogogramPipeline(dataset, name, config)
         else:
-            raise ValueError("Wrong value for pipeline {}: {}".format(name, config))
+            return LogogramPipeline(dataset, name, config)
     else:
         raise ValueError("Wrong value for pipeline {}: {}".format(name, config))
 
@@ -64,13 +65,30 @@ class Pipeline:
         '''
         raise NotImplementedError
 
+    def predict(self, image_path):
+        '''Run the pipeline on the given image and return the resulting
+        annotation.
+
+        Args:
+            image_path (str): Path to the image to run the pipeline on.
+
+        Returns:
+            Annotation: The resulting annotation.
+        '''
+        if Logogram.target in self.target:
+            a = Logogram(image_path)
+        else:
+            a = Grapheme(image_path)
+        self.run(a)
+        return a
+
 
 class SequencePipeline(Pipeline):
     '''A pipeline that runs a sequence of other pipelines. All steps should have
     the same target.'''
 
     def __init__(self, dataset, name, config):
-        super().__init__(dataset, name, config)
+        super().__init__(dataset, name)
         self.steps = [create_pipeline(dataset, f'{name}.{str(i)}', step)
                       for i, step in enumerate(config)]
         self.target = self.steps[0].target
@@ -98,14 +116,24 @@ class LogogramPipeline(Pipeline):
 
     def __init__(self, dataset, name, config):
         super().__init__(dataset, name)
-        self.detect = create_pipeline(dataset, f'{name}.detect', config['detect'])
-        self.classify = create_pipeline(dataset, f'{name}.classify', config['classify'])
-        self.target = Target.LOGO
+        if 'detect' in config:
+            self.detect = create_pipeline(dataset, f'{name}.detect', config['detect'])
+        else:
+            self.detect = None
+
+        if 'classify' in config:
+            self.classify = create_pipeline(dataset, f'{name}.classify', config['classify'])
+        else:
+            self.classify = None
+
+        self.target = Logogram.target
 
     def run(self, a: Annotation):
-        self.detect.run(a)
-        for g in a.graphemes:
-            self.classify.run(g)
+        if self.detect is not None:
+            self.detect.run(a)
+        if self.classify is not None:
+            for g in a.graphemes:
+                self.classify.run(g)
 
 
 class BranchPipeline(Pipeline):
@@ -175,7 +203,7 @@ class FunctionPipeline(Pipeline):
         try:
             self.target = a.annotation.target
         except AttributeError:
-            self.target = Target.LOGO if a.name.startswith('l') else Target.GRAPHEME
+            self.target = Logogram.target if a.name.startswith('l') else Grapheme.target
 
     def run(self, a: Annotation):
         self.function(self.dataset, a)

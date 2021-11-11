@@ -5,7 +5,7 @@
 import click
 import json
 
-from quevedo.annotation import Logogram, Grapheme, Target
+from quevedo import Target
 
 
 @click.command('predict')
@@ -20,12 +20,8 @@ def predict_image(obj, image):
 
     if 'pipeline' in obj:
         pipeline = dataset.get_pipeline(obj['pipeline'])
-        if Logogram.target in pipeline.target:
-            a = Logogram(image)
-        else:
-            a = Grapheme(image)
-        pipeline.run(a)
-        print(json.dumps(a.to_dict()))
+        r = pipeline.predict(image)
+        print(json.dumps(r.to_dict()))
     else:
         network = dataset.get_network(obj['network'])
         if not network.is_trained():

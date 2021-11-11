@@ -38,6 +38,7 @@ class Dataset:
         self.local_config_path = self._path / 'config.local.toml'
         self.script_path = self._path / 'scripts'
         self._networks = {}
+        self._pipelines = {}
 
     @property
     def path(self):

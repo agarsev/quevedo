@@ -6,7 +6,7 @@ import importlib.util
 import re
 import sys
 
-from quevedo import Dataset, Target
+from quevedo.annotation import Target
 
 
 # Adapted from @wecsam
@@ -43,7 +43,7 @@ def run_script(obj, scriptname, grapheme_set, logogram_set, extra_args):
     called once and firstmost with the dataset and any extra arguments that have
     been passed to this command.'''
 
-    ds: Dataset = obj['dataset']
+    ds = obj['dataset']
 
     script = module_from_file(scriptname, ds.script_path)
     if script is None:

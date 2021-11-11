@@ -45,7 +45,6 @@ Created 'inference' module
 - [X] -P flag for cli alternative to net
 - [X] predict cli uses pipeline too
 - [ ] test cli uses pipeline too
-- [ ] dataset get_info about pipeline
 
 *** TODO Improve default 
 
@@ -60,7 +59,15 @@ Created 'inference' module
 
 The pipelines from VisSE cover all options to be checked, use them.
 
+- [X] Test predict
+- [ ] Test test
+- [ ] Test default
+- [ ] Test web
+
 *** TODO Documentation
+
+- [ ] dataset get_info about pipeline
+- [ ] Writeup
 
 ** DONE Add example dataset
    CLOSED: [2021-10-15 Fri 14:41]
