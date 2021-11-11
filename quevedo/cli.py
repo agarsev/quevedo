@@ -44,11 +44,13 @@ def cli(ctx, dataset, network, pipeline):
     if network is not None and pipeline is not None:
         raise click.UsageError("-N and -P are exclusive")
 
-    ctx.obj = {
-        'dataset': dataset,
-        'network': network,
-        'pipeline': pipeline
-    }
+    ctx.obj = {'dataset': dataset}
+
+    if network is not None:
+        ctx.obj['network'] = network
+    elif pipeline is not None:
+        ctx.obj['pipeline'] = pipeline
+
     if ctx.invoked_subcommand is None:
         ctx.invoke(ds.info)
         click.echo(cli.get_help(ctx))

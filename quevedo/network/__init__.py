@@ -9,7 +9,7 @@ from .classify import ClassifyNet
 def create_network(dataset, name):
     try:
         config = dataset.config['network'][name]
-    except ValueError:
+    except KeyError:
         raise SystemExit("No such network: {}".format(name))
     if 'extend' in config:
         config = {

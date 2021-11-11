@@ -17,6 +17,11 @@ def create_pipeline(dataset, name=None, config=None):
             config = dataset.config['pipeline'][name]
         except KeyError:
             raise ValueError("No such pipeline: {}".format(name))
+    if 'extend' in config:
+        config = {
+            **dataset.config['pipeline'][config['extend']],
+            **config
+        }
 
     if name is None:
         name = 'anonymous'
@@ -47,13 +52,15 @@ class Pipeline:
     graph that can be used for the task of detection or classification of
     logograms or graphemes.'''
 
-    def __init__(self, dataset, name):
+    def __init__(self, dataset, name, config):
         '''This method shouldn't be called directly, please use the dataset
         method [get_pipeline](quevedodatasetdatasetget_pipeline).'''
         # Dataset: Parent dataset
         self.dataset = dataset
         # str: Name of the pipeline
         self.name = name
+        # Configuration of the pipeline
+        self.config = config
         # Target: whether input  is a logogram or a grapheme. Should be set by child classes.
         self.target = None
 
@@ -88,21 +95,21 @@ class SequencePipeline(Pipeline):
     the same target.'''
 
     def __init__(self, dataset, name, config):
-        super().__init__(dataset, name)
+        super().__init__(dataset, name, config)
         self.steps = [create_pipeline(dataset, f'{name}.{str(i)}', step)
                       for i, step in enumerate(config)]
         self.target = self.steps[0].target
 
     def run(self, a: Annotation):
         for p in self.steps:
-            a = p.run(a)
+            p.run(a)
 
 
 class NetworkPipeline(Pipeline):
     '''A pipeline step that runs a network on the given annotation.'''
 
     def __init__(self, dataset, name, config):
-        super().__init__(dataset, name)
+        super().__init__(dataset, name, config)
         self.network = dataset.get_network(config)
         self.target = self.network.target
 
@@ -115,7 +122,7 @@ class LogogramPipeline(Pipeline):
     them, using networks or sub pipelines.'''
 
     def __init__(self, dataset, name, config):
-        super().__init__(dataset, name)
+        super().__init__(dataset, name, config)
         if 'detect' in config:
             self.detect = create_pipeline(dataset, f'{name}.detect', config['detect'])
         else:
@@ -152,7 +159,7 @@ class BranchPipeline(Pipeline):
     '''
 
     def __init__(self, dataset, name, config):
-        super().__init__(dataset, name)
+        super().__init__(dataset, name, config)
         crit = config['criterion']
         self.criterion = crit
         if crit.startswith('lambda'):
@@ -165,8 +172,8 @@ class BranchPipeline(Pipeline):
             raise ValueError("Wrong criterion for {}: {}".format(name, config))
 
         self.branches = {
-            branch: create_pipeline(dataset, f'{name}.{branch}', config=branch)
-            for branch in config['branches']
+            key: create_pipeline(dataset, f'{name}.{key}', config=config[key])
+            for key in config if key != 'criterion'
         }
 
         self.target = self.branches[list(self.branches.keys())[0]].target
@@ -194,7 +201,7 @@ class FunctionPipeline(Pipeline):
     Grapheme for the second parameter.'''
 
     def __init__(self, dataset, name, config):
-        super().__init__(dataset, name)
+        super().__init__(dataset, name, config)
         module, function = config.split(':')
         module = module_from_file(module, dataset.script_path)
         self.function = getattr(module, function)

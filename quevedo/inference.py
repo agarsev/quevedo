@@ -5,7 +5,8 @@
 import click
 import json
 
-from quevedo import Target
+from quevedo.annotation import Target, Grapheme, Logogram
+from quevedo.network.detect import match
 
 
 @click.command('predict')
@@ -59,10 +60,14 @@ class Stats():
     def get_results(self):
         '''Get a dictionary of computed accuracies.'''
         return {
-            'overall': self.hits / self.observations,
-            'det_acc': self.detections / self.observations,
-            'cls_acc': self.true_clas / self.detections,
+            'overall': safe_divide(self.hits, self.observations),
+            'det_acc': safe_divide(self.detections, self.observations),
+            'cls_acc': safe_divide(self.true_clas, self.detections),
         }
+
+
+def safe_divide(a, b):
+    return a / b if a != 0 and b != 0 else 0
 
 
 @click.command('test')
@@ -84,23 +89,44 @@ def test(obj, do_print, results_json, predictions_csv, on_train):
     analysis with statistics software.'''
 
     dataset = obj['dataset']
-    network = dataset.get_network(obj['network'])
+
+    if 'network' in obj:
+        model = dataset.get_network(obj['network'])
+        path = model.path
+    elif 'pipeline' in obj:
+        model = dataset.get_pipeline(obj['pipeline'])
+        path = dataset.path / 'pipelines' / model.name
+
+        def join_tags(tags, all_tags=dataset.config['tag_schema']):
+            return ''.join(tags.get(k, '') for k in all_tags)
+    else:
+        raise SystemExit("Please specify a network or a pipeline")
 
     prefix = 'train_' if on_train else ''
 
     record = None
     record_path = None
     if predictions_csv:
-        record_path = network.path / f'{prefix}predictions.csv'
+        record_path = path / f'{prefix}predictions.csv'
+        path.mkdir(parents=True, exist_ok=True)
         record = open(record_path, 'w')
 
-    if network.target == Target.GRAPH:
+    if model.target == Target.GRAPH:
         stats = Stats(record, other_variables=('image', 'confidence'))
+        test_fn = test_grapheme
     else:
         stats = Stats(record, other_variables=('image', 'confidence', 'iou'))
+        test_fn = test_logogram
 
-    for an in network.get_annotations(not on_train):
-        network.test(an, stats)
+    if 'network' in obj:
+        for an in model.get_annotations(not on_train):
+            model.test(an, stats)
+    elif 'pipeline' in obj:
+        subsets = model.config.get('subsets')
+        for an in dataset.get_annotations(model.target, subsets):
+            if not dataset.is_train(an):
+                test_fn(model, an, stats, join_tags)
+
     results = stats.get_results()
 
     if predictions_csv:
@@ -110,9 +136,32 @@ def test(obj, do_print, results_json, predictions_csv, on_train):
         click.echo(json.dumps(results, indent=4))
 
     if results_json:
-        file_path = network.path / f'{prefix}results.json'
+        path.mkdir(parents=True, exist_ok=True)
+        file_path = path / f'{prefix}results.json'
         file_path.write_text(json.dumps(results))
         click.echo("Printed results to '{}'".format(file_path.resolve()))
 
     if predictions_csv:
         click.echo("Printed predictions to '{}'".format(record_path.resolve()))
+
+
+def test_grapheme(pipeline, an, stats, join_tags):
+    p = Grapheme(image=an.image)
+    pipeline.run(p)
+    truth = join_tags(an.tags)
+    pred = join_tags(p.tags)
+    stats.register(prediction=pred, truth=truth,
+            image=an.image_path.relative_to(pipeline.dataset.path),
+            confidence=p.meta['confidence'])
+
+
+def test_logogram(pipeline, an, stats, join_tags):
+    p = Logogram(image=an.image)
+    pipeline.run(p)
+    for x, y, iou in match(an.graphemes, p.graphemes):
+        truth = join_tags(x.tags) if x is not None else None
+        pred = join_tags(y.tags) if y is not None else None
+        confidence = y.meta['confidence'] if y is not None else 0
+        stats.register(prediction=pred, truth=truth,
+                image=an.image_path.relative_to(pipeline.dataset.path),
+                confidence=confidence, iou=iou)

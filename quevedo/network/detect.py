@@ -20,7 +20,7 @@ class DetectNet(Network):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        #: IOU threshold for matching a prediction to a grapheme
+        #: IOU threshold for matching a prediction to a grapheme during test
         self.threshold = self.config.get('threshold', 0.2)
 
     def _update_tag_set(self, tag_set, annotation):
@@ -143,7 +143,7 @@ def calc_iou(a, b):
     return safe_divide(i, (s - i))
 
 
-def match(x, y, threshold=0):
+def match(x, y, threshold=0.2):
     '''Match two lists of graphemes according to best box fit.
 
     Receives two grapheme lists and returns a list of 3-tuples, where the first

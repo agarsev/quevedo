@@ -38,13 +38,14 @@ Handle scripts arguments for them
 *** DONE Pipeline class and factory method
     CLOSED: [2021-11-10 Wed 20:04]
 
-*** TODO Test and predict with pipeline
+*** DONE Test and predict with pipeline
+    CLOSED: [2021-11-11 Thu 19:19]
 
 Created 'inference' module
 
 - [X] -P flag for cli alternative to net
 - [X] predict cli uses pipeline too
-- [ ] test cli uses pipeline too
+- [X] test cli uses pipeline too
 
 *** TODO Improve default 
 
@@ -60,7 +61,7 @@ Created 'inference' module
 The pipelines from VisSE cover all options to be checked, use them.
 
 - [X] Test predict
-- [ ] Test test
+- [X] Test test
 - [ ] Test default
 - [ ] Test web
 
