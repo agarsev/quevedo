@@ -37,10 +37,12 @@ def create_pipeline(dataset, name=None, config=None):
             try:
                 return FunctionPipeline(dataset, name, config)
             except ValueError:
-                raise ValueError("Wrong value for pipeline {}: {}".format(name, config))
+                raise ValueError("Wrong value for pipeline {}: {}".format(name, config)) from None
     elif isinstance(config, dict):
         if 'criterion' in config:
             return BranchPipeline(dataset, name, config)
+        elif 'sequence' in config:
+            return SequencePipeline(dataset, name, config)
         else:
             return LogogramPipeline(dataset, name, config)
     else:
@@ -96,6 +98,8 @@ class SequencePipeline(Pipeline):
 
     def __init__(self, dataset, name, config):
         super().__init__(dataset, name, config)
+        if isinstance(config, dict):
+            config = config['sequence']
         self.steps = [create_pipeline(dataset, f'{name}.{str(i)}', step)
                       for i, step in enumerate(config)]
         self.target = self.steps[0].target

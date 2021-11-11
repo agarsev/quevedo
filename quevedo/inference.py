@@ -122,7 +122,10 @@ def test(obj, do_print, results_json, predictions_csv, on_train):
         for an in model.get_annotations(not on_train):
             model.test(an, stats)
     elif 'pipeline' in obj:
-        subsets = model.config.get('subsets')
+        try:
+            subsets = model.config.get('subsets')
+        except AttributeError:
+            subsets = None
         for an in dataset.get_annotations(model.target, subsets):
             if not dataset.is_train(an):
                 test_fn(model, an, stats, join_tags)
@@ -152,7 +155,7 @@ def test_grapheme(pipeline, an, stats, join_tags):
     pred = join_tags(p.tags)
     stats.register(prediction=pred, truth=truth,
             image=an.image_path.relative_to(pipeline.dataset.path),
-            confidence=p.meta['confidence'])
+            confidence=p.meta.get('confidence', 0))
 
 
 def test_logogram(pipeline, an, stats, join_tags):
