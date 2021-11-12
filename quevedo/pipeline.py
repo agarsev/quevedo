@@ -195,8 +195,8 @@ class FunctionPipeline(Pipeline):
 
     The config should be a string in the form 'module.py:function'. 'module.py'
     should be a file in the `scripts` directory of the dataset, and 'function'
-    should be the name of a function in that file, that accepts a dataset and
-    annotation and returns nothing.
+    should be the name of a function in that file, that accepts an annotation
+    and a dataset and returns nothing.
 
     The target of this pipeline is deduced from the signature of the function.
     This is often inconsequential, but if this network is the first of
@@ -210,11 +210,11 @@ class FunctionPipeline(Pipeline):
         module = module_from_file(module, dataset.script_path)
         self.function = getattr(module, function)
 
-        _, a = signature(self.function).parameters.values()
+        a, _ = signature(self.function).parameters.values()
         try:
             self.target = a.annotation.target
         except AttributeError:
             self.target = Logogram.target if a.name.startswith('l') else Grapheme.target
 
     def run(self, a: Annotation):
-        self.function(self.dataset, a)
+        self.function(a, self.dataset)

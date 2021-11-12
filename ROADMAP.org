@@ -55,16 +55,18 @@ Created 'inference' module
 - [X] make a single dataset param default which is either a pipeline or
   network. It is added as param to the click context object in CLI entry point.
 
-*** TODO Pipeline in web interface
+*** DONE Pipeline in web interface
+    CLOSED: [2021-11-12 Fri 14:15]
 
-*** TODO Test
+*** DONE Test
+    CLOSED: [2021-11-12 Fri 14:16]
 
 The pipelines from VisSE cover all options to be checked, use them.
 
 - [X] Test predict
 - [X] Test test
 - [X] Test default
-- [ ] Test web
+- [X] Test web
 
 *** TODO Documentation
 

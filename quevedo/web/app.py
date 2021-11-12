@@ -64,6 +64,12 @@ def load_dataset(dataset, language):
                       for s in dataset.script_path.glob('*.py') 
                       if s.stem.startswith('logo')}
     }
+    app_data['pipes'] = {
+        'graphemes': {n.name: None for n in dataset.list_pipelines() if
+                      n.target == Target.GRAPH},
+        'logograms': {n.name: None for n in dataset.list_pipelines() if
+                      n.target == Target.LOGO},
+    }
 
 
 def run(host, port, path):
@@ -167,7 +173,7 @@ def new_dir(target, dir):
 
 @app.route('/api/run/<function>/<target>/<dir>/<idx>')
 @authenticated
-def run_net_or_script(function, target, dir, idx):
+def run_backend(function, target, dir, idx):
     ds = app_data['dataset']
     an = ds.get_single(string_to_target(target), dir, idx)
     if function in app_data['nets'][target]:
@@ -175,7 +181,6 @@ def run_net_or_script(function, target, dir, idx):
         if net is None:
             net = ds.get_network(function)
             app_data['nets'][target][function] = net
-        an = ds.get_single(string_to_target(target), dir, idx)
         net.auto_annotate(an)
     elif function in app_data['scripts'][target]:
         script = app_data['scripts'][target][function]
@@ -187,8 +192,14 @@ def run_net_or_script(function, target, dir, idx):
                 pass
             app_data['scripts'][target][function] = script
         script.process(an, ds)
+    elif function in app_data['pipes'][target]:
+        pipe = app_data['pipes'][target][function]
+        if pipe is None:
+            pipe = ds.get_pipeline(function)
+            app_data['pipes'][target][function] = pipe
+        pipe.run(an)
     else:
-        raise ValueError("Unknown net or script '{}'".format(function))
+        return "Unknown network, pipeline or script '{}'".format(function), 404
     return an.to_dict()
 
 
@@ -273,6 +284,7 @@ def edit(target, dir, idx):
 
     a = ds.get_single(target_, dir, idx)
     functions = [f for f in chain(app_data['nets'][target].keys(),
+                                  app_data['pipes'][target].keys(),
                                   app_data['scripts'][target].keys())]
 
     data = {
