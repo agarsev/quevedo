@@ -118,17 +118,30 @@ def test(obj, do_print, results_json, predictions_csv, on_train):
         stats = Stats(record, other_variables=('image', 'confidence', 'iou'))
         test_fn = test_logogram
 
+    if do_print:
+        print("Annotations tested: 0", end='\r')
+    n = 0
+
     if 'network' in obj:
         for an in model.get_annotations(not on_train):
             model.test(an, stats)
+            if do_print:
+                print("Annotations tested: {}".format(n), end='\r')
+                n += 1
     elif 'pipeline' in obj:
         try:
             subsets = model.config.get('subsets')
         except AttributeError:
             subsets = None
         for an in dataset.get_annotations(model.target, subsets):
-            if not dataset.is_train(an):
+            if dataset.is_test(an):
                 test_fn(model, an, stats, join_tags)
+                if do_print:
+                    print("Annotations tested: {}".format(n), end='\r')
+                    n += 1
+
+    if do_print:
+        print("Annotations tested: {}".format(n))
 
     results = stats.get_results()
 

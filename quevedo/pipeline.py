@@ -196,7 +196,8 @@ class FunctionPipeline(Pipeline):
     The config should be a string in the form 'module.py:function'. 'module.py'
     should be a file in the `scripts` directory of the dataset, and 'function'
     should be the name of a function in that file, that accepts an annotation
-    and a dataset and returns nothing.
+    and a dataset and returns nothing. Alternatively, a string containing
+    a lambda function, receiving the same arguments, can be used.
 
     The target of this pipeline is deduced from the signature of the function.
     This is often inconsequential, but if this network is the first of
@@ -206,9 +207,13 @@ class FunctionPipeline(Pipeline):
 
     def __init__(self, dataset, name, config):
         super().__init__(dataset, name, config)
-        module, function = config.split(':')
-        module = module_from_file(module, dataset.script_path)
-        self.function = getattr(module, function)
+
+        if config.startswith('lambda'):
+            self.function = eval(config)
+        else:
+            module, function = config.split(':')
+            module = module_from_file(module, dataset.script_path)
+            self.function = getattr(module, function)
 
         a, _ = signature(self.function).parameters.values()
         try:
