@@ -1,4 +1,3 @@
-
 # 2021-11-10 Antonio F. G. Sevilla <afgs@ucm.es>
 # Licensed under the Open Software License version 3.0
 

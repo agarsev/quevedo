@@ -17,6 +17,9 @@ class Annotation:
         path: the full path to the annotation files (either source image or tag
             dictionary, which should share path and filename but not extension
             (the annotation dictionary need not exist).
+
+        image: either a file object or a PIL image to create a "path-less"
+            annotation which lives in memory.
         '''
 
     target = None  # Should be set by concrete class
@@ -37,8 +40,12 @@ class Annotation:
             self.image_path = path.with_suffix('.png')
             if self.json_path.exists():
                 self.update(**json.loads(self.json_path.read_text()))
-        if image:
-            self._image_data = image
+        if image is not None:
+            from PIL import Image
+            if isinstance(image, Image.Image):
+                self._image_data = image
+            else:
+                self._image_data = Image.open(image)
         self.update(**kwds)
 
     def update(self, *, meta=None, fold=None, **kwds):
