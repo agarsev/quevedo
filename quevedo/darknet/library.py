@@ -17,30 +17,16 @@ Modified Antonio F. G. Sevilla <afgs@ucm.es> 2020-07-09, 2021-04-21
 """
 
 from ctypes import *
-from contextlib import contextmanager
-import math
 import os
 import PIL
 import sys
 
 
-# Adapted from @jfs
-# https://stackoverflow.com/questions/5081657/how-do-i-prevent-a-c-shared-library-to-print-on-stdout-in-python
-@contextmanager
-def DarknetShutup():
-    '''
-    import os
-
-    with stdout_redirected(to=filename):
-        print("from Python")
-        os.system("echo non-Python applications are also supported")
-    '''
+def supress_stdio():
     fdo = sys.stdout.fileno()
     fde = sys.stderr.fileno()
-
     old_stdout = os.fdopen(os.dup(fdo), 'w')
     old_stderr = os.fdopen(os.dup(fde), 'w')
-
     with open(os.devnull, 'w') as file:
         sys.stdout.close()  # + implicit flush()
         sys.stderr.close()  # + implicit flush()
@@ -48,16 +34,17 @@ def DarknetShutup():
         os.dup2(file.fileno(), fde)  # fde writes to 'to' file
         sys.stdout = os.fdopen(fdo, 'w')  # Python writes to fdo
         sys.stderr = os.fdopen(fde, 'w')  # Python writes to fde
+    return [fdo, fde, old_stdout, old_stderr]
 
-    try:
-        yield  # allow code to be run with the redirected stdout
-    finally:
-        sys.stdout.close()  # + implicit flush()
-        sys.stderr.close()  # + implicit flush()
-        os.dup2(old_stdout.fileno(), fdo)  # fdo writes to 'to' file
-        os.dup2(old_stderr.fileno(), fde)  # fde writes to 'to' file
-        sys.stdout = os.fdopen(fdo, 'w')  # Python writes to fdo
-        sys.stderr = os.fdopen(fde, 'w')  # Python writes to fde
+
+def restore_stdio(supressed):
+    fdo, fde, old_stdout, old_stderr = supressed
+    sys.stdout.close()  # + implicit flush()
+    sys.stderr.close()  # + implicit flush()
+    os.dup2(old_stdout.fileno(), fdo)  # fdo writes to 'to' file
+    os.dup2(old_stderr.fileno(), fde)  # fde writes to 'to' file
+    sys.stdout = os.fdopen(fdo, 'w')  # Python writes to fdo
+    sys.stderr = os.fdopen(fde, 'w')  # Python writes to fde
 
 
 def cstr(s):
@@ -111,11 +98,18 @@ class METADATA(Structure):
 
 class DarknetNetwork():
 
-    def __init__ (self, libraryPath=None, configPath=None, weightPath=None, metaPath=None):
+    def __init__ (self, libraryPath=None, configPath=None, weightPath=None,
+                  metaPath=None, shutupDarknet=True):
 
         self.netMain = None
         self.metaMain = None
         self.altNames = None
+
+        # If shutupDarknet is False, no stdout/stderr magic is used, so Darknet
+        # will spew A LOT of text on them. Consider define-ing printf and
+        # fprintf to empty and recompiling darknet
+        self.shutupDarknet = shutupDarknet
+        if shutupDarknet: suppressed = supress_stdio()
 
         libraryPath = cstr(libraryPath)
         configPath = cstr(configPath)
@@ -166,6 +160,9 @@ class DarknetNetwork():
                     print("Environment variables indicated a CPU run, but we didn't find `"+winNoGPUdll+"`. Trying a GPU run anyway.")
         else:
             lib = CDLL(libraryPath, RTLD_GLOBAL)
+
+        if shutupDarknet: restore_stdio(suppressed)
+
         lib.network_width.argtypes = [c_void_p]
         lib.network_width.restype = c_int
         lib.network_height.argtypes = [c_void_p]
@@ -389,9 +386,13 @@ class DarknetNetwork():
             ('obj_label', confidence, (bounding_box_x_px, bounding_box_y_px, bounding_box_width_px, bounding_box_height_px))
             The X and Y coordinates are from the center of the bounding box. Subtract half the width or height to get the lower corner.
         """
-        with DarknetShutup():
-            return self._detect(self.netMain, self.metaMain, image, thresh)
+        if self.shutupDarknet: suppressed = supress_stdio()
+        ret = self._detect(self.netMain, self.metaMain, image, thresh)
+        if self.shutupDarknet: restore_stdio(suppressed)
+        return ret
 
     def classify(self, image):
-        with DarknetShutup():
-            return self._classify(self.netMain, self.metaMain, image)
+        if self.shutupDarknet: suppressed = supress_stdio()
+        ret = self._classify(self.netMain, self.metaMain, image)
+        if self.shutupDarknet: restore_stdio(suppressed)
+        return ret

@@ -208,14 +208,15 @@ class Network:
             oldcwd = os.getcwd()
             os.chdir(self.path)
 
-            from quevedo.darknet import DarknetShutup, DarknetNetwork
+            from quevedo.darknet import DarknetNetwork
 
-            with DarknetShutup():
-                self._darknet_weights = DarknetNetwork(
-                    libraryPath=str(lib_path),
-                    configPath='darknet.cfg',
-                    weightPath='darknet_final.weights',
-                    metaPath='darknet.data')
+            self._darknet_weights = DarknetNetwork(
+                libraryPath=str(lib_path),
+                configPath='darknet.cfg',
+                weightPath='darknet_final.weights',
+                metaPath='darknet.data',
+                shutupDarknet=self.dataset.config['darknet'].get('shutup', True),
+            )
 
             os.chdir(oldcwd)
 
