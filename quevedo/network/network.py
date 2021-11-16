@@ -202,7 +202,9 @@ class Network:
             tag_map = json.loads((self.path / 'tag_map.json').read_text())
             self.tag_map = {v: k for k, v in tag_map.items()}
 
-            lib_path = Path(self.dataset.config['darknet']['library']).resolve()
+            lib_path = (self.dataset._path /
+                        self.dataset.config['darknet']['library']
+                        ).resolve()
             oldcwd = os.getcwd()
             os.chdir(self.path)
 
