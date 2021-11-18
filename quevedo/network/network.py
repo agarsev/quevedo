@@ -202,16 +202,17 @@ class Network:
             tag_map = json.loads((self.path / 'tag_map.json').read_text())
             self.tag_map = {v: k for k, v in tag_map.items()}
 
-            lib_path = (self.dataset._path /
-                        self.dataset.config['darknet']['library']
-                        ).resolve()
+            lib_path = Path(self.dataset.config['darknet']['library'])
+            if not lib_path.is_absolute():
+                lib_path = self.dataset.path / lib_path
+
             oldcwd = os.getcwd()
             os.chdir(self.path)
 
             from quevedo.darknet import DarknetNetwork
 
             self._darknet_weights = DarknetNetwork(
-                libraryPath=str(lib_path),
+                libraryPath=str(lib_path.resolve()),
                 configPath='darknet.cfg',
                 weightPath='darknet_final.weights',
                 metaPath='darknet.data',
