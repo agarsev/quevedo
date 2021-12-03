@@ -45,7 +45,7 @@ class Annotation:
             if isinstance(image, Image.Image):
                 self._image_data = image
             else:
-                self._image_data = Image.open(image)
+                self._image_data = Image.open(image).convert('RGB')
         self.update(**kwds)
 
     def update(self, *, meta=None, fold=None, **kwds):
