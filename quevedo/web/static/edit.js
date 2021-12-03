@@ -98,9 +98,11 @@ function App ({ title, target, id, annotation_help, links, anot,
 
 function Header ({ title, id, links, saveChanges, message, show_save,
     functions, runFunction, changes }) {
-
-    const func_select = useRef({ value: null });
-
+    const [ selected, _setSelected ] = useState(localStorage.getItem('quevedo.last_function') || '');
+    const setSelected = fun_name => {
+        localStorage.setItem('quevedo.last_function', fun_name);
+        _setSelected(fun_name);
+    };
     return html`<header>
         <a href="">${title}</a> » 
         <a href="list/${id.dir}">${id.dir}</a> » ${id.num}
@@ -110,12 +112,12 @@ function Header ({ title, id, links, saveChanges, message, show_save,
         ${show_save?html`<button tabIndex=2
             onclick=${saveChanges} >💾</button>`:null}
         <span class="message_text">${message}</span>
-        ${functions.length<1?null:html`<select ref=${func_select}>
-            ${functions.map(e=>html`<option value=${e}>${e}</option>`)}
-        </select>`}
-        ${functions.length<1?null:html`
-            <button onclick=${() => runFunction(func_select.current.value)}>⚙️</button>
-        `}
+        ${functions.length>0?html`
+            <select onchange=${e => setSelected(e.target.value)} value=${selected}>
+                ${functions.map(e=>html`<option value=${e}>${e}</option>`)}
+            </select>
+            <button onclick=${() => runFunction(selected)}>⚙️</button>
+        `:null}
     </header>`;
 }
 

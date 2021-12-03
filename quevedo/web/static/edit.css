@@ -2,6 +2,7 @@
 
 header select {
     margin-left: 3em;
+    min-width: 10em;
 }
 
 h2 {
