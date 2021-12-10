@@ -7,6 +7,7 @@ nav:
   - Concepts:
     - concepts.md
     - nets.md
+    - pipes.md
   - Admin Guides:
     - config.md
     - cli.md

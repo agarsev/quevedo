@@ -22,9 +22,9 @@ from quevedo.split import split
     web.launcher, run_script, migrate,
 ], chain=True, invoke_without_command=True)
 @click.option('-D', '--dataset', type=click.Path(), default=getcwd(),
-              help="Path to the dataset to use, by default use current directory")
-@click.option('-N', '--network', help="Neural network configuration to use")
-@click.option('-P', '--pipeline', help="Pipeline configuration to use")
+              help="Path to the dataset to use, by default use current directory.")
+@click.option('-N', '--network', help="Neural network configuration to use.")
+@click.option('-P', '--pipeline', help="Pipeline configuration to use.")
 @click.version_option()
 @click.pass_context
 def cli(ctx, dataset, network, pipeline):

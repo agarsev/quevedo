@@ -9,17 +9,19 @@ Usage: quevedo [OPTIONS] COMMAND1 [ARGS]... [COMMAND2 [ARGS]...]...
   This includes file management, annotation of data, and neural network
   training and use.
 
-  The -D and -N flags are global, and affect all commands used afterwards. For
-  example, to run a full experiment for neural network 'one', run:
+  The -D, -N and -P flags are global, and affect all commands used afterwards.
+  -N and -P are exclusive. For example, to run a full experiment for neural
+  network 'one', run:
 
       quevedo -D path/to/dataset -N one split -p 80 prepare train test
 
 Options:
-  -D, --dataset PATH  Path to the dataset to use, by default use current
-                      directory
-  -N, --network TEXT  Neural network configuration to use
-  --version           Show the version and exit.
-  --help              Show this message and exit.
+  -D, --dataset PATH   Path to the dataset to use, by default use current
+                       directory.
+  -N, --network TEXT   Neural network configuration to use.
+  -P, --pipeline TEXT  Pipeline configuration to use.
+  --version            Show the version and exit.
+  --help               Show this message and exit.
 
 Commands:
   add_images  Import images from external directories into the dataset.
@@ -29,11 +31,11 @@ Commands:
   generate    Generate artificial logograms from existing graphemes.
   info        Get general status information about a dataset.
   migrate     Upgrades a dataset config and data to the latest version.
-  predict     Get predictions for an image using the trained neural network.
+  predict     Get predictions for an image using a trained neural network...
   prepare     Create the files needed for training and using this network.
   run_script  Run a data processing script on dataset objects.
   split       Assign annotations randomly to different folds.
-  test        Compute evaluation metrics for a trained neural network.
+  test        Compute evaluation metrics for a trained neural network or...
   train       Train the neural network.
   web         Run a web interface to the dataset.
 ```
@@ -211,7 +213,7 @@ Options:
 ```txt
 Usage: quevedo predict [OPTIONS]
 
-  Get predictions for an image using the trained neural network.
+  Get predictions for an image using a trained neural network or pipeline.
 
 Options:
   -i, --image PATH  Image to predict  [required]
@@ -223,19 +225,15 @@ Options:
 ```txt
 Usage: quevedo test [OPTIONS]
 
-  Compute evaluation metrics for a trained neural network.
+  Compute evaluation metrics for a trained neural network or pipeline.
 
-  By default annotations marked as "test" (see train/test split) are used.
-  Precision, recall and f-score are computed for each class, as well as their
-  average (micro) and global metrics (macro average). For more detailed
-  statistics, the full predictions can be printed into a csv to be loaded into
-  other software (like R).
+  By default annotations in test folds (see train/test split) are used.
+  Accuracy is computed, and also separate accuracies for detection and
+  classification. The full predictions can be printed into a csv for further
+  analysis with statistics software.
 
 Options:
   -p, --print / --no-print        Show results in the command line
-  --results-csv / --no-results-csv
-                                  Print results into a `results.csv` file in
-                                  the network directory
   --results-json / --no-results-json
                                   Print results into a `results.json` file in
                                   the network directory

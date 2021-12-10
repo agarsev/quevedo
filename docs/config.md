@@ -55,6 +55,8 @@ isolated graphemes.
     [`Darknet installation`](nets.md#installation).
 - `network`: Configuration for training and using neural networks. See
     [`Network configuration`](nets.md#network-configuration).
+- `pipeline`: Configuration for pipelines which use many networks to solve
+    a task. See [`Pipeline configuration`](pipes.md#pipeline-configuration).
 - `web`: Configuration for the web interface. See
     [`Web interface configuration`](web.md#configuration).
 - `generate`: These options guide the process of artificial logogram generation

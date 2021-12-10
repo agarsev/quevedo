@@ -66,3 +66,19 @@ Therefore, you should get the network from a Quevedo dataset's method
 is built.
 
 ### ![mkapi](quevedo.network.network.Network|short)
+
+## Pipelines
+
+[Pipeline](pipes.md) objects in Quevedo can often act as substitutes for
+networks, to perform their task but using a more complex system of networks and
+steps. There are a number of types of pipelines, each represented by a different
+class in the code, and a base class that serves as common interface. To get
+a configured pipeline from a dataset, use its
+[`get_pipeline`](#quevedodatasetdatasetget_pipeline) method.
+
+### ![mkapi](quevedo.pipeline.Pipeline|short)
+### ![mkapi](quevedo.pipeline.NetworkPipeline|short)
+### ![mkapi](quevedo.pipeline.LogogramPipeline|short)
+### ![mkapi](quevedo.pipeline.SequencePipeline|short)
+### ![mkapi](quevedo.pipeline.BranchPipeline|short)
+### ![mkapi](quevedo.pipeline.FunctionPipeline|short)

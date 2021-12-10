@@ -2,16 +2,6 @@
 
 * Version 1.2
 
-** TODO Data augmentation
-
-Incorporate VISSE code of data augmentation to replace the existing module. The
-idea is to use user code to generate examples, because they know how their tags
-work. We can still provide the image generation and grapheme placement with
-force simulation for logogram generation.
-
-- [ ] Generate graphemes
-- [ ] Generate logograms
-
 ** DONE Improve detector network use of tags
 
 - [X] Allow detector networks to train without any classification, only detecting
@@ -33,7 +23,8 @@ that.
 
 Handle scripts arguments for them
 
-** TODO Pipeline
+** DONE Pipeline
+   CLOSED: [2021-12-10 Fri 22:34]
 
 *** DONE Pipeline class and factory method
     CLOSED: [2021-11-10 Wed 20:04]
@@ -68,10 +59,10 @@ The pipelines from VisSE cover all options to be checked, use them.
 - [X] Test default
 - [X] Test web
 
-*** TODO Documentation
+*** DONE Documentation
+    CLOSED: [2021-12-10 Fri 22:32]
 
-- [ ] dataset get_info about pipeline
-- [ ] Writeup
+- [X] Writeup
 
 ** DONE Add example dataset
    CLOSED: [2021-10-15 Fri 14:41]
@@ -79,11 +70,9 @@ The pipelines from VisSE cover all options to be checked, use them.
 Added the example toy arithmetic dataset to the repo as suggested by
 @albertodiazatfdi
 
-** TODO Improve net and pipe configuration
+** DONE Improve net and pipe configuration
 
-- [X] "extend" key for inheriting parameters from other config
-- [ ] make extend recursive, if extend extends an extension
-- [ ] merge instead of replace configs
+"extend" key for inheriting parameters from other config
 
 ** Bugfixes
 
@@ -134,6 +123,16 @@ image is now frontend state, not just a src link.
 
 Study migrating to a python-based ML library.
 
+** TODO Data augmentation
+
+Incorporate VISSE code of data augmentation to replace the existing module. The
+idea is to use user code to generate examples, because they know how their tags
+work. We can still provide the image generation and grapheme placement with
+force simulation for logogram generation.
+
+- [ ] Generate graphemes
+- [ ] Generate logograms
+
 ** TODO Grapheme dependency trees
 
 *** TODO Code representation
@@ -150,3 +149,8 @@ the table side, how to visualize?
 *** TODO Logogram use
 
 Access the tree from the logogram.
+
+** TODO Improve net and pipe configuration
+
+- [ ] make extend recursive, if extend extends an extension
+- [ ] merge instead of replace configs

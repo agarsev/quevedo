@@ -80,7 +80,7 @@ def safe_divide(a, b):
 @click.option('--on-train', is_flag=True, default=False,
               help='Test the network on the train set instead of the test one')
 def test(obj, do_print, results_json, predictions_csv, on_train):
-    '''Compute evaluation metrics for a trained neural network.
+    '''Compute evaluation metrics for a trained neural network or pipeline.
 
     By default annotations in test folds (see train/test split) are used.
     Accuracy is computed, and also separate accuracies for detection and
