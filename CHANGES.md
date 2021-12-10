@@ -1,5 +1,31 @@
 # Changelog
 
+## v1.2
+
+### Pipelines
+
+There are now Pipeline objects in Quevedo, which combine trained neural networks
+into complex systems able to perform more complicated tasks. See the
+[documentation](https://agarsev.github.io/quevedo/latest/pipes/) for more.
+
+### Other
+
+- When creating an in-memory annotation, convert image to RGB.
+- Remember last function selected in the web app edit page.
+- If config key darknet.shutup is false, no stdio redirection is done.
+- Allow in-memory images for annotations.
+- Lambda function as pipeline step and improved test command.
+- Global default config value substitutes default config per net.
+- Simplified evaluation code: overall, detection and classification accuracy.
+- Add an "extend" key to net configs to allow sharing config values.
+- Improve user scripts init function.
+- Use Graphemes and Logograms instead of dicts.
+- Improved test command with more info and better algos.
+- Allow training detector with "no" tag (same tag for every object).
+- Allow use of relative paths for darknet library.
+- Other bug fixes.
+- Added example toy arithmetic dataset to the repo.
+
 ## v1.1
 
 ### New dataset version 1

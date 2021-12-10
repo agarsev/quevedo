@@ -1,82 +1,21 @@
 #+title: Roadmap
 
-* Version 1.2
+* Next
 
-** DONE Improve detector network use of tags
+** TODO Improve net and pipe configuration
 
-- [X] Allow detector networks to train without any classification, only detecting
-bounding boxes. Set `tag` option in the network config to the empty string for
-that.
-- [X] Allow using "empty" tags in training, don't skip unnanotated objects
-  WARN: BREAKING!
+- [ ] make extend recursive, if extend extends an extension
+- [ ] merge instead of replace configs
 
-** DONE Improve test command
-   CLOSED: [2021-09-28 Tue 19:46]
+** TODO Data augmentation
 
-- The predictions csv now has more info, like image path and confidence of
-  prediction, and IOU of box for detection
-- Improved the match algorithm for graphemes and predictions
-- Networks now have an optional 'threshold' config param for testing
+Incorporate VISSE code of data augmentation to replace the existing module. The
+idea is to use user code to generate examples, because they know how their tags
+work. We can still provide the image generation and grapheme placement with
+force simulation for logogram generation.
 
-** DONE Improve scripts handling
-   CLOSED: [2021-10-14 Thu 21:45]
-
-Handle scripts arguments for them
-
-** DONE Pipeline
-   CLOSED: [2021-12-10 Fri 22:34]
-
-*** DONE Pipeline class and factory method
-    CLOSED: [2021-11-10 Wed 20:04]
-
-*** DONE Test and predict with pipeline
-    CLOSED: [2021-11-11 Thu 19:19]
-
-Created 'inference' module
-
-- [X] -P flag for cli alternative to net
-- [X] predict cli uses pipeline too
-- [X] test cli uses pipeline too
-
-*** DONE Improve default
-    CLOSED: [2021-11-11 Thu 19:38]
-
-- [X] Remove default as net param
-- [X] Remove default from default config
-- [X] make a single dataset param default which is either a pipeline or
-  network. It is added as param to the click context object in CLI entry point.
-
-*** DONE Pipeline in web interface
-    CLOSED: [2021-11-12 Fri 14:15]
-
-*** DONE Test
-    CLOSED: [2021-11-12 Fri 14:16]
-
-The pipelines from VisSE cover all options to be checked, use them.
-
-- [X] Test predict
-- [X] Test test
-- [X] Test default
-- [X] Test web
-
-*** DONE Documentation
-    CLOSED: [2021-12-10 Fri 22:32]
-
-- [X] Writeup
-
-** DONE Add example dataset
-   CLOSED: [2021-10-15 Fri 14:41]
-
-Added the example toy arithmetic dataset to the repo as suggested by
-@albertodiazatfdi
-
-** DONE Improve net and pipe configuration
-
-"extend" key for inheriting parameters from other config
-
-** Bugfixes
-
-*** DONE Macro F-score calculation was using recall value.
+- [ ] Generate graphemes
+- [ ] Generate logograms
 
 * Backlog
 
@@ -123,16 +62,6 @@ image is now frontend state, not just a src link.
 
 Study migrating to a python-based ML library.
 
-** TODO Data augmentation
-
-Incorporate VISSE code of data augmentation to replace the existing module. The
-idea is to use user code to generate examples, because they know how their tags
-work. We can still provide the image generation and grapheme placement with
-force simulation for logogram generation.
-
-- [ ] Generate graphemes
-- [ ] Generate logograms
-
 ** TODO Grapheme dependency trees
 
 *** TODO Code representation
@@ -150,7 +79,3 @@ the table side, how to visualize?
 
 Access the tree from the logogram.
 
-** TODO Improve net and pipe configuration
-
-- [ ] make extend recursive, if extend extends an extension
-- [ ] merge instead of replace configs
