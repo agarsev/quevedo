@@ -16,6 +16,11 @@ execute with the `-P` flag (equivalent to the `-N` flag for networks). In the
 web interface, the pipelines are available along the trained networks and user
 functions for the user to run and visualize.
 
+!!! note
+    Quevedo pipelines can be used to create expert systems for processing
+    visually complex images. One such example, for the case of SignWriting, is
+    described in the article [Automatic SignWriting Recognition](https://eprints.ucm.es/id/eprint/69235/).
+
 ## Pipeline configuration
 
 Pipelines are added to the `config.toml` file of the dataset. Each entry is the

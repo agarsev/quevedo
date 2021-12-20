@@ -115,7 +115,8 @@ Quevedo is part of the project ["Visualizando la SignoEscritura" (Proyecto VisSE
 Facultad de Informática, Universidad Complutense de
 Madrid)](https://www.ucm.es/visse) as part of the
 program for funding of research projects on Accesible Technologies financed by
-INDRA and Fundación Universia.
+INDRA and Fundación Universia. An expert system developed using Quevedo is
+described [in this article](https://eprints.ucm.es/id/eprint/69235/).
 
 ### VisSE team
 
