@@ -7,7 +7,7 @@ import { LogogramEditor } from './logo.js';
 import { GraphemeEditor } from './graph.js';
 
 const html = htm.bind(preact.h);
-const { useState, useRef } = preactHooks;
+const { useState } = preactHooks;
 
 
 preact.render(html`<${App} ...${window.quevedo_data} />`, document.body);
@@ -116,7 +116,7 @@ function Header ({ title, id, links, saveChanges, message, show_save,
             <select onchange=${e => setSelected(e.target.value)} value=${selected}>
                 ${functions.map(e=>html`<option value=${e}>${e}</option>`)}
             </select>
-            <button onclick=${() => runFunction(selected)}>⚙️</button>
+            <button disabled=${selected==''} onclick=${() => runFunction(selected)}>⚙️</button>
         `:null}
     </header>`;
 }
