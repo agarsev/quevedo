@@ -5,7 +5,7 @@ const html = htm.bind(preact.h);
 const { useState, useEffect, useRef } = preactHooks;
 
 import Text from './i18n.js';
-import { useList } from './common_state.js';
+import { useList, useSavedState } from './common_state.js';
 
 const color_list = [ '#FF0000', '#00FF00', '#0000FF', '#FF00FF',
     '#00FFFF', '#880000', '#008800', '#000088', '#888800', '#008888' ];
@@ -16,14 +16,9 @@ function getNextColor () {
     return r;
 }
 
-export function LogogramEditor (props) {
-    return html`
-        <h2>${Text['annotation']}</h2>
-        <${GraphemeList} ...${props} />
-    `;
-}
+export function LogogramEditor ({ id, graphemes, g_tags }) {
 
-function GraphemeList ({ id, graphemes, g_tags }) {
+    const [ mode, setMode ] = useSavedState('select');
 
     const colors = useList([]);
     if (colors.list.length < graphemes.list.length) {
@@ -34,16 +29,31 @@ function GraphemeList ({ id, graphemes, g_tags }) {
     // Grapheme being currently edited (object with idx (array index), start_x and
     // start_y of rectangle being drawn
     const [ editing_grapheme, setEditing ] = useState(null);
+    const stop_editing = () => setEditing(null);
     useEffect(() => {
-        // on mouse up, we stop drawing but keep selected box
-        document.addEventListener('mouseup', () =>
-            setEditing(es => es!=null?({ idx: es.idx }):null))
-        document.addEventListener('touchend', () =>
-            setEditing(es => es!=null?({ idx: es.idx }):null))
-        // on mouse down outside the annotation, we stop drawing
-        document.addEventListener('mousedown', () => setEditing(null));
-        document.addEventListener('touchstart', () => setEditing(null));
-    }, []);
+        if (mode == 'draw') {
+            // if drawing, on mouse up inside, we stop drawing but keep selected box. On mouse down out, stop
+            const stop_but_keep = () => setEditing(es => es!=null?({ idx: es.idx }):null);
+            document.addEventListener('mouseup', stop_but_keep);
+            document.addEventListener('touchend', stop_but_keep);
+            document.addEventListener('mousedown', stop_editing);
+            document.addEventListener('touchstart', stop_editing);
+            return () => {
+                document.removeEventListener('mouseup', stop_but_keep);
+                document.removeEventListener('touchend', stop_but_keep);
+                document.removeEventListener('mousedown', stop_editing);
+                document.removeEventListener('touchstart', stop_editing);
+            };
+        } else {
+            // if not drawing, on mouse up, we stop editing
+            document.addEventListener('mouseup', stop_editing);
+            document.addEventListener('touchend', stop_editing);
+            return () => {
+                document.removeEventListener('mouseup', stop_editing);
+                document.removeEventListener('touchend', stop_editing);
+            };
+        }
+    }, [mode]);
 
     const removeGrapheme = i => {
         setEditing(null);
@@ -51,68 +61,33 @@ function GraphemeList ({ id, graphemes, g_tags }) {
         colors.remove(i);
     };
 
-    return html`<div class="GraphemeList">
-        <${Annotation} ...${{id, graphemes, colors, editing_grapheme, setEditing}} />
-        <div><table>
-            <thead><tr><th />
-                ${g_tags.map(c => html`<th>${c}</th>`)}
-                <th />
-            </tr></thead>
-            <tbody>${graphemes.list.map((s, i) => {
-                const current = editing_grapheme !== null && editing_grapheme.idx === i;
-                return html`<${GraphemeEntry} tags=${s.tags || {}}
-                    changeTag=${(k, v) => graphemes.update_fn(i,
-                            s => ({ ...s, tags: {...s.tags, [k]: v}}),
-                            `GRAPH_${i}_UPD_TAG_${k}`)}
-                    columns=${g_tags}
-                    color=${colors.list[i]} changeColor=${c => colors.update(i, c)}
-                    remove=${() => removeGrapheme(i)}
-                    markEditing=${e => {
-                        setEditing({ idx: i });
-                        e.stopPropagation();
-                    }}
-                    editing=${current}
-                    navigate=${e => { switch(e.key) {
-                        case "Enter": setEditing(null); break;
-                        case "ArrowDown": {
-                            let ts = Array.from(document.querySelectorAll(".GraphemeEntry input[type=text]"));
-                            let act = ts.findIndex(el => el==document.activeElement);
-                            let nx = act+columns.length;
-                            if (nx < ts.length) ts[nx].focus();
-                            break; }
-                        case "ArrowUp": {
-                            let ts = Array.from(document.querySelectorAll(".GraphemeEntry input[type=text]"));
-                            let act = ts.findIndex(el => el==document.activeElement);
-                            let nx = act-columns.length;
-                            if (nx >= 0) ts[nx].focus();
-                            break; }
-                        default: return;
-                        }
-                        e.stopPropagation();
-                        e.preventDefault();
-                    }}
-                />`;
-            })}</tbody>
-        </table></div>
-    </div>`;
+    function ModeRadio ({ value, label }) {
+        return html`<label class="ModeRadio">
+            <input type=radio name=mode 
+            checked=${mode==value} onchange=${e => {
+                setMode(value);
+                e.stopPropagation();
+            }} />
+            ${label}
+        </label>`;
+    }
+
+    return html`
+        <h2 class="AnnotationHeader">${Text['annotation']}
+            <${ModeRadio} value="select" label=${Text['select'] || 'select'} />
+            <${ModeRadio} value="draw" label=${Text['draw'] || 'draw'} />
+            <${ModeRadio} value="edit" label=${Text['edges'] || 'edges'} />
+        </h2>
+        <div class="GraphemeList">
+        <${Annotation} ...${{id, graphemes, colors, editing_grapheme,
+            setEditing, mode}} />
+        <${TagTable} ...${{g_tags, graphemes, colors, editing_grapheme,
+            setEditing, removeGrapheme}} />
+        </div>
+    `;
 }
 
-function GraphemeEntry ({ tags, changeTag, columns, remove,
-        color, changeColor, markEditing, editing, navigate }) {
-    return html`<tr class=${`GraphemeEntry ${editing?'editing':''}`}
-        onmousedown=${markEditing}>
-        <td><input type=color value=${color}
-            oninput=${e => changeColor(e.target.value)} /></td>
-        ${columns.map(c => html`<td><input type=text
-            placeholder=${c} tabIndex=1 value=${tags[c]}
-            oninput=${e => changeTag(c, e.target.value)}
-            onkeydown=${navigate}
-            onfocus=${markEditing} /></td>`)}
-        <td><button onclick=${remove}>🗑️</button></td>
-    </tr>`;
-}
-
-function Annotation ({ id, graphemes, colors, editing_grapheme, setEditing }) {
+function Annotation ({ id, graphemes, colors, editing_grapheme, setEditing, mode }) {
 
     // Image bounding rectangle 
     const image_rect = useRef(null);
@@ -128,7 +103,7 @@ function Annotation ({ id, graphemes, colors, editing_grapheme, setEditing }) {
     // I don't know a better way to wait for the image to be rendered
     useEffect(() => setTimeout(reflow, 100), []);
 
-    const mouse_down = e => {
+    const start_rect_draw = e => {
         if (editing_grapheme === null) {
             editing_grapheme = { idx: graphemes.list.length };
             graphemes.add({ box: [0,0,0,0], tags: {} },
@@ -148,7 +123,7 @@ function Annotation ({ id, graphemes, colors, editing_grapheme, setEditing }) {
         e.preventDefault();
         e.stopPropagation();
     };
-    const mouse_move = e => {
+    const rect_draw = e => {
         if (editing_grapheme === null) return;
         if (editing_grapheme.start_x === undefined) return;
         const { left, top } = image_rect.current.getBoundingClientRect();
@@ -166,6 +141,9 @@ function Annotation ({ id, graphemes, colors, editing_grapheme, setEditing }) {
         e.preventDefault();
     }
 
+    const mouse_down = mode == 'draw' ? start_rect_draw : null;
+    const mouse_move = mode == 'draw' ? rect_draw : null;
+
     return html`<div class="Annotation">
         <img src="img/${id.full}.png"
             ref=${image_rect}
@@ -181,11 +159,12 @@ function Annotation ({ id, graphemes, colors, editing_grapheme, setEditing }) {
                 image_width=${image_width}
                 image_height=${image_height}
                 current=${editing_grapheme && editing_grapheme.idx==i}
+                click=${mode=='select'?() => setEditing({ idx: i }):null}
         />`)}
     </div>`;
 }
 
-function BBox ({ x, y, w, h, color, image_width, image_height, current }) {
+function BBox ({ x, y, w, h, color, image_width, image_height, current, click }) {
 
     if (x === undefined) return null;
     const left = Math.round((x-w/2.0)*image_width)+'px';
@@ -193,8 +172,79 @@ function BBox ({ x, y, w, h, color, image_width, image_height, current }) {
     const width = Math.round(w*1.0*image_width)+'px';
     const height = Math.round(h*1.0*image_height)+'px';
 
+    const can_click = (click !== null) && !current;
+    const do_click = e => {
+        if (can_click) click();
+        e.stopPropagation();
+    };
+
     return html`<span class=${`BBox ${current?'editing':''}`} style=${`
         left: ${left}; top: ${top};
         width: ${width}; height: ${height};
-        border-color: ${color};`} />`;
+        border-color: ${color};
+        cursor: ${can_click?'pointer':'default'};
+        pointer-events: ${can_click?'auto':'none'};
+        `}
+        onclick=${do_click}
+    />`;
+}
+
+function TagTable ({ g_tags, graphemes, colors, editing_grapheme, setEditing,
+        removeGrapheme }) {
+    return html`<div><table>
+        <thead><tr><th />
+            ${g_tags.map(c => html`<th>${c}</th>`)}
+            <th />
+        </tr></thead>
+        <tbody>${graphemes.list.map((s, i) => {
+            const current = editing_grapheme !== null && editing_grapheme.idx === i;
+            return html`<${GraphemeEntry} tags=${s.tags || {}}
+                changeTag=${(k, v) => graphemes.update_fn(i,
+                        s => ({ ...s, tags: {...s.tags, [k]: v}}),
+                        `GRAPH_${i}_UPD_TAG_${k}`)}
+                columns=${g_tags}
+                color=${colors.list[i]} changeColor=${c => colors.update(i, c)}
+                remove=${() => removeGrapheme(i)}
+                markEditing=${e => {
+                    setEditing({ idx: i });
+                    e.stopPropagation();
+                }}
+                editing=${current}
+                navigate=${e => { switch(e.key) {
+                    case "Enter": setEditing(null); break;
+                    case "ArrowDown": {
+                        let ts = Array.from(document.querySelectorAll(".GraphemeEntry input[type=text]"));
+                        let act = ts.findIndex(el => el==document.activeElement);
+                        let nx = act+columns.length;
+                        if (nx < ts.length) ts[nx].focus();
+                        break; }
+                    case "ArrowUp": {
+                        let ts = Array.from(document.querySelectorAll(".GraphemeEntry input[type=text]"));
+                        let act = ts.findIndex(el => el==document.activeElement);
+                        let nx = act-columns.length;
+                        if (nx >= 0) ts[nx].focus();
+                        break; }
+                    default: return;
+                    }
+                    e.stopPropagation();
+                    e.preventDefault();
+                }}
+            />`;
+        })}</tbody>
+    </table></div>`;
+}
+
+function GraphemeEntry ({ tags, changeTag, columns, remove,
+        color, changeColor, markEditing, editing, navigate }) {
+    return html`<tr class=${`GraphemeEntry ${editing?'editing':''}`}
+        onmousedown=${markEditing} onclick=${markEditing}>
+        <td><input type=color value=${color}
+            oninput=${e => changeColor(e.target.value)} /></td>
+        ${columns.map(c => html`<td><input type=text
+            placeholder=${c} tabIndex=1 value=${tags[c]}
+            oninput=${e => changeTag(c, e.target.value)}
+            onkeydown=${navigate}
+            onfocus=${markEditing} /></td>`)}
+        <td><button onclick=${remove}>🗑️</button></td>
+    </tr>`;
 }

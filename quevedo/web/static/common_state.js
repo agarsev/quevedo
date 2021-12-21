@@ -93,3 +93,12 @@ export function useDict (initial_value, change_stack) {
         update: (k, v, action) => set({...dict, [k]: v}, action)
     };
 }
+
+export function useSavedState (name, default_value) {
+    const saved = localStorage.getItem('quevedo.'+name);
+    const [ state, setState ] = useState(saved || default_value);
+    return [ state, v => {
+        localStorage.setItem('quevedo.'+name, v);
+        setState(v);
+    } ];
+}

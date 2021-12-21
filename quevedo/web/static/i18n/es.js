@@ -24,4 +24,7 @@ export default {
     meta: 'Metadatos', // Additional information for an annotation
     annotation: 'Anotación',
     tags: 'Etiquetas', // Title of tags
+    select: 'Seleccionar grafemas',
+    draw: 'Dibujar cajas',
+    edges: 'Dibujar aristas',
 };

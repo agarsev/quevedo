@@ -24,4 +24,7 @@ export default {
     meta: 'Metadata', // Additional information for an annotation
     annotation: 'Annotation', // Title of annotation
     tags: 'Tags', // Title of tags
+    select: 'Select graphemes',
+    draw: 'Draw boxes',
+    edges: 'Draw edges',
 };

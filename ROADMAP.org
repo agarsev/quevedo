@@ -1,6 +1,6 @@
 #+title: Roadmap
 
-* Next
+* Next (v1.3)
 
 ** TODO Improve net and pipe configuration
 
@@ -33,7 +33,7 @@ logograms, they are useful for annotation rather than processing.
 *** TODO Web annotation
 
 - [X] Separate meta tags and logogram tags
-- [ ] Annotation mode selection: box draw, grapheme edit, edge edit 
+- [X] Annotation mode selection: box draw, grapheme edit, edge edit 
 - [ ] Drag and drop to create edges
 - [ ] Edge tags table
 

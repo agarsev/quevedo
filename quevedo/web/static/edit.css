@@ -75,6 +75,23 @@ h2 {
     padding-right: 1em;
 }
 
+.AnnotationHeader {
+    margin-top: 0.5em;
+}
+
+.ModeRadio {
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+.ModeRadio:first-child {
+    margin-left: 1em;
+}
+
+.ModeRadio input {
+    margin: 0 0.5em 0 1em;
+}
+
 .GraphemeEntry.editing {
     background-color: #aaf;
 }
@@ -106,7 +123,6 @@ h2 {
 .BBox {
     display: block;
     position: absolute;
-    pointer-events: none;
     border: 2px solid black;
 }
 

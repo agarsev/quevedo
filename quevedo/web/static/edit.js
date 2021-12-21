@@ -2,7 +2,7 @@
 // Licensed under the Open Software License version 3.0
 
 import Text from './i18n.js';
-import { useChangeStack, useList, useDict } from './common_state.js';
+import { useChangeStack, useList, useDict, useSavedState } from './common_state.js';
 import { LogogramEditor } from './logo.js';
 import { GraphemeEditor } from './graph.js';
 
@@ -96,11 +96,7 @@ function App ({ title, target, id, annotation_help, links, anot,
 
 function Header ({ title, id, links, saveChanges, message, show_save,
     functions, runFunction, changes }) {
-    const [ selected, _setSelected ] = useState(localStorage.getItem('quevedo.last_function') || '');
-    const setSelected = fun_name => {
-        localStorage.setItem('quevedo.last_function', fun_name);
-        _setSelected(fun_name);
-    };
+    const [ selected, setSelected ] = useSavedState('last_function', '');
     return html`<header>
         <a href="">${title}</a> » 
         <a href="list/${id.dir}">${id.dir}</a> » ${id.num}
