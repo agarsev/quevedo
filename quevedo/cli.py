@@ -41,6 +41,10 @@ def cli(ctx, dataset, network, pipeline):
         quevedo -D path/to/dataset -N one split -p 80 prepare train test
     '''
 
+    if ctx.invoked_subcommand is None:
+        click.echo(cli.get_help(ctx))
+        return
+
     dataset = ds.Dataset(dataset)
     ctx.obj = {'dataset': dataset}
 
@@ -51,16 +55,6 @@ def cli(ctx, dataset, network, pipeline):
         ctx.obj['network'] = network
     elif pipeline is not None:
         ctx.obj['pipeline'] = pipeline
-    elif 'default' in dataset.config:
-        default = dataset.config['default']
-        if default in dataset.config['network']:
-            ctx.obj['network'] = default
-        elif default in dataset.config['pipeline']:
-            ctx.obj['pipeline'] = default
-
-    if ctx.invoked_subcommand is None:
-        ctx.invoke(ds.info)
-        click.echo(cli.get_help(ctx))
 
 
 # Adapted from https://stackoverflow.com/a/58018765

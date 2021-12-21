@@ -9,13 +9,16 @@ description = """
 $description
 """
 
-tag_schema = [ "tag" ]
-# For a multi-tag schema, use:
-# tag_schema = [ "tag1", "tag2" ]
+# Grapheme annotation schema (tags)
+g_tags = [ "tag" ]
+# Logogram annotation schema (tags)
+l_tags = [ "tag" ]
+# Edges annotation schema (tags)
+e_tags = [ "tag" ]
+# "Meta" tags are about the annotation collection process, etc. The first one will
+# be used as title for the annotation in the web listing.
+meta_tags = [ "filename" ]
 
-# Meta tags affect the whole annotation, rather than individual graphemes. The
-# first one will be used as title for the annotation in the web listing.
-meta_tags = [ "filename", "meaning" ]
 
 # Flags are also meta tags, but can only be true/false. They are displayed in
 # the web interface as checkboxes with the icon set here.
@@ -28,17 +31,13 @@ instructions. For example:
 Make boxes slightly larger than the graphemes, not too tight.
 """
 
-config_version = 1 # Version of quevedo dataset schema, not of dataset data
+config_version = 2 # Version of quevedo dataset schema, not of dataset data
 
 # Number of folds to split annotations into, and which to use for training and
 # which to use for testing
 folds = 10
 train_folds = [0,1,2,3,4,5,6,7]
 test_folds = [8,9]
-
-# Default network or pipeline to use
-default = "one"
-# default = "combined"
 
 [darknet]
 path = "darknet/darknet" 
@@ -47,7 +46,7 @@ options = [ "-dont_show", "-mjpeg_port", "8090" ]
 
 [network.one]
 task = "detect"
-# tag = "tag" # Uncomment and choose a tag name from tag_schema to use
+# tag = "tag" # Uncomment and choose a tag name from g_tags to use
 # subsets = [ "default" ] # If not specified, all subsets will be used
 subject = "Focus on grapheme type learning and recognition"
 # max_batches = 2000  # Uncomment and change to run training for longer/shorter

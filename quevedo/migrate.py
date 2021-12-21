@@ -41,6 +41,17 @@ def _migrate_one(dataset: Dataset):
     dataset.config['flags'] = {"done": "✔️", "problem": "⚠️", "notes": "📝"}
 
 
+def _migrate_two(dataset: Dataset):
+    '''Migrate dataset from version 1 to 2.'''
+    dataset.config['config_version'] = 2
+    dataset.config['g_tags'] = dataset.config['tag_schema']
+    dataset.config['l_tags'] = []
+    dataset.config['e_tags'] = []
+    del dataset.config['tag_schema']
+    if 'default' in dataset.config:
+        del dataset.config['default']
+
+
 @click.command('migrate')
 @click.pass_obj
 def migrate(obj):
@@ -57,6 +68,8 @@ def migrate(obj):
 
     if version < 1:
         _migrate_one(dataset)
+    if version < 2:
+        _migrate_two(dataset)
 
     dataset.config_path.write_text("# This file is a Quevedo dataset configuration file. Find more at:\n" +
                                    "# https://www.github.com/agarsev/quevedo\n\n" +

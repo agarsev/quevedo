@@ -11,30 +11,55 @@ class Logogram(Annotation):
     target = Target.LOGO
 
     def __init__(self, *args, **kwargs):
+        #: annotated tags for this logogram.
+        self.tags = {}  # type: dict[str,str]
         #: list of [bound graphemes](#quevedoannotationlogogramboundgrapheme) found within this logogram.
         self.graphemes = []  # type: list[BoundGrapheme]
+        #: list of [edges](#quevedoannotationlogogramedge) found within this logogram.
+        self.edges = []  # type: list[Edge]
         super().__init__(*args, **kwargs)
 
-    def update(self, *, graphemes=None, **kwds):
+    def update(self, *, tags=None, graphemes=None, edges=None, **kwds):
         '''Extends base
         [`update`](#quevedo.annotation.annotation.Annotation.update), other
         arguments will be passed through.
 
         Args:
+            tags: new tags for this logogram (replaces all).
             graphemes: either a list of Graphemes, BoundGraphemes, or dicts with
                 the keys necessary to initialize a
                 [BoundGrapheme](quevedoannotationlogogramboundgrapheme).
+            edges: either a list of Edges, or dicts with the keys necessary to
+                initialize an [Edge](quevedoannotationlogogramedge). In this
+                case, start and end should be the indices of the boundgraphemes
+                in the graphemes list.
         '''
         super().update(**kwds)
+        if tags is not None:
+            self.tags = {k: t for k, t in tags.items()
+                         if t is not None and t != ''}
         if graphemes is not None:
             self.graphemes = [BoundGrapheme(self, **g)
                               if isinstance(g, dict) else g
                               for g in graphemes]
+        if edges is not None:
+            self.edges = [Edge(self.graphemes[e['start']],
+                               self.graphemes[e['end']],
+                               e.tags)
+                          if isinstance(e, dict) else e
+                          for e in edges]
 
     def to_dict(self):
         return {
             **super().to_dict(),
-            'graphemes': [g.to_dict() for g in self.graphemes]
+            'tags': {k: t for k, t in self.tags.items()
+                     if t is not None and t != ''},
+            'graphemes': [g.to_dict() for g in self.graphemes],
+            'edges': [{
+                'start': self.graphemes.index(e.start),
+                'end': self.graphemes.index(e.end),
+                'tags': e.tags
+            } for e in self.edges]
         }
 
 
@@ -70,3 +95,17 @@ class BoundGrapheme(Grapheme):
             u = float(self.box[1]) * height - (h / 2)
             self._image_data = img.crop((l, u, l + w, u + h))
         return self._image_data
+
+
+class Edge:
+    '''An edge between graphemes in a logogram.
+
+    Edges are used to connect two graphemes, and can be used to define the
+    dependency or function between them. The edges and graphemes of a logogram
+    form a directed graph. The tags for an edge are a dictionary with keys in
+    the dataset's `e_tags` field.'''
+
+    def __init__(self, start: BoundGrapheme, end: BoundGrapheme, tags: dict = {}):
+        self.start = start
+        self.end = end
+        self.tags = tags

@@ -27,19 +27,19 @@ class Network:
         self.path = dataset.path / 'networks' / name
         self.path.mkdir(exist_ok=True, parents=True)
 
-        which_tag = self.config.get('tag', dataset.config['tag_schema'][0])
+        which_tag = self.config.get('tag', dataset.config['g_tags'][0])
         try:
             if not isinstance(which_tag, str):
                 def get_multitag(tags, which_tag=which_tag):
                     return TAG_JOIN_CHAR.join(tags.get(w, '') for w in which_tag)
-                #: function to get the relevant label for the network from a list of tags according to `tag_schema`
+                #: function to get the relevant label for the network from a list of tags according to `g_tags`
                 self.get_tag = get_multitag
 
                 def undo_multitag(pred, which_tag=which_tag):
                     return {which_tag[i]: val
                             for i, val in enumerate(pred.split(TAG_JOIN_CHAR))
                             if val != ''}
-                #: function to get the `tag_schema` values from the tag/label/class predicted by the network
+                #: function to get the `g_tags` values from the tag/label/class predicted by the network
                 self.prediction_to_tag = undo_multitag
             elif which_tag == '':
                 self.get_tag = lambda tags, which_tag=which_tag: ''

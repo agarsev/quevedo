@@ -9,15 +9,30 @@
 
 ** TODO Grapheme graphs in the logogram
 
-*** TODO Code representation
+*** DONE New dataset version (2)
+    CLOSED: [2021-12-21 Tue 20:12]
 
-- [ ] Refactor tag_scheme to grapheme_tags
-- [ ] Add edge_tags (tag scheme for edges)
-- [ ] Add Edge class (parent logogram, from, to (indices), tags (dict))
-- [ ] Add edge list to logogram
+warn: INCOMPATIBLE!
+
+Instead of tag_schema, now there is a schema for grapheme, logogram and edge
+annotation (g_tags, l_tags, e_tags). Meta tags stay, both for graphemes and
+logograms, they are useful for annotation rather than processing.
+
+- [X] Dataset version, migration, default_config
+- [X] Refactor tag_schema to g_tags
+- [X] Remove "default" network to use, please always specify one
+
+*** DONE Code representation
+    CLOSED: [2021-12-21 Tue 20:12]
+
+- [X] Add `tags` to logograms
+- [X] Add Edge class (parent logogram, from, to (indices), tags (dict))
+- [X] Add edge list to logogram
+- [X] Save and load from json
 
 *** TODO Web annotation
 
+- [ ] Separate meta tags and logogram tags
 - [ ] Annotation mode selection: box draw, grapheme edit, edge edit 
 - [ ] Drag and drop to create edges
 - [ ] Edge tags table
@@ -39,6 +54,14 @@ can be trained and tested.
 How to filter edges? This is global, and probably application dependent. Maybe
 a user script? "seed" nodes from where to compute maximum probability spanning
 trees?
+
+*** TODO Test
+
+- [ ] Test migration
+
+*** TODO Docs
+
+- [ ] Document new config and dataset version
 
 * Backlog
 

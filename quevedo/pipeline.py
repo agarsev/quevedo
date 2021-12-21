@@ -152,9 +152,7 @@ class BranchPipeline(Pipeline):
     criterion. The criterion can be:
 
     - a tag name: the pipeline will run the branch corresponding to the tag
-      value (only for graphemes)
-    - a meta tag: the pipeline will run the branch corresponding to the meta
-      tag value (graphemes and logograms)
+      value. Can also be a meta tag.
     - a lambda expression: the pipeline will run the branch corresponding to
       the result of the lambda expression, which will receive the annotation as
       parameter.
@@ -168,9 +166,11 @@ class BranchPipeline(Pipeline):
         self.criterion = crit
         if crit.startswith('lambda'):
             self.get_branch = eval(self.criterion)
-        elif crit in dataset.config['tag_schema']:
+        elif crit in dataset.config['g_tags']:
             self.get_branch = lambda a, crit=crit: a.tags.get(crit)
-        elif crit in dataset.config['meta_schema']:
+        elif crit in dataset.config['l_tags']:
+            self.get_branch = lambda a, crit=crit: a.tags.get(crit)
+        elif crit in dataset.config['meta_tags']:
             self.get_branch = lambda a, crit=crit: a.meta.get(crit)
         else:
             raise ValueError("Wrong criterion for {}: {}".format(name, config))

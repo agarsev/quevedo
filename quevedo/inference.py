@@ -96,7 +96,7 @@ def test(obj, do_print, results_json, predictions_csv, on_train):
         model = dataset.get_pipeline(obj['pipeline'])
         path = dataset.path / 'pipelines' / model.name
 
-        def join_tags(tags, all_tags=dataset.config['tag_schema']):
+        def join_tags(tags, all_tags=dataset.config['g_tags']):
             return ''.join(tags.get(k, '') for k in all_tags)
     else:
         raise SystemExit("Please specify a network or a pipeline")

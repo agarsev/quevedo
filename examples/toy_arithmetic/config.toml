@@ -5,9 +5,9 @@ title = "Toy Arithmetic"
 description = """ 
 Toy dataset of Spanish-style elementary arithmetic for demonstration purposes.
 """
-
-tag_schema = [ "type", "value" ]
-
+g_tags = [ "type", "value",]
+l_tags = []
+e_tags = []
 meta_tags = [ "filename" ]
 
 flags = { done = "✔️", problem = "⚠️", notes = "📝" }
@@ -16,14 +16,14 @@ annotation_help = """
 Make boxes slightly larger than the graphemes, not too tight.
 """
 
-config_version = 1 # Version of quevedo dataset schema, not of dataset data
+config_version = 2 # Version of quevedo dataset schema, not of dataset data
 
 folds = 4
 train_folds = [0,1,2]
 test_folds = [3]
 
 [darknet]
-path = "darknet/darknet" 
+path = "darknet/darknet"
 library = "darknet/libdarknet.so"
 options = [ "-dont_show", "-mjpeg_port", "8090" ]
 

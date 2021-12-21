@@ -14,7 +14,7 @@ from quevedo.network import create_network
 from quevedo.pipeline import create_pipeline
 
 
-CURRENT_CONFIG_VERSION = 1
+CURRENT_CONFIG_VERSION = 2
 
 
 class Dataset:
@@ -85,6 +85,8 @@ class Dataset:
 
         Returns:
             list of [Networks](#network)'''
+        if 'network' not in self.config:
+            return []
         return [create_network(self, n) for n in self.config['network'].keys()]
 
     def get_network(self, name):
@@ -109,6 +111,8 @@ class Dataset:
 
         Returns:
             list of [Pipelines](#pipeline)'''
+        if 'pipeline' not in self.config:
+            return []
         return [create_pipeline(self, p) for p in self.config['pipeline'].keys()]
 
     def get_pipeline(self, name):
@@ -377,7 +381,10 @@ def info(obj):
     click.secho('{}\n{}'.format(config["title"], '▔' * len(config['title'])),
                 nl=False, bold=True)
     click.echo(config["description"])
-    click.secho('Tag schema: {}\n'.format(', '.join(config["tag_schema"])), bold=True)
+    click.secho('Grapheme tag schema: {}'.format(', '.join(config["g_tags"])))
+    click.secho('Logogram tag schema: {}'.format(', '.join(config["l_tags"])))
+    click.secho('Edge tag schema: {}'.format(', '.join(config["e_tags"])))
+    click.secho('Meta tags for annotations: {}\n'.format(', '.join(config["meta_tags"])))
 
     logos = list(dataset.get_annotations(Target.LOGO))
     num_logos = count(logos)
