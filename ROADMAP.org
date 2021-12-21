@@ -7,15 +7,38 @@
 - [ ] make extend recursive, if extend extends an extension
 - [ ] merge instead of replace configs
 
-** TODO Data augmentation
+** TODO Grapheme graphs in the logogram
 
-Incorporate VISSE code of data augmentation to replace the existing module. The
-idea is to use user code to generate examples, because they know how their tags
-work. We can still provide the image generation and grapheme placement with
-force simulation for logogram generation.
+*** TODO Code representation
 
-- [ ] Generate graphemes
-- [ ] Generate logograms
+- [ ] Refactor tag_scheme to grapheme_tags
+- [ ] Add edge_tags (tag scheme for edges)
+- [ ] Add Edge class (parent logogram, from, to (indices), tags (dict))
+- [ ] Add edge list to logogram
+
+*** TODO Web annotation
+
+- [ ] Annotation mode selection: box draw, grapheme edit, edge edit 
+- [ ] Drag and drop to create edges
+- [ ] Edge tags table
+
+*** TODO Edge probability learning
+
+New type of "network" (bayesian network for now, maybe neural in future) that
+can be trained and tested.
+
+- [ ] Graph network
+- [ ] Prepare -> extract all training edges.
+    For each pair of graphemes as <box, grapheme tags according to net config>
+    link or not, edge tag according to net config.
+- [ ] quevedo optional dep scikit-learn
+- [ ] Train -> fit bayesian network, serialize it to disk
+- [ ] Test -> load serialized model, for each pair of graphemes in a logogram
+    predict edge or not and tag.
+
+How to filter edges? This is global, and probably application dependent. Maybe
+a user script? "seed" nodes from where to compute maximum probability spanning
+trees?
 
 * Backlog
 
@@ -62,20 +85,12 @@ image is now frontend state, not just a src link.
 
 Study migrating to a python-based ML library.
 
-** TODO Grapheme dependency trees
+** TODO Data augmentation
 
-*** TODO Code representation
+Incorporate VISSE code of data augmentation to replace the existing module. The
+idea is to use user code to generate examples, because they know how their tags
+work. We can still provide the image generation and grapheme placement with
+force simulation for logogram generation.
 
-A "parent" field for BoundGraphemes, and some kind of ID (better not use
-indices, arrays are always problematic).
-
-*** TODO Web annotation
-
-A tab that presents an alternative interface. In the drag and drop, drag from
-object to object to establish the child-parent link (visualized as an arrow). In
-the table side, how to visualize?
-
-*** TODO Logogram use
-
-Access the tree from the logogram.
-
+- [ ] Generate graphemes
+- [ ] Generate logograms
