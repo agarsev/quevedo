@@ -18,12 +18,12 @@ function getNextColor () {
 
 export function LogogramEditor (props) {
     return html`
-        <h2>${Text['logogram_annotation']}</h2>
+        <h2>${Text['annotation']}</h2>
         <${GraphemeList} ...${props} />
     `;
 }
 
-function GraphemeList ({ id, graphemes, columns }) {
+function GraphemeList ({ id, graphemes, g_tags }) {
 
     const colors = useList([]);
     if (colors.list.length < graphemes.list.length) {
@@ -55,7 +55,7 @@ function GraphemeList ({ id, graphemes, columns }) {
         <${Annotation} ...${{id, graphemes, colors, editing_grapheme, setEditing}} />
         <div><table>
             <thead><tr><th />
-                ${columns.map(c => html`<th>${c}</th>`)}
+                ${g_tags.map(c => html`<th>${c}</th>`)}
                 <th />
             </tr></thead>
             <tbody>${graphemes.list.map((s, i) => {
@@ -64,7 +64,7 @@ function GraphemeList ({ id, graphemes, columns }) {
                     changeTag=${(k, v) => graphemes.update_fn(i,
                             s => ({ ...s, tags: {...s.tags, [k]: v}}),
                             `GRAPH_${i}_UPD_TAG_${k}`)}
-                    columns=${columns}
+                    columns=${g_tags}
                     color=${colors.list[i]} changeColor=${c => colors.update(i, c)}
                     remove=${() => removeGrapheme(i)}
                     markEditing=${e => {

@@ -13,17 +13,14 @@ const { useState } = preactHooks;
 preact.render(html`<${App} ...${window.quevedo_data} />`, document.body);
 
 function App ({ title, target, id, annotation_help, links, anot,
-    columns, functions, meta_tags, flags }) {
+    functions, g_tags, l_tags, meta_tags, flags }) {
 
     const changes = useChangeStack();
     const meta = useDict(anot.meta, changes);
     const is_logo = target == 'logograms';
 
-    if (is_logo) {
-        var graphemes = useList(anot.graphemes, changes)
-    } else {
-        var tags = useDict(anot.tags, changes);
-    }
+    const graphemes = is_logo?useList(anot.graphemes, changes):null;
+    const tags = useDict(anot.tags, changes);
 
     const [ message, setMessage ] = useState('');
     const setError = resp => {
@@ -88,10 +85,11 @@ function App ({ title, target, id, annotation_help, links, anot,
         <${Header} ...${{title, id, links, saveChanges,
             message, show_save: changes.dirty>0, runFunction,
             functions, changes }} />
-        <${MetaEditor} ...${{meta_tags, flags, meta }} />
+        <${TagEditor} schema=${is_logo?l_tags:g_tags}
+            ...${{meta_tags, flags, meta, tags }} />
         ${is_logo?
-            html`<${LogogramEditor} ...${{id, graphemes, columns}} />`
-            :html`<${GraphemeEditor} ...${{id, tags, columns}} />`}
+            html`<${LogogramEditor} ...${{id, graphemes, g_tags}} />`
+            :html`<${GraphemeEditor} ...${{id}} />`}
         <pre>${annotation_help}</pre>
     `;
 }
@@ -121,22 +119,31 @@ function Header ({ title, id, links, saveChanges, message, show_save,
     </header>`;
 }
 
-function MetaEditor ({ meta_tags, meta, flags }) {
+function TagEditor ({ meta_tags, meta, schema, tags, flags }) {
     const text_tags = meta_tags.filter(t => flags[t]==undefined);
-    return html`<div class="MetaEditor">
-        <h2>${Text['meta']}</h2>
-        <table>${text_tags.map(k => html`<tr>
+    return html`<table class="TagEditor">
+        ${text_tags.map((k, i) => html`<tr
+            class=${i==text_tags.length-1?'last':''}>
+            ${i>0?html`<th></th>`:html`<th>${Text['meta']}</th>`}
             <th>${k}:</th>
             <td><textarea rows="1" autocomplete="off"
                 oninput=${e => meta.update(k, e.target.value, `UPD_META_${k}`)}
                 value=${meta.dict[k] || ''} />
             </td>
         </tr>`)}
-        <tr><th></th><td>${Object.keys(flags).map(f => html`<span class="flag">
+        ${schema.map((t, i) => html`<tr
+            class=${`${i==0?'first':''} ${i==schema.length-1?'last':''}`}>
+            ${i>0?html`<th></th>`:html`<th>${Text['tags']}</th>`}
+            <th>${t}:</th>
+            <td><input type=text value=${tags.dict[t] || ''}
+                oninput=${e => tags.update(c, e.target.value, `TAG_${t}_UPD`)}
+            /></td>
+        </tr>`)}
+        <tr class="first">
+            <th colspan="2"></th><td>${Object.keys(flags).map(f => html`<span class="flag">
             <input type="checkbox"
                 onchange=${() => meta.update(f, !meta.dict[f], `UPD_META_${f}`)}
                 checked=${!!meta.dict[f]} /> ${flags[f]}
         </span>`)}</td></tr>
-        </table>
-    </div>`;
+    </table>`;
 }

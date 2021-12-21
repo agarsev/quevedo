@@ -22,6 +22,6 @@ export default {
     saving: 'Saving...', // Message when sending changes to server
     saved: 'Saved', // Message when changes were succesfully saved
     meta: 'Metadata', // Additional information for an annotation
-    logogram_annotation: 'Annotation (drag to draw)', // Title of logogram annotation
-    grapheme_annotation: 'Annotation', // Title of grapheme tag list
+    annotation: 'Annotation', // Title of annotation
+    tags: 'Tags', // Title of tags
 };

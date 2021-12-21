@@ -10,7 +10,7 @@ const { useState, useRef } = preactHooks;
 
 preact.render(html`<${App} ...${window.quevedo_data} />`, document.body);
 
-function App ({ title, path, description, columns, dir_name, target,
+function App ({ title, path, description, dir_name, target,
         list, list2 }) {
     const in_dir = dir_name !== undefined;
 
@@ -44,7 +44,6 @@ function App ({ title, path, description, columns, dir_name, target,
             <span class="message_text">${message}</span>
         </header>
         <pre><b>(${path})</b></pre>
-        <pre><b>${Text['columns']}: ${columns.join(', ')}</b></pre>
         <pre>${description}</pre>
         <${in_dir?AnnoList:DirList} list=${list} list2=${list2}
             upload=${upload} />

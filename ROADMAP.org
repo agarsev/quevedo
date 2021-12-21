@@ -32,7 +32,7 @@ logograms, they are useful for annotation rather than processing.
 
 *** TODO Web annotation
 
-- [ ] Separate meta tags and logogram tags
+- [X] Separate meta tags and logogram tags
 - [ ] Annotation mode selection: box draw, grapheme edit, edge edit 
 - [ ] Drag and drop to create edges
 - [ ] Edge tags table

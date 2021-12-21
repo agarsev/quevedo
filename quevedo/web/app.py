@@ -232,7 +232,10 @@ def index(target, dir):
     data = {
         'title': ds.config['title'],
         'path': str(app_data['path']),
-        'columns': ds.config['tag_schema'],
+        'g_tags': ds.config['g_tags'],
+        'l_tags': ds.config['l_tags'],
+        'e_tags': ds.config['e_tags'],
+        'meta_tags': ds.config['meta_tags']
     }
 
     if dir is None:
@@ -303,7 +306,10 @@ def edit(target, dir, idx):
         'functions': functions,
         'meta_tags': app_data['meta_tags'],
         'flags': app_data['flags'],
-        'columns': ds.config['tag_schema'],
+        'g_tags': ds.config['g_tags'],
+        'l_tags': ds.config['l_tags'],
+        'e_tags': ds.config['e_tags'],
+        'meta_tags': ds.config['meta_tags'],
         'anot': a.to_dict(),
     }
     return html_template.substitute(
