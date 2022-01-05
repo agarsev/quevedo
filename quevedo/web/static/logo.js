@@ -7,24 +7,23 @@ const { useState, useEffect, useRef } = preactHooks;
 import Text from './i18n.js';
 import { useList, useSavedState } from './common_state.js';
 
-const color_list = [ '#FF0000', '#00FF00', '#0000FF', '#FF00FF',
-    '#00FFFF', '#880000', '#008800', '#000088', '#888800', '#008888' ];
 let next_color = 0;
-function getNextColor () {
+function getNextColor (color_list) {
     const r = color_list[next_color];
     next_color = (next_color + 1) % color_list.length;
     return r;
 }
 
-export function LogogramEditor ({ id, graphemes, edges, g_tags }) {
+export function LogogramEditor ({ id, graphemes, edges, g_tags, color_list }) {
 
     // modes: select, draw, edges
     const [ mode, setMode ] = useSavedState('select');
 
     const colors = useList([]);
+    colors.next = () => getNextColor(color_list);
     if (colors.list.length < graphemes.list.length) {
         next_color = 0;
-        colors.set(graphemes.list.map(getNextColor));
+        colors.set(graphemes.list.map(colors.next));
     }
 
     // Object being currently edited:
@@ -123,7 +122,7 @@ function Annotation ({ id, graphemes, edges, colors, being_edited, setEditing, a
             being_edited = { idx: graphemes.list.length };
             graphemes.add({ box: [0,0,0,0], tags: {} },
                 `GRAPH_${being_edited.idx}_UPD_BOX`);
-            colors.add(getNextColor());
+            colors.add(colors.next());
         } else {
             being_edited = { ...being_edited }; // should be cloned
         }

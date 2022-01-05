@@ -45,6 +45,9 @@ can be set:
 
 - `lang`: the language for messages in the web interface. Supported values for
     now are `en` (english) or `es` (spanish).
+- `colors`: a custom list of colors (in hex notation) can be given for the
+    logogram annotation interface to use. For example: `colors = ['#ff0000',
+    '#00ff00', '#0000ff']`.
 - `public`: If true, no login will be required. If false, access will only be
     provided to logged in users.
 

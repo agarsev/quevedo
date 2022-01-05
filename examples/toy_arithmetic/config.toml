@@ -50,3 +50,7 @@ mount_path = ""
 lang = "en"
 public = true
 secret_key = "ce8c9cd0316faac773645648ac827ff6"
+# Modified from https://sashamaps.net/docs/resources/20-colors/
+colors = [ '#e6194b', '#3cb44b', '#ffcb1b', '#4363d8', '#f58231',
+           '#911eb4', '#42d4f4', '#f032e6', '#97c523', '#469990',
+           '#9c70cf', '#9a6324', '#800000', '#808000', '#000075' ]

@@ -41,6 +41,10 @@ def annotation_info(a: Annotation):
     }
 
 
+DEFAULT_COLOR_LIST = ['#FF0000', '#00FF00', '#0000FF', '#FF00FF', '#00FFFF',
+                      '#880000', '#008800', '#000088', '#888800', '#008888']
+
+
 def load_dataset(dataset, language):
     app_data['dataset'] = dataset
     app_data['lang'] = language
@@ -70,6 +74,7 @@ def load_dataset(dataset, language):
         'logograms': {n.name: None for n in dataset.list_pipelines() if
                       n.target == Target.LOGO},
     }
+    app_data['color_list'] = dataset.config['web'].get('colors', DEFAULT_COLOR_LIST)
 
 
 def run(host, port, path):
@@ -310,6 +315,7 @@ def edit(target, dir, idx):
         'l_tags': ds.config['l_tags'],
         'e_tags': ds.config['e_tags'],
         'meta_tags': ds.config['meta_tags'],
+        'color_list': app_data['color_list'],
         'anot': a.to_dict(),
     }
     return html_template.substitute(

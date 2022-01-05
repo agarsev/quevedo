@@ -65,6 +65,13 @@ trees?
 
 - [ ] Document new config and dataset version
 
+** Other
+
+*** User configurable colors
+
+The color list to use in the web annotation tool can be configured in the
+config.toml.
+
 * Backlog
 
 ** TODO Web interface improvements
