@@ -16,8 +16,9 @@ function getNextColor () {
     return r;
 }
 
-export function LogogramEditor ({ id, graphemes, g_tags }) {
+export function LogogramEditor ({ id, graphemes, edges, g_tags }) {
 
+    // modes: select, draw, edges
     const [ mode, setMode ] = useSavedState('select');
 
     const colors = useList([]);
@@ -26,9 +27,10 @@ export function LogogramEditor ({ id, graphemes, g_tags }) {
         colors.set(graphemes.list.map(getNextColor));
     }
 
-    // Grapheme being currently edited (object with idx (array index), start_x and
-    // start_y of rectangle being drawn
-    const [ editing_grapheme, setEditing ] = useState(null);
+    // Object being currently edited:
+    // - if a grapheme: idx (array index), start_x and start_y if drawing box
+    // - if an edge: start (array index), end_x and end_y if drawing line
+    const [ being_edited, setEditing ] = useState(null);
     const stop_editing = () => setEditing(null);
     useEffect(() => {
         if (mode == 'draw') {
@@ -56,9 +58,21 @@ export function LogogramEditor ({ id, graphemes, g_tags }) {
     }, [mode]);
 
     const removeGrapheme = i => {
+        // TODO FIX EDGES
         setEditing(null);
         graphemes.remove(i);
         colors.remove(i);
+    };
+
+    const addEdge = (i, j) => {
+        setEditing(null);
+        if (i == j) return;
+        if (edges.list.some(({ start, end }) => start == i && end == j)) return;
+        edges.add({
+            start: i,
+            end: j,
+            tags: {},
+        });
     };
 
     function ModeRadio ({ value, label }) {
@@ -76,18 +90,19 @@ export function LogogramEditor ({ id, graphemes, g_tags }) {
         <h2 class="AnnotationHeader">${Text['annotation']}
             <${ModeRadio} value="select" label=${Text['select'] || 'select'} />
             <${ModeRadio} value="draw" label=${Text['draw'] || 'draw'} />
-            <${ModeRadio} value="edit" label=${Text['edges'] || 'edges'} />
+            <${ModeRadio} value="edges" label=${Text['edges'] || 'edges'} />
         </h2>
         <div class="GraphemeList">
-        <${Annotation} ...${{id, graphemes, colors, editing_grapheme,
-            setEditing, mode}} />
-        <${TagTable} ...${{g_tags, graphemes, colors, editing_grapheme,
-            setEditing, removeGrapheme}} />
+        <${Annotation} ...${{id, graphemes, edges, colors, being_edited,
+            setEditing, addEdge, mode}} />
+        <${TagTable} editing_grapheme=${being_edited}
+            ...${{g_tags, graphemes, colors, setEditing, removeGrapheme}} />
         </div>
     `;
 }
 
-function Annotation ({ id, graphemes, colors, editing_grapheme, setEditing, mode }) {
+function Annotation ({ id, graphemes, edges, colors, being_edited, setEditing, addEdge,
+    mode }) {
 
     // Image bounding rectangle 
     const image_rect = useRef(null);
@@ -104,45 +119,72 @@ function Annotation ({ id, graphemes, colors, editing_grapheme, setEditing, mode
     useEffect(() => setTimeout(reflow, 100), []);
 
     const start_rect_draw = e => {
-        if (editing_grapheme === null) {
-            editing_grapheme = { idx: graphemes.list.length };
+        if (being_edited === null) {
+            being_edited = { idx: graphemes.list.length };
             graphemes.add({ box: [0,0,0,0], tags: {} },
-                `GRAPH_${editing_grapheme.idx}_UPD_BOX`);
+                `GRAPH_${being_edited.idx}_UPD_BOX`);
             colors.add(getNextColor());
         } else {
-            editing_grapheme = { ...editing_grapheme }; // should be cloned
+            being_edited = { ...being_edited }; // should be cloned
         }
         const { left, top } = image_rect.current.getBoundingClientRect();
         const pos = e.type == 'touchstart' ? e.touches[0] : e;
-        editing_grapheme.start_x = pos.clientX - left;
-        editing_grapheme.start_y = pos.clientY - top;
-        graphemes.update_fn(editing_grapheme.idx, s => ({ ...s, box: [
-            editing_grapheme.start_x/image_width, editing_grapheme.start_y/image_height,
-            0,0] }), `GRAPH_${editing_grapheme.idx}_UPD_BOX`);
-        setEditing(editing_grapheme);
+        being_edited.start_x = pos.clientX - left;
+        being_edited.start_y = pos.clientY - top;
+        graphemes.update_fn(being_edited.idx, s => ({ ...s, box: [
+            being_edited.start_x/image_width, being_edited.start_y/image_height,
+            0,0] }), `GRAPH_${being_edited.idx}_UPD_BOX`);
+        setEditing(being_edited);
         e.preventDefault();
         e.stopPropagation();
     };
     const rect_draw = e => {
-        if (editing_grapheme === null) return;
-        if (editing_grapheme.start_x === undefined) return;
+        if (being_edited === null) return;
+        if (being_edited.start_x === undefined) return;
         const { left, top } = image_rect.current.getBoundingClientRect();
         const pos = e.type == 'touchmove' ? e.touches[0] : e;
         const mx = pos.clientX - left;
         const my = pos.clientY - top;
-        const bw = mx - editing_grapheme.start_x;
-        const bh = my - editing_grapheme.start_y;
-        graphemes.update_fn(editing_grapheme.idx, s => ({ ...s, box: [
-            (editing_grapheme.start_x + bw/2)/image_width, // x
-            (editing_grapheme.start_y + bh/2)/image_height, // y
+        const bw = mx - being_edited.start_x;
+        const bh = my - being_edited.start_y;
+        graphemes.update_fn(being_edited.idx, s => ({ ...s, box: [
+            (being_edited.start_x + bw/2)/image_width, // x
+            (being_edited.start_y + bh/2)/image_height, // y
             (bw>=0?bw:-bw)/image_width, // w
             (bh>=0?bh:-bh)/image_height, // h
-        ] }), `GRAPH_${editing_grapheme.idx}_UPD_BOX`);
+        ] }), `GRAPH_${being_edited.idx}_UPD_BOX`);
         e.preventDefault();
     }
+    const start_edge_draw = (e, i) => {
+        setEditing({
+            start: i,
+            start_x: graphemes.list[i].box[0] * image_width,
+            start_y: graphemes.list[i].box[1] * image_height,
+        });
+        e.stopPropagation();
+        e.preventDefault();
+    };
+    const edge_draw = e => {
+        if (being_edited === null) return;
+        const { left, top } = image_rect.current.getBoundingClientRect();
+        const pos = e.type == 'touchmove' ? e.touches[0] : e;
+        const mx = pos.clientX - left;
+        const my = pos.clientY - top;
+        setEditing(s => ({ ...s, 
+            end_x: mx, end_y: my }));
+        e.stopPropagation();
+        e.preventDefault();
+    };
+    const edge_finish = (e, i) => {
+        if (being_edited === null) return;
+        if (being_edited.end_x === undefined) return;
+        addEdge(being_edited.start, i);
+        e.stopPropagation();
+        e.preventDefault();
+    };
 
     const mouse_down = mode == 'draw' ? start_rect_draw : null;
-    const mouse_move = mode == 'draw' ? rect_draw : null;
+    const mouse_move = mode == 'draw' ? rect_draw : mode == 'edges' ? edge_draw : null;
 
     return html`<div class="Annotation">
         <img src="img/${id.full}.png"
@@ -158,13 +200,30 @@ function Annotation ({ id, graphemes, colors, editing_grapheme, setEditing, mode
                 color=${colors.list[i]}
                 image_width=${image_width}
                 image_height=${image_height}
-                current=${editing_grapheme && editing_grapheme.idx==i}
+                current=${being_edited && being_edited.idx==i}
                 click=${mode=='select'?() => setEditing({ idx: i }):null}
+                mousedown=${mode=='edges'?e => start_edge_draw(e, i):null}
+                mousemove=${mouse_move}
+                mouseup=${mode=='edges' && being_edited!==null ? 
+                    e => edge_finish(e, i):null}
         />`)}
+        ${edges.list.map(e => html`<${Edge}
+            x1=${graphemes.list[e.start].box[0]*image_width}
+            y1=${graphemes.list[e.start].box[1]*image_height}
+            x2=${graphemes.list[e.end].box[0]*image_width}
+            y2=${graphemes.list[e.end].box[1]*image_height}
+            color=${colors.list[e.start]} />`)}
+        ${being_edited && being_edited.end_x !== undefined ?
+            html`<${Edge}
+                x1=${being_edited.start_x} y1=${being_edited.start_y}
+                x2=${being_edited.end_x} y2=${being_edited.end_y}
+                color=${colors.list[being_edited.start]}
+            />`:null}
     </div>`;
 }
 
-function BBox ({ x, y, w, h, color, image_width, image_height, current, click }) {
+function BBox ({ x, y, w, h, color, image_width, image_height, current,
+        click, mousemove, mousedown, mouseup }) {
 
     if (x === undefined) return null;
     const left = Math.round((x-w/2.0)*image_width)+'px';
@@ -177,16 +236,45 @@ function BBox ({ x, y, w, h, color, image_width, image_height, current, click })
         if (can_click) click();
         e.stopPropagation();
     };
+    const interactive = can_click || mousemove !== null;
 
     return html`<span class=${`BBox ${current?'editing':''}`} style=${`
         left: ${left}; top: ${top};
         width: ${width}; height: ${height};
         border-color: ${color};
-        cursor: ${can_click?'pointer':'default'};
-        pointer-events: ${can_click?'auto':'none'};
+        cursor: ${interactive?'pointer':'default'};
+        pointer-events: ${interactive?'auto':'none'};
         `}
-        onclick=${do_click}
+        onclick=${do_click} onmousedown=${mousedown} onmouseup=${mouseup}
+        onmousemove=${mousemove}
     />`;
+}
+
+const EDGE_MARGIN = 10;
+function Edge ({ x1, y1, x2, y2, color }) {
+    const left = (x1>x2 ? x2 : x1)-EDGE_MARGIN;
+    const top = (y1>y2 ? y2 : y1)-EDGE_MARGIN;
+    const width = Math.abs(x1-x2)+2*EDGE_MARGIN;
+    const height = Math.abs(y1-y2)+2*EDGE_MARGIN;
+    const markerId = `arrow-${color}`;
+    return html`<svg viewBox=${`${left} ${top} ${width} ${height}`}
+        style=${`position: absolute;
+            left: ${left}px; top: ${top}px;
+            width: ${width}px; height: ${height}px;
+            pointer-events: none;
+        `}>
+        <defs>
+            <marker id=${markerId} viewBox="0 0 10 10" refX="5" refY="5"
+                markerWidth="8" markerHeight="8"
+                orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill=${color} />
+            </marker>
+        </defs>
+        <line x1=${x1} y1=${y1}
+            x2=${x2} y2=${y2}
+            stroke=${color} stroke-width="2"
+            vector-effect='non-scaling-stroke' marker-end='url(#${markerId})' />
+    </svg>`;
 }
 
 function TagTable ({ g_tags, graphemes, colors, editing_grapheme, setEditing,

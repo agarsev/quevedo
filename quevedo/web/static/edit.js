@@ -20,6 +20,7 @@ function App ({ title, target, id, annotation_help, links, anot,
     const is_logo = target == 'logograms';
 
     const graphemes = is_logo?useList(anot.graphemes, changes):null;
+    const edges = is_logo?useList(anot.edges, changes):null;
     const tags = useDict(anot.tags, changes);
 
     const [ message, setMessage ] = useState('');
@@ -88,7 +89,7 @@ function App ({ title, target, id, annotation_help, links, anot,
         <${TagEditor} schema=${is_logo?l_tags:g_tags}
             ...${{meta_tags, flags, meta, tags }} />
         ${is_logo?
-            html`<${LogogramEditor} ...${{id, graphemes, g_tags}} />`
+            html`<${LogogramEditor} ...${{id, graphemes, edges, g_tags}} />`
             :html`<${GraphemeEditor} ...${{id}} />`}
         <pre>${annotation_help}</pre>
     `;
