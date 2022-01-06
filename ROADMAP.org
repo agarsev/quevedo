@@ -36,7 +36,7 @@ logograms, they are useful for annotation rather than processing.
 - [X] Annotation mode selection: box draw, grapheme edit, edge edit 
 - [X] Drag and drop to create edges
 - [ ] Edge tags table
-- [ ] Save edges in backend
+- [X] Save edges in backend
 - [ ] Improve annotation mode: show/hide/select/draw toggle for graphemes and edges
 
 *** TODO Edge probability learning

@@ -36,9 +36,10 @@ function App ({ title, target, id, annotation_help, links, anot,
         changes.setSaving();
         setMessage(Text['saving']);
         if (is_logo) {
-            var body = { meta: meta.dict, graphemes: graphemes.list }
+            var body = { meta: meta.dict, graphemes: graphemes.list,
+                         edges: edges.list };
         } else {
-            var body = { meta: meta.dict, tags: tags.dict }
+            var body = { meta: meta.dict, tags: tags.dict };
         }
         fetch(`api/save/${id.full}`, {
             method: 'POST',

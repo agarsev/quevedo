@@ -45,7 +45,7 @@ class Logogram(Annotation):
         if edges is not None:
             self.edges = [Edge(self.graphemes[e['start']],
                                self.graphemes[e['end']],
-                               e.tags)
+                               e['tags'])
                           if isinstance(e, dict) else e
                           for e in edges]
 
