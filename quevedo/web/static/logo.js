@@ -243,9 +243,11 @@ function Annotation ({ id, graphemes, edges, colors, being_edited, setEditing,
             y1=${graphemes.list[e.start].box[1]*image_height}
             x2=${graphemes.list[e.end].box[0]*image_width}
             y2=${graphemes.list[e.end].box[1]*image_height}
-            color=${colors.list[e.start]} />`)}
+            color=${colors.list[e.start]}
+            highlight=${being_edited && (being_edited.idx==e.start || being_edited.idx==e.end)}
+        />`)}
         ${being_edited && being_edited.end_x !== undefined ?
-            html`<${Edge}
+            html`<${Edge} drawing=${true}
                 x1=${being_edited.start_x} y1=${being_edited.start_y}
                 x2=${being_edited.end_x} y2=${being_edited.end_y}
                 color=${colors.list[being_edited.start]}
@@ -282,17 +284,32 @@ function BBox ({ x, y, w, h, color, image_width, image_height, current,
 }
 
 const EDGE_MARGIN = 10;
-function Edge ({ x1, y1, x2, y2, color }) {
+const SHORTEN_PERCENT = 0.15;
+const MAX_SHORTEN_LENGTH = 20;
+function Edge ({ x1, y1, x2, y2, color, drawing, highlight }) {
     const left = (x1>x2 ? x2 : x1)-EDGE_MARGIN;
     const top = (y1>y2 ? y2 : y1)-EDGE_MARGIN;
     const width = Math.abs(x1-x2)+2*EDGE_MARGIN;
     const height = Math.abs(y1-y2)+2*EDGE_MARGIN;
     const markerId = `arrow-${color}`;
+    // Shorten the arrow a bit
+    let shorten_x = (x2-x1) * SHORTEN_PERCENT;
+    if (shorten_x > MAX_SHORTEN_LENGTH) shorten_x = MAX_SHORTEN_LENGTH;
+    if (shorten_x < -MAX_SHORTEN_LENGTH) shorten_x = -MAX_SHORTEN_LENGTH;
+    let shorten_y = (y2-y1) * SHORTEN_PERCENT;
+    if (shorten_y > MAX_SHORTEN_LENGTH) shorten_y = MAX_SHORTEN_LENGTH;
+    if (shorten_y < -MAX_SHORTEN_LENGTH) shorten_y = -MAX_SHORTEN_LENGTH;
+    const start_x = x1 + shorten_x;
+    const start_y = y1 + shorten_y;
+    const end_x = x2 - (drawing?0:shorten_x);
+    const end_y = y2 - (drawing?0:shorten_y);
+
     return html`<svg viewBox=${`${left} ${top} ${width} ${height}`}
         style=${`position: absolute;
             left: ${left}px; top: ${top}px;
             width: ${width}px; height: ${height}px;
             pointer-events: none;
+            ${highlight?'z-index: 20;':''}
         `}>
         <defs>
             <marker id=${markerId} viewBox="0 0 10 10" refX="5" refY="5"
@@ -301,8 +318,7 @@ function Edge ({ x1, y1, x2, y2, color }) {
                 <path d="M 0 0 L 10 5 L 0 10 z" fill=${color} />
             </marker>
         </defs>
-        <line x1=${x1} y1=${y1}
-            x2=${x2} y2=${y2}
+        <line x1=${start_x} y1=${start_y} x2=${end_x} y2=${end_y}
             stroke=${color} stroke-width="2"
             vector-effect='non-scaling-stroke' marker-end='url(#${markerId})' />
     </svg>`;
