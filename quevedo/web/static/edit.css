@@ -79,16 +79,13 @@ h2 {
     margin-top: 0.5em;
 }
 
-.ModeRadio {
+.ModeSelect {
     font-size: 1rem;
     font-weight: normal;
+    margin-left: 2em;
 }
 
-.ModeRadio:first-child {
-    margin-left: 1em;
-}
-
-.ModeRadio input {
+.ModeSelect input {
     margin: 0 0.5em 0 1em;
 }
 
@@ -128,6 +125,7 @@ h2 {
 
 .BBox.editing {
     outline: 100vw solid rgba(0,0,0,0.2);
+    z-index: 10;
 }
 
 pre {

@@ -24,7 +24,9 @@ export default {
     meta: 'Metadatos', // Additional information for an annotation
     annotation: 'Anotación',
     tags: 'Etiquetas', // Title of tags
-    select: 'Seleccionar grafemas',
-    draw: 'Dibujar cajas',
-    edges: 'Dibujar aristas',
+    boxes: 'Cajas de Grafemas', // Label for box mode
+    edges: 'Aristas', // Label for edge mode
+    hide: 'Ocultar', // Label for hiding the box/edge
+    show: 'Mostrar', // Label for showing the box/edge
+    draw: 'Dibujar', // Label for drawing the box/edge
 };

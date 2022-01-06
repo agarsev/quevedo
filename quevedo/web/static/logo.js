@@ -17,8 +17,21 @@ function getNextColor (color_list) {
 export function LogogramEditor ({ id, graphemes, edges, g_tags, color_list,
     changes }) {
 
-    // modes: select, draw, edges
-    const [ mode, setMode ] = useSavedState('select');
+    // modes: hide, show (and select), draw
+    const [ box_mode, _setBoxMode ] = useSavedState('show_boxes', 'show');
+    const [ edge_mode, _setEdgeMode ] = useSavedState('show_edges', 'show');
+    function setBoxMode (mode) {
+        _setBoxMode(mode);
+        if (mode === 'draw' && edge_mode === 'draw') {
+            _setEdgeMode('show');
+        }
+    }
+    function setEdgeMode (mode) {
+        _setEdgeMode(mode);
+        if (mode === 'draw' && box_mode === 'draw') {
+            _setBoxMode('show');
+        }
+    }
 
     const colors = useList([]);
     colors.next = () => getNextColor(color_list);
@@ -33,7 +46,7 @@ export function LogogramEditor ({ id, graphemes, edges, g_tags, color_list,
     const [ being_edited, setEditing ] = useState(null);
     const stop_editing = () => setEditing(null);
     useEffect(() => {
-        if (mode == 'draw') {
+        if (box_mode == 'draw' || edge_mode == 'draw') {
             // if drawing, on mouse up inside, we stop drawing but keep selected box. On mouse down out, stop
             const stop_but_keep = () => setEditing(es => es!=null?({ idx: es.idx }):null);
             document.addEventListener('mouseup', stop_but_keep);
@@ -55,7 +68,7 @@ export function LogogramEditor ({ id, graphemes, edges, g_tags, color_list,
                 document.removeEventListener('touchend', stop_editing);
             };
         }
-    }, [mode]);
+    }, [box_mode, edge_mode]);
 
     const removeGrapheme = i => {
         const action = `GRAPH_RM_${Math.random()}`;
@@ -89,34 +102,35 @@ export function LogogramEditor ({ id, graphemes, edges, g_tags, color_list,
         });
     };
 
-    function ModeRadio ({ value, label }) {
-        return html`<label class="ModeRadio">
-            <input type=radio name=mode 
-            checked=${mode==value} onchange=${e => {
-                setMode(value);
-                e.stopPropagation();
-            }} />
-            ${label}
-        </label>`;
-    }
-
     return html`
         <h2 class="AnnotationHeader">${Text['annotation']}
-            <${ModeRadio} value="select" label=${Text['select'] || 'select'} />
-            <${ModeRadio} value="draw" label=${Text['draw'] || 'draw'} />
-            <${ModeRadio} value="edges" label=${Text['edges'] || 'edges'} />
+            <${ModeSelect} value=${box_mode} label=${Text['boxes']} set=${setBoxMode} />
+            <${ModeSelect} value=${edge_mode} label=${Text['edges']} set=${setEdgeMode} />
         </h2>
         <div class="GraphemeList">
         <${Annotation} ...${{id, graphemes, edges, colors, being_edited,
-            setEditing, addEdge, mode}} />
+            setEditing, addEdge, box_mode, edge_mode }} />
         <${TagTable} editing_grapheme=${being_edited}
             ...${{g_tags, graphemes, colors, setEditing, removeGrapheme}} />
         </div>
     `;
 }
 
-function Annotation ({ id, graphemes, edges, colors, being_edited, setEditing, addEdge,
-    mode }) {
+function ModeSelect ({ value, label, set }) {
+    return html`<label class="ModeSelect">
+        ${label}: <select value=${value} onchange=${e => {
+            set(e.target.value);
+            e.stopPropagation();
+        }}>
+            <option value="hide">${Text['hide']}</option>
+            <option value="show">${Text['show']}</option>
+            <option value="draw">${Text['draw']}</option>
+        </select>
+    </label>`;
+}
+
+function Annotation ({ id, graphemes, edges, colors, being_edited, setEditing,
+    addEdge, box_mode, edge_mode }) {
 
     // Image bounding rectangle 
     const image_rect = useRef(null);
@@ -197,8 +211,9 @@ function Annotation ({ id, graphemes, edges, colors, being_edited, setEditing, a
         e.preventDefault();
     };
 
-    const mouse_down = mode == 'draw' ? start_rect_draw : null;
-    const mouse_move = mode == 'draw' ? rect_draw : mode == 'edges' ? edge_draw : null;
+    const mouse_down = box_mode == 'draw' ? start_rect_draw : e => e.preventDefault();
+    const mouse_move = box_mode == 'draw' ? rect_draw : 
+                       edge_mode == 'draw' ? edge_draw : null;
 
     return html`<div class="Annotation">
         <img src="img/${id.full}.png"
@@ -208,20 +223,22 @@ function Annotation ({ id, graphemes, edges, colors, being_edited, setEditing, a
             ontouchstart=${mouse_down}
             ontouchmove=${mouse_move}
         />
-        ${graphemes.list.map((s, i) => html`<${BBox}
+        ${(box_mode != 'hide' || edge_mode == 'draw') && graphemes.list.map((s, i) =>
+            html`<${BBox}
                 x=${s.box[0]} y=${s.box[1]}
                 w=${s.box[2]} h=${s.box[3]}
-                color=${colors.list[i]}
+                color=${box_mode != 'hide' ? colors.list[i] : 'transparent'}
                 image_width=${image_width}
                 image_height=${image_height}
                 current=${being_edited && being_edited.idx==i}
-                click=${mode=='select'?() => setEditing({ idx: i }):null}
-                mousedown=${mode=='edges'?e => start_edge_draw(e, i):null}
+                click=${(box_mode=='show' && edge_mode!='draw')?
+                        () => setEditing({ idx: i }):null}
+                mousedown=${edge_mode=='draw'?e => start_edge_draw(e, i):null}
                 mousemove=${mouse_move}
-                mouseup=${mode=='edges' && being_edited!==null ? 
+                mouseup=${edge_mode=='draw' && being_edited!==null ? 
                     e => edge_finish(e, i):null}
         />`)}
-        ${edges.list.map(e => html`<${Edge}
+        ${edge_mode != 'hide' && edges.list.map(e => html`<${Edge}
             x1=${graphemes.list[e.start].box[0]*image_width}
             y1=${graphemes.list[e.start].box[1]*image_height}
             x2=${graphemes.list[e.end].box[0]*image_width}
@@ -250,7 +267,7 @@ function BBox ({ x, y, w, h, color, image_width, image_height, current,
         if (can_click) click();
         e.stopPropagation();
     };
-    const interactive = can_click || mousemove !== null;
+    const interactive = can_click || mousedown !== null;
 
     return html`<span class=${`BBox ${current?'editing':''}`} style=${`
         left: ${left}; top: ${top};
