@@ -14,7 +14,8 @@ function getNextColor (color_list) {
     return r;
 }
 
-export function LogogramEditor ({ id, graphemes, edges, g_tags, color_list }) {
+export function LogogramEditor ({ id, graphemes, edges, g_tags, color_list,
+    changes }) {
 
     // modes: select, draw, edges
     const [ mode, setMode ] = useSavedState('select');
@@ -57,10 +58,24 @@ export function LogogramEditor ({ id, graphemes, edges, g_tags, color_list }) {
     }, [mode]);
 
     const removeGrapheme = i => {
-        // TODO FIX EDGES
+        const action = `GRAPH_RM_${Math.random()}`;
         setEditing(null);
-        graphemes.remove(i);
+        changes.push(() => {
+            graphemes._set(graphemes.list);
+            colors.set(colors.list);
+            edges._set(edges.list);
+        }, action);
+        graphemes.remove(i, action);
         colors.remove(i);
+        let el = edges.list.slice()
+            .filter(e => e.start != i && e.end != i);
+        for (let j = 0; j < el.length; j++) {
+            let e = el[j];
+            if (e.start > i) e = {...e, start: e.start-1};
+            if (e.end > i) e = {...e, end: e.end-1};
+            el[j] = e;
+        }
+        edges.set(el, action);
     };
 
     const addEdge = (i, j) => {
@@ -324,7 +339,7 @@ function TagTable ({ g_tags, graphemes, colors, editing_grapheme, setEditing,
 function GraphemeEntry ({ tags, changeTag, columns, remove,
         color, changeColor, markEditing, editing, navigate }) {
     return html`<tr class=${`GraphemeEntry ${editing?'editing':''}`}
-        onmousedown=${markEditing} onclick=${markEditing}>
+        onclick=${markEditing}>
         <td><input type=color value=${color}
             oninput=${e => changeColor(e.target.value)} /></td>
         ${columns.map(c => html`<td><input type=text
@@ -332,6 +347,6 @@ function GraphemeEntry ({ tags, changeTag, columns, remove,
             oninput=${e => changeTag(c, e.target.value)}
             onkeydown=${navigate}
             onfocus=${markEditing} /></td>`)}
-        <td><button onclick=${remove}>🗑️</button></td>
+        <td><button onclick=${e => {remove(); e.stopPropagation();}}>🗑️</button></td>
     </tr>`;
 }

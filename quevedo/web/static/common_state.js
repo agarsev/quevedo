@@ -66,7 +66,7 @@ export function useList (initial_value, change_stack) {
             change_stack.push(() => setList(list), action);
             setList(l);
         } : setList;
-    return { list, set,
+    return { list, set, _set: setList,
         add: (v, action) => set(list.concat([v]), action),
         remove: (i, action) => {
             let nl = list.slice(); nl.splice(i, 1);

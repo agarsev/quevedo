@@ -89,7 +89,8 @@ function App ({ title, target, id, annotation_help, links, anot,
         <${TagEditor} schema=${is_logo?l_tags:g_tags}
             ...${{meta_tags, flags, meta, tags }} />
         ${is_logo?
-            html`<${LogogramEditor} ...${{id, graphemes, edges, g_tags, color_list}} />`
+            html`<${LogogramEditor} ...${{id, graphemes, edges, g_tags,
+                color_list, changes}} />`
             :html`<${GraphemeEditor} ...${{id}} />`}
         <pre>${annotation_help}</pre>
     `;
