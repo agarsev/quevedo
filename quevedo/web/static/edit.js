@@ -13,7 +13,7 @@ const { useState } = preactHooks;
 preact.render(html`<${App} ...${window.quevedo_data} />`, document.body);
 
 function App ({ title, target, id, annotation_help, links, anot,
-    functions, g_tags, l_tags, meta_tags, flags, color_list }) {
+    functions, g_tags, l_tags, e_tags, meta_tags, flags, color_list }) {
 
     const changes = useChangeStack();
     const meta = useDict(anot.meta, changes);
@@ -91,7 +91,7 @@ function App ({ title, target, id, annotation_help, links, anot,
             ...${{meta_tags, flags, meta, tags }} />
         ${is_logo?
             html`<${LogogramEditor} ...${{id, graphemes, edges, g_tags,
-                color_list, changes}} />`
+                e_tags, color_list, changes}} />`
             :html`<${GraphemeEditor} ...${{id}} />`}
         <pre>${annotation_help}</pre>
     `;

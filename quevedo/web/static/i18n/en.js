@@ -24,8 +24,10 @@ export default {
     meta: 'Metadata', // Additional information for an annotation
     annotation: 'Annotation', // Title of annotation
     tags: 'Tags', // Title of tags
-    boxes: 'Bounding Boxes', // Label for box mode
-    edges: 'Edges', // Label for edge mode
+    boxes: 'Bounding Boxes',
+    edges: 'Edges',
+    graphemes: 'Graphemes',
+    graph_and_edges: 'All', // Title for graph and edges tags
     hide: 'Hide', // Label for hiding the box/edge
     show: 'Show', // Label for showing the box/edge
     draw: 'Draw', // Label for drawing the box/edge

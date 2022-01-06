@@ -5,9 +5,9 @@ title = "Toy Arithmetic"
 description = """ 
 Toy dataset of Spanish-style elementary arithmetic for demonstration purposes.
 """
-g_tags = [ "type", "value",]
+g_tags = [ "type", "value" ]
 l_tags = []
-e_tags = []
+e_tags = [ "function", "order" ]
 meta_tags = [ "filename" ]
 
 flags = { done = "✔️", problem = "⚠️", notes = "📝" }

@@ -30,12 +30,13 @@ logograms, they are useful for annotation rather than processing.
 - [X] Add edge list to logogram
 - [X] Save and load from json
 
-*** TODO Web annotation
+*** DONE Web annotation
+    CLOSED: [2022-01-06 Thu 21:45]
 
 - [X] Separate meta tags and logogram tags
 - [X] Annotation mode selection: box draw, grapheme edit, edge edit 
 - [X] Drag and drop to create edges
-- [ ] Edge tags table
+- [X] Edge tags table
 - [X] Save edges in backend
 - [X] Improve annotation mode: hide/show/draw toggle for graphemes and edges
 

@@ -24,8 +24,10 @@ export default {
     meta: 'Metadatos', // Additional information for an annotation
     annotation: 'Anotación',
     tags: 'Etiquetas', // Title of tags
-    boxes: 'Cajas de Grafemas', // Label for box mode
-    edges: 'Aristas', // Label for edge mode
+    boxes: 'Cajas de Grafemas',
+    edges: 'Aristas',
+    graphemes: 'Grafemas',
+    graph_and_edges: 'Todas', // Title for graph and edges tags
     hide: 'Ocultar', // Label for hiding the box/edge
     show: 'Mostrar', // Label for showing the box/edge
     draw: 'Dibujar', // Label for drawing the box/edge

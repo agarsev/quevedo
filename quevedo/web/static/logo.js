@@ -14,23 +14,43 @@ function getNextColor (color_list) {
     return r;
 }
 
-export function LogogramEditor ({ id, graphemes, edges, g_tags, color_list,
-    changes }) {
+const ANNOT_OPTIONS = [
+    { value: 'hide', label: Text['hide'] },
+    { value: 'show', label: Text['show'] },
+    { value: 'draw', label: Text['draw'] },
+];
+const TAG_OPTIONS = [
+    { value: 'graphemes', label: Text['graphemes'] },
+    { value: 'edges', label: Text['edges'] },
+    { value: 'both', label: Text['graph_and_edges'] },
+];
 
-    // modes: hide, show (and select), draw
+export function LogogramEditor ({ id, graphemes, edges, g_tags, e_tags,
+    color_list, changes }) {
+
+    // ANNOT_OPTIONS
     const [ box_mode, _setBoxMode ] = useSavedState('show_boxes', 'show');
     const [ edge_mode, _setEdgeMode ] = useSavedState('show_edges', 'show');
+    const [ tag_mode, _setTagMode ] = useSavedState('show_tags', 'graphemes');
+
     function setBoxMode (mode) {
         _setBoxMode(mode);
-        if (mode === 'draw' && edge_mode === 'draw') {
-            _setEdgeMode('show');
+        if (mode === 'draw') {
+            if (edge_mode === 'draw') _setEdgeMode('show');
+            if (tag_mode == 'edges') _setTagMode('graphemes');
         }
     }
     function setEdgeMode (mode) {
         _setEdgeMode(mode);
-        if (mode === 'draw' && box_mode === 'draw') {
-            _setBoxMode('show');
+        if (mode === 'draw') {
+            if (box_mode === 'draw') _setBoxMode('show');
+            if (tag_mode == 'graphemes') _setTagMode('edges');
         }
+    }
+    function setTagMode (mode) {
+        _setTagMode(mode);
+        if (mode === 'edges' && box_mode === 'draw') _setBoxMode('show');
+        if (mode === 'graphemes' && edge_mode === 'draw') _setEdgeMode('show');
     }
 
     const colors = useList([]);
@@ -104,27 +124,34 @@ export function LogogramEditor ({ id, graphemes, edges, g_tags, color_list,
 
     return html`
         <h2 class="AnnotationHeader">${Text['annotation']}
-            <${ModeSelect} value=${box_mode} label=${Text['boxes']} set=${setBoxMode} />
-            <${ModeSelect} value=${edge_mode} label=${Text['edges']} set=${setEdgeMode} />
+            <${ModeSelect} value=${box_mode} label=${Text['boxes']} set=${setBoxMode} options=${ANNOT_OPTIONS} />
+            <${ModeSelect} value=${edge_mode} label=${Text['edges']} set=${setEdgeMode} options=${ANNOT_OPTIONS} />
+            <${ModeSelect} value=${tag_mode} label=${Text['tags']} set=${setTagMode} options=${TAG_OPTIONS} />
         </h2>
         <div class="GraphemeList">
         <${Annotation} ...${{id, graphemes, edges, colors, being_edited,
             setEditing, addEdge, box_mode, edge_mode }} />
-        <${TagTable} editing_grapheme=${being_edited}
-            ...${{g_tags, graphemes, colors, setEditing, removeGrapheme}} />
+        ${tag_mode!='edges' && html`<${TagTable} mode="graphemes"
+            columns=${g_tags}
+            objects=${graphemes}
+            remove=${removeGrapheme}
+            ...${{colors, being_edited, setEditing}} />`}
+        ${tag_mode!='graphemes' && html`<${TagTable} mode="edges"
+            columns=${e_tags}
+            objects=${edges}
+            remove=${i => edges.remove(i)}
+            ...${{colors, being_edited, setEditing}} />`}
         </div>
     `;
 }
 
-function ModeSelect ({ value, label, set }) {
+function ModeSelect ({ value, label, set, options }) {
     return html`<label class="ModeSelect">
         ${label}: <select value=${value} onchange=${e => {
             set(e.target.value);
             e.stopPropagation();
         }}>
-            <option value="hide">${Text['hide']}</option>
-            <option value="show">${Text['show']}</option>
-            <option value="draw">${Text['draw']}</option>
+        ${options.map(({ value, label }) => html`<option value=${value}>${label}</option>`)}
         </select>
     </label>`;
 }
@@ -231,6 +258,9 @@ function Annotation ({ id, graphemes, edges, colors, being_edited, setEditing,
                 image_width=${image_width}
                 image_height=${image_height}
                 current=${being_edited && being_edited.idx==i}
+                dim=${(being_edited?.idx != null && being_edited.idx!=i) ||
+                      (being_edited?.ide != null && 
+                       being_edited.start!=i && being_edited.end!=i)}
                 click=${(box_mode=='show' && edge_mode!='draw')?
                         () => setEditing({ idx: i }):null}
                 mousedown=${edge_mode=='draw'?e => start_edge_draw(e, i):null}
@@ -238,13 +268,16 @@ function Annotation ({ id, graphemes, edges, colors, being_edited, setEditing,
                 mouseup=${edge_mode=='draw' && being_edited!==null ? 
                     e => edge_finish(e, i):null}
         />`)}
-        ${edge_mode != 'hide' && edges.list.map(e => html`<${Edge}
+        ${edge_mode != 'hide' && edges.list.map((e, i) => html`<${Edge}
             x1=${graphemes.list[e.start].box[0]*image_width}
             y1=${graphemes.list[e.start].box[1]*image_height}
             x2=${graphemes.list[e.end].box[0]*image_width}
             y2=${graphemes.list[e.end].box[1]*image_height}
             color=${colors.list[e.start]}
             highlight=${being_edited && (being_edited.idx==e.start || being_edited.idx==e.end)}
+            dim=${(being_edited?.ide != null && being_edited.ide!=i) ||
+                  (being_edited?.idx != null &&
+                   e.start!=being_edited.idx && e.end!=being_edited.idx)}
         />`)}
         ${being_edited && being_edited.end_x !== undefined ?
             html`<${Edge} drawing=${true}
@@ -255,7 +288,7 @@ function Annotation ({ id, graphemes, edges, colors, being_edited, setEditing,
     </div>`;
 }
 
-function BBox ({ x, y, w, h, color, image_width, image_height, current,
+function BBox ({ x, y, w, h, color, image_width, image_height, dim,
         click, mousemove, mousedown, mouseup }) {
 
     if (x === undefined) return null;
@@ -264,14 +297,14 @@ function BBox ({ x, y, w, h, color, image_width, image_height, current,
     const width = Math.round(w*1.0*image_width)+'px';
     const height = Math.round(h*1.0*image_height)+'px';
 
-    const can_click = (click !== null) && !current;
+    const can_click = click !== null;
     const do_click = e => {
         if (can_click) click();
         e.stopPropagation();
     };
     const interactive = can_click || mousedown !== null;
 
-    return html`<span class=${`BBox ${current?'editing':''}`} style=${`
+    return html`<span class=${`BBox ${dim?'dim':''}`} style=${`
         left: ${left}; top: ${top};
         width: ${width}; height: ${height};
         border-color: ${color};
@@ -286,7 +319,7 @@ function BBox ({ x, y, w, h, color, image_width, image_height, current,
 const EDGE_MARGIN = 10;
 const SHORTEN_PERCENT = 0.15;
 const MAX_SHORTEN_LENGTH = 20;
-function Edge ({ x1, y1, x2, y2, color, drawing, highlight }) {
+function Edge ({ x1, y1, x2, y2, color, drawing, dim }) {
     const left = (x1>x2 ? x2 : x1)-EDGE_MARGIN;
     const top = (y1>y2 ? y2 : y1)-EDGE_MARGIN;
     const width = Math.abs(x1-x2)+2*EDGE_MARGIN;
@@ -305,11 +338,11 @@ function Edge ({ x1, y1, x2, y2, color, drawing, highlight }) {
     const end_y = y2 - (drawing?0:shorten_y);
 
     return html`<svg viewBox=${`${left} ${top} ${width} ${height}`}
-        style=${`position: absolute;
-            left: ${left}px; top: ${top}px;
+        class="Edge ${dim?'dim':''}"
+        style=${`left: ${left}px; top: ${top}px;
             width: ${width}px; height: ${height}px;
             pointer-events: none;
-            ${highlight?'z-index: 20;':''}
+            color: ${color};
         `}>
         <defs>
             <marker id=${markerId} viewBox="0 0 10 10" refX="5" refY="5"
@@ -319,32 +352,44 @@ function Edge ({ x1, y1, x2, y2, color, drawing, highlight }) {
             </marker>
         </defs>
         <line x1=${start_x} y1=${start_y} x2=${end_x} y2=${end_y}
-            stroke=${color} stroke-width="2"
+            stroke=${color}
             vector-effect='non-scaling-stroke' marker-end='url(#${markerId})' />
     </svg>`;
 }
 
-function TagTable ({ g_tags, graphemes, colors, editing_grapheme, setEditing,
-        removeGrapheme }) {
+function TagTable ({ mode, columns, objects, colors, being_edited, setEditing, remove }) {
+    const markEditing = mode == 'graphemes'?
+        (idx) => setEditing({ idx }):
+        (ide) => setEditing({ ide,
+            start: objects.list[ide].start,
+            end: objects.list[ide].end });
     return html`<div><table>
         <thead><tr><th />
-            ${g_tags.map(c => html`<th>${c}</th>`)}
+            ${columns.map(c => html`<th>${c}</th>`)}
             <th />
         </tr></thead>
-        <tbody>${graphemes.list.map((s, i) => {
-            const current = editing_grapheme !== null && editing_grapheme.idx === i;
+        <tbody>${objects.list.map((s, i) => {
+            let highlight = '';
+            if (mode == 'graphemes' && being_edited?.idx == i) {
+                highlight = 'editing';
+            } else if (mode == 'edges' && being_edited?.ide == i) {
+                highlight = 'editing';
+            } else if (mode == 'edges' && (being_edited?.idx == s.start || being_edited?.idx == s.end)) {
+                highlight = 'related';
+            } else if (mode == 'graphemes' && (being_edited?.start == i || being_edited?.end == i)) {
+                highlight = 'related';
+            }
             return html`<${GraphemeEntry} tags=${s.tags || {}}
-                changeTag=${(k, v) => graphemes.update_fn(i,
+                changeTag=${(k, v) => objects.update_fn(i,
                         s => ({ ...s, tags: {...s.tags, [k]: v}}),
-                        `GRAPH_${i}_UPD_TAG_${k}`)}
-                columns=${g_tags}
-                color=${colors.list[i]} changeColor=${c => colors.update(i, c)}
-                remove=${() => removeGrapheme(i)}
-                markEditing=${e => {
-                    setEditing({ idx: i });
-                    e.stopPropagation();
-                }}
-                editing=${current}
+                        `${mode}_${i}_UPD_TAG_${k}`)}
+                columns=${columns}
+                colors=${colors}
+                color1=${mode=='graphemes'?i:s.start}
+                color2=${mode=='edges'?s.end:null}
+                remove=${() => remove(i)}
+                markEditing=${e => { markEditing(i); e.stopPropagation(); }}
+                highlight=${highlight}
                 navigate=${e => { switch(e.key) {
                     case "Enter": setEditing(null); break;
                     case "ArrowDown": {
@@ -370,13 +415,17 @@ function TagTable ({ g_tags, graphemes, colors, editing_grapheme, setEditing,
 }
 
 function GraphemeEntry ({ tags, changeTag, columns, remove,
-        color, changeColor, markEditing, editing, navigate }) {
-    return html`<tr class=${`GraphemeEntry ${editing?'editing':''}`}
+        colors, color1, color2, markEditing, highlight, navigate }) {
+    return html`<tr class=${`GraphemeEntry ${highlight}`}
         onclick=${markEditing}>
-        <td><input type=color value=${color}
-            oninput=${e => changeColor(e.target.value)} /></td>
+        <td>
+            <input type=color value=${colors.list[color1]}
+                oninput=${e => colors.update(color1, e.target.value)} />
+            ${color2!==null?html`<input type=color value=${colors.list[color2]}
+                oninput=${e => colors.update(color2, e.target.value)} />`:''}
+        </td>
         ${columns.map(c => html`<td><input type=text
-            placeholder=${c} tabIndex=1 value=${tags[c]}
+            placeholder=${c} tabIndex=1 value=${tags[c] || ''}
             oninput=${e => changeTag(c, e.target.value)}
             onkeydown=${navigate}
             onfocus=${markEditing} /></td>`)}

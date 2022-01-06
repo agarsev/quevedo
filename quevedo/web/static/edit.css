@@ -56,7 +56,7 @@ h2 {
     margin-right: 1em;
 }
 
-.GraphemeList div:nth-child(2) {
+.GraphemeList div:not(:first-child) {
     flex: 1;
     display: inline-block;
 }
@@ -89,9 +89,8 @@ h2 {
     margin: 0 0.5em 0 1em;
 }
 
-.GraphemeEntry.editing {
-    background-color: #aaf;
-}
+.GraphemeEntry.editing { background-color: #aaf; }
+.GraphemeEntry.related { background-color: #FFD5A9; }
 
 .GraphemeEntry td:nth-child(1),
 .GraphemeEntry td:nth-last-child(1) {
@@ -100,6 +99,10 @@ h2 {
 
 .GraphemeEntry td:first-child{
     padding-left: 2vw;
+}
+
+.GraphemeEntry td {
+    white-space: nowrap;
 }
 
 .GraphemeEntry input[type="text"] { width: 100%; }
@@ -123,9 +126,20 @@ h2 {
     border: 2px solid black;
 }
 
-.BBox.editing {
-    outline: 100vw solid rgba(0,0,0,0.2);
-    z-index: 10;
+.BBox.dim {
+    border: 1px dashed black;
+}
+
+.Edge {
+    position: absolute;
+}
+
+.Edge line {
+    stroke-width: 2px;
+}
+.Edge.dim line {
+    stroke-width: 1px;
+    stroke-dasharray: 3px;
 }
 
 pre {
