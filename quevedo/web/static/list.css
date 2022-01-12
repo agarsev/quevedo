@@ -77,3 +77,15 @@ body > h2 {
     font-size: 5vw;
     margin: auto;
 }
+
+.Filter .flag_icon {
+    font-size: 1.2em;
+}
+
+.Filter label {
+    margin-left: 1em;
+}
+
+.Filter input {
+    margin-right: 1ex;
+}

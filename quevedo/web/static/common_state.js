@@ -95,10 +95,15 @@ export function useDict (initial_value, change_stack) {
 }
 
 export function useSavedState (name, default_value) {
-    const saved = localStorage.getItem('quevedo.'+name);
+    let saved;
+    try {
+        saved = JSON.parse(localStorage.getItem('quevedo.'+name));
+    } catch {
+        saved = localStorage.getItem('quevedo.'+name);
+    }
     const [ state, setState ] = useState(saved || default_value);
     return [ state, v => {
-        localStorage.setItem('quevedo.'+name, v);
+        localStorage.setItem('quevedo.'+name, JSON.stringify(v));
         setState(v);
     } ];
 }

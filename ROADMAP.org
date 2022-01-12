@@ -66,9 +66,14 @@ trees?
 
 - [ ] Document new config and dataset version
 
+** Web interface improvements
+
+*** DONE Quick filter annotations in listing according to flags.
+    CLOSED: [2022-01-13 Thu 00:06]
+
 ** Other
 
-*** User configurable colors
+*** DONE User configurable colors
 
 The color list to use in the web annotation tool can be configured in the
 config.toml.
@@ -77,7 +82,9 @@ config.toml.
 
 ** TODO Web interface improvements
 
-*** TODO Filter/search annotations in listing according to some tag(s).
+*** TODO Search annotations in listing according to tags or metadata.
+
+Beyond the quick filter, this needs a new view.
 
 *** TODO Autosuggest values for tagging
 maybe use https://developer.mozilla.org/en-US/docs/Web/HTML/Element/datalist

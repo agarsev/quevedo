@@ -17,6 +17,10 @@ export default {
     name_for_subset: 'Name of the new subset',
     list_logo: 'Logograms',
     list_graph: 'Graphemes',
+    quick_filter: 'Quick filter', // Filter by flag
+    all: 'All', // Every filter must match
+    any: 'Any', // At least one filter must match
+    none: 'None', // No filter can match
     // EDIT.js
     warning_save: 'Warning: unsaved changes will be lost', // Warning when trying to leave without saving
     saving: 'Saving...', // Message when sending changes to server

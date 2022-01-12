@@ -240,7 +240,8 @@ def index(target, dir):
         'g_tags': ds.config['g_tags'],
         'l_tags': ds.config['l_tags'],
         'e_tags': ds.config['e_tags'],
-        'meta_tags': ds.config['meta_tags']
+        'meta_tags': ds.config['meta_tags'],
+        'flags': ds.config['flags'],
     }
 
     if dir is None:

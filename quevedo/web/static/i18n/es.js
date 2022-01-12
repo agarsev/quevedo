@@ -17,6 +17,10 @@ export default {
     name_for_subset: 'Nombre del nuevo conjunto',
     list_logo: 'Logogramas',
     list_graph: 'Grafemas',
+    quick_filter: 'Filtro rápido', // Filter by flag
+    all: 'Todos', // Every filter must match
+    any: 'Alguno', // At least one filter must match
+    none: 'Ninguno', // No filter can match
     // EDIT.js
     warning_save: 'Atención: se perderán los cambios sin guardar', // Warning when trying to leave without saving
     saving: 'Guardando...', // Message when sending changes to server
