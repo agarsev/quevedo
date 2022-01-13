@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+title: "Quevedo: Annotation and Processing of Graphical Languages Datasets"
+authors:
+  - family-names: Sevilla
+    given-names: Antonio F. G.
+    orcid: "https://orcid.org/0000-0001-9025-1724"
+abstract: |
+    Python tool for managing datasets of images with compositional semantics,
+    with a focus on the training and evaluation of machine learning algorithms
+    on these images.
+version: 1.2.0
+date-released: "2021-12-10"
+url: "https://agarsev.github.io/quevedo"
+message: |
+    If you use this software, please cite the repository, but also don't
+    hesitate to get in touch!
