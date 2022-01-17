@@ -2,9 +2,9 @@
 
 # Quevedo
 
-Quevedo is a python tool for managing datasets of images with compositional
-semantics, with a focus on the training and evaluation of machine learning
-algorithms on these images.
+Quevedo is a python tool for creating, annotating and managing datasets of
+graphical languages, with a focus on the training and evaluation of machine
+learning algorithms for their recognition.
 
 Quevedo is part of the [VisSE project](https://www.ucm.es/visse). The code can
 be found at [GitHub](https://github.com/agarsev/quevedo), and [detailed
