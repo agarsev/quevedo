@@ -50,6 +50,7 @@ which make up a logogram.
 ### ![mkapi](quevedo.annotation.Grapheme|short)
 ### ![mkapi](quevedo.annotation.Logogram|short)
 ### ![mkapi](quevedo.annotation.logogram.BoundGrapheme|short)
+### ![mkapi](quevedo.annotation.logogram.Edge|short)
 
 ## Networks
 

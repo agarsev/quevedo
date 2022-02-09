@@ -2,6 +2,6 @@
 # Licensed under the Open Software License version 3.0
 
 from quevedo.dataset import Dataset
-from quevedo.annotation import Annotation, Target, Logogram, Grapheme, BoundGrapheme
+from quevedo.annotation import Annotation, Target, Logogram, Grapheme, BoundGrapheme, Edge
 from quevedo.network.network import Network
 from quevedo.pipeline import Pipeline

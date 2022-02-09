@@ -1,4 +1,4 @@
-# 2021-04-29 Antonio F. G. Sevilla <afgs@ucm.es>
+# 2021-04-29 Antonio F. G. Sevrlla <afgs@ucm.es>
 # Licensed under the Open Software License version 3.0
 
 from .annotation import Annotation, Target
@@ -132,6 +132,9 @@ class Edge:
     the dataset's `e_tags` field.'''
 
     def __init__(self, start: BoundGrapheme, end: BoundGrapheme, tags: dict = {}):
-        self.start = start
-        self.end = end
-        self.tags = tags
+        #: [bound grapheme](#quevedoannotationlogogramboundgrapheme) origin of the edge
+        self.start = start  # type: BoundGrapheme
+        #: [bound grapheme](#quevedoannotationlogogramboundgrapheme) end of the edge
+        self.end = end  # type: BoundGrapheme
+        #: annotated tags for this edge.
+        self.tags = tags  # type: dict[str,str]

@@ -27,28 +27,32 @@ hashed).
 
 ## Annotation schema
 
-Two important options in the configuration file are `tag_schema` and
-`meta_tags`. These describe the schema of the dataset annotation, and are lists
-of strings with the names of the different tags (features) to annotate.
+The annotation schema of a dataset is a complex set of information and
+decisions, but to Quevedo, the important information is the featuers that
+graphemes, logograms and edges can have. These are lists of strings, and each
+string represents a possible feature for an annotation object. Each concrete
+object, then, has a particular value (another string) for each of the
+appropriate features in its schema. There are four schemas:
 
-The `meta_tags` are used to add information to each annotation file, such as
-filename, author of the annotation, but also maybe meaning of the transcription,
-etc. They are common to both logograms and graphemes.  The tags in `tag_schema`
-is a list of the different tags or features that each grapheme, either isolated
-or bound, can have. Both meta tags and grapheme tags are represented as
-dictionary objects both in the annotation files (in `json` format) and in the
-code (python `dict`s).
+- `g_tags`: Possible features for each grapheme, either bound or isolated.
+- `l_tags`: Features for each of the logograms.
+- `e_tags`: Features for the edges of the logogram graph.
+- `meta_tags`: Additional information that can be stored for isolated annotation
+    files, either graphemes or logograms, but not for bound graphemes.
+
+Tags are represented as dictionary objects both in the annotation files (in
+`json` format) and in the code (python `dict`s).
 
 !!! warning
-    In older versions of Quevedo (before v1.1), tags were stored as a list instead of
-    a dictionary. If your dataset is using this old structure, Quevedo will warn
-    you. Please run the [`migrate`](cli.md#migrate) command to upgrade the dataset.
+    In versions of Quevedo before v1.1, tags were stored as a list instead of
+    a dictionary. Before v1.3, there was no logogram annotation schema. If your
+    dataset is using an old structure, Quevedo will warn you. Please run the
+    [`migrate`](cli.md#migrate) command to upgrade the dataset.
 
-Isolated graphemes (in the `graphemes` directory) have a single dictionary of
-tags associated with the transcription. Conversely, logograms have a list of
-graphemes that can be found in them. This list includes the grapheme position,
-and also the tag dictionary in the same format and with the same meaning as for
-isolated graphemes.
+In the annotation file, apart from their own `tags`, logograms have a list of
+graphemes found within them. These bound graphemes have their own `tags` from
+the `g_tags` schema, and an additional piece of information: the coordinates
+where they can be found within the logogram image (a.k.a bounding boxes).
 
 ## Other options
 

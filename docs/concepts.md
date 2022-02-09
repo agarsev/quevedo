@@ -53,19 +53,24 @@ One of the characteristics of visual writing systems is that they can encode
 multiple meanings within a single symbol, taking advantage of the possibilities
 offered by the visual medium. In Quevedo, annotation consist not of a single
 tag, but rather of a dictionary of tag names and values. This allows different
-systems to peruse different aspects of the symbols' meaning, and also lets
+systems to use different aspects of the symbols' meaning, and also lets
 researchers experiment with different, simultaneous and possibly overlapping
 annotation schemas for the dataset.
 
-Each grapheme in the dataset has one such dictionary of tags associated, manually
-entered by an annotator or automatically filled by some process. Logograms, on
-the other hand, don't have these tags directly, but rather in the graphemes they
-contain. Logograms are annotated by marking the different graphemes contained
-within them, and then tagging each grapheme with the tags from the tag schema.
-Additionally, both graphemes and logograms can have "meta" tags which represent
-other information. This can be used to store information about the filenames,
-the source of the data, or in the case of logograms, information about the
-logogram itself not associated with any particular grapheme.
+Each annotation, both logograms and graphemes, has one such dictionary of tags
+associated, manually entered by an annotator or automatically filled by some
+process. Logograms, additionally, have a list of graphemes found within them,
+and each of these also has a dictionary of tags. Independent annotations (so,
+not the graphemes within logograms) can also have "meta" tags which can be used
+to represent other information, such as source of the annotation, status, notes,
+etc.
+
+To represent the spatial relations between graphemes, logograms also contain
+a graph of edges between the graphemes. These edges again have their own
+annotation schema and dictionary of tags.
+
+!!! note "New in v.3"
+    Logogram graphs are new in version 1.3.
 
 ![Logogram annotation](img/web_logogram_anno.png)
 
