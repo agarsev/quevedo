@@ -6,6 +6,7 @@
 
 - [ ] make extend recursive, if extend extends an extension
 - [ ] merge instead of replace configs
+- [ ] doc
 
 ** TODO Grapheme graphs in the logogram
 
@@ -40,7 +41,34 @@ logograms, they are useful for annotation rather than processing.
 - [X] Save edges in backend
 - [X] Improve annotation mode: hide/show/draw toggle for graphemes and edges
 
-*** TODO Edge probability learning
+*** TODO Access the graph and examples
+
+- [ ] Utility functions for navigating/getting graphemes from edges
+- [ ] Example script merging graphemes with some functor
+
+*** TODO Test
+
+- [ ] Test migration
+
+*** TODO Docs
+
+- [ ] Document new config and dataset version
+
+** DONE Web interface improvements
+
+*** DONE Quick filter annotations in listing according to flags.
+    CLOSED: [2022-01-13 Thu 00:06]
+
+** DONE Other
+
+*** DONE User configurable colors
+
+The color list to use in the web annotation tool can be configured in the
+config.toml.
+
+* v1.4
+
+** TODO Edge probability learning
 
 New type of "network" (bayesian network for now, maybe neural in future) that
 can be trained and tested.
@@ -58,28 +86,6 @@ How to filter edges? This is global, and probably application dependent. Maybe
 a user script? "seed" nodes from where to compute maximum probability spanning
 trees?
 
-*** TODO Test
-
-- [ ] Test migration
-
-*** TODO Docs
-
-- [ ] Document new config and dataset version
-
-** Web interface improvements
-
-*** DONE Quick filter annotations in listing according to flags.
-    CLOSED: [2022-01-13 Thu 00:06]
-
-** Other
-
-*** DONE User configurable colors
-
-The color list to use in the web annotation tool can be configured in the
-config.toml.
-
-* Backlog
-
 ** TODO Web interface improvements
 
 *** TODO Search annotations in listing according to tags or metadata.
@@ -92,16 +98,6 @@ maybe use https://developer.mozilla.org/en-US/docs/Web/HTML/Element/datalist
 *** TODO Improve messaging
 Remove "saved" message when doing changes (inconsistent), maybe load indicator
 
-*** TODO Allow deleting entries
-Maybe just move the last to the hole?
-
-*** TODO Better mobile interface
-Maybe integrate with camera/scan app, make quevedo a target for "sharing"
-(uploading) images.
-
-*** TODO Web user improvements
-User groups, record annotator in json.
-
 *** TODO Improve CSS
 
 - Add CSS Normalization/reset
@@ -111,6 +107,17 @@ User groups, record annotator in json.
 
 - [ ] "flags" (from v1.1)
 - [ ] changes from v1.2
+- [ ] changes from v1.3
+
+* Backlog
+
+** TODO Web interface improvements
+
+*** TODO Allow deleting entries
+Maybe just move the last to the hole?
+
+*** TODO Web user improvements
+User groups, record annotator in json.
 
 ** TODO Improve use of scripts when modifing images
 
