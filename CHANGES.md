@@ -1,5 +1,31 @@
 # Changelog
 
+## v1.3
+
+### New dataset version 2
+
+There are four annotation schemas now, one for graphemes, one for logograms,
+another one for graph edges, and a final one for meta tags. The logogram
+annotation schema is new, but previously this information could be stored in
+the meta tags (now they are separate). See below for more about graphs. The new
+dataset version in not compatible, so existing datasets need to be migrated.
+
+### Logogram graphs
+
+Logograms can now store a graph which connects bound graphemes with edges. These
+edges have their own tags and tag schema, and can be used to capture the
+compositional or spatial relations between bound graphemes. The dataset
+configuration has been updated, as well as the web interface, to allow
+annotating these new values.
+
+### Other
+
+- Configuration dictionaries are now merged instead of replaced in network, pipeline and dataset configs.
+- "Extend" configurations can be chained.
+- In the web interface listing, annotations can be filtered according to flags.
+- The color list to use in the logogram editor can now be customized.
+- Other bug fixes and documentation
+
 ## v1.2
 
 ### Pipelines
