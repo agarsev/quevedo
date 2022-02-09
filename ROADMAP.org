@@ -42,14 +42,16 @@ logograms, they are useful for annotation rather than processing.
 - [X] Save edges in backend
 - [X] Improve annotation mode: hide/show/draw toggle for graphemes and edges
 
-*** TODO Access the graph and examples
+*** DONE Access the graph and examples
+    CLOSED: [2022-02-09 Wed 18:26]
 
-- [ ] Utility functions for navigating/getting graphemes from edges
-- [ ] Example script merging graphemes with some functor
+- [X] Utility functions for navigating/getting graphemes from edges
+- [X] Example script merging graphemes with some functor
 
-*** TODO Test
+*** DONE Test
+    CLOSED: [2022-02-09 Wed 18:26]
 
-- [ ] Test migration
+- [X] Test migration
 
 *** TODO Docs
 

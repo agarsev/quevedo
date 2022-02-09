@@ -2,5 +2,5 @@
 # Licensed under the Open Software License version 3.0
 
 from .annotation import Annotation, Target
-from .logogram import Logogram
+from .logogram import Logogram, BoundGrapheme
 from .grapheme import Grapheme

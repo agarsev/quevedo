@@ -75,8 +75,7 @@ class BoundGrapheme(Grapheme):
     def __init__(self, logogram, box=[0, 0, 0, 0], *args, **kwargs):
         #: Logogram where this grapheme is found.
         self.logogram = logogram
-        #: Coordinates (x, y, w, h) of this grapheme's bounding box within the logogram. x and y are the coordinates of the **center**. Values are relative to the logogram size, in the range `[0, 1]`.
-        self.box = box  # type: list[float]
+        self._box = box
         super().__init__(*args, **kwargs)
 
     def to_dict(self):
@@ -95,6 +94,33 @@ class BoundGrapheme(Grapheme):
             u = float(self.box[1]) * height - (h / 2)
             self._image_data = img.crop((l, u, l + w, u + h))
         return self._image_data
+
+    @property
+    def box(self):
+        '''list[float]: Bounding box coordinates (x, y, w, h) of this grapheme
+        within the logogram.
+
+        - (x, y): coordinates of the **center**.
+        - (w, h): width and height.
+
+        Values are relative to the logogram size, in the range `[0, 1]`.'''
+        return self._box
+
+    @box.setter
+    def box(self, coords):
+        self._box = coords
+        if hasattr(self, '_image_data'):
+            del self._image_data
+
+    def outbound(self):
+        '''Generator[Edge,None,None]: edges in the logogram emanating from this
+        grapheme.'''
+        return (e for e in self.logogram.edges if e.start == self)
+
+    def inbound(self):
+        '''Generator[Edge,None,None]: edges in the logogram ending in this
+        grapheme.'''
+        return (e for e in self.logogram.edges if e.end == self)
 
 
 class Edge:
