@@ -2,11 +2,12 @@
 
 * Next (v1.3)
 
-** TODO Improve net and pipe configuration
+** DONE Improve net and pipe configuration
+   CLOSED: [2022-02-09 Wed 13:44]
 
-- [ ] make extend recursive, if extend extends an extension
-- [ ] merge instead of replace configs
-- [ ] doc
+- [X] make extend recursive, if extend extends an extension
+- [X] merge instead of replace configs
+- [X] doc
 
 ** TODO Grapheme graphs in the logogram
 

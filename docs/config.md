@@ -17,7 +17,8 @@ Quevedo datasets are meant to be shared, and configuration is an essential part
 of the dataset. However, some options may be applicable only for the local
 environment, and others may be sensitive and best not distributed. For this,
 Quevedo also reads a `config.local.toml` if present. The options in the local
-configuration file override those in the main file.
+configuration file are merged with those in the main file, overriding them when
+there is a conflict.
 
 This can be useful for the configuration of darknet installation, which is
 likely different for different environments, and for the web interface, which

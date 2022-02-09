@@ -62,8 +62,31 @@ class Dataset:
                                  "Please use the 'migrate' command to update.".format(
                                      self._path, version))
             if self.local_config_path.exists():
-                self._config.update(**toml.loads(self.local_config_path.read_text()))
+                self._config = _dict_merge(self._config, toml.loads(self.local_config_path.read_text()))
         return self._config
+
+    def get_config(self, section, key):
+        '''Get the configuration for a key under a section (a value in a table,
+        eg [network.example], where network is the section and example is the
+        key. This method looks for the "extend" key and merges configuration
+        recursively.
+
+        Returns:
+            dict
+        '''
+        config = {}
+        while key is not None:
+            try:
+                ext = self.config[section][key]
+                key = ext.get('extend')
+            except KeyError:
+                raise ValueError("No such {}: {}".format(section, key)) from None
+            config = _dict_merge(ext, config)  # Newer keys (config) have precedence
+        try:
+            del config['extend']
+        except KeyError:
+            pass
+        return config
 
     def create(self):
         '''Create or initialize a directory to be a Quevedo dataset.'''
@@ -283,6 +306,19 @@ class Dataset:
     def is_test(self, annotation):
         '''Checks if an annotation belongs to the training split.'''
         return annotation.fold in self.config['test_folds']
+
+
+def _dict_merge(a, b):
+    '''Recursively merge keys from dict b into a. Keys in b override those in a.'''
+    r = {}
+    for k in chain(a.keys(), b.keys()):
+        if k in a and k in b and isinstance(a[k], dict) and isinstance(b[k], dict):
+            r[k] = _dict_merge(a[k], b[k])
+        elif k in b:
+            r[k] = b[k]
+        else:
+            r[k] = a[k]
+    return r
 
 
 @click.command('create')

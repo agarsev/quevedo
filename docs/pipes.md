@@ -43,7 +43,8 @@ train the networks individually.
 
 Pipelines can also use the `extend` keyword to inherit configuration from
 another pipeline, making it easy to set the same subsets to test all pipelines,
-or share some of the options.
+or share some of the options. This extension is recursive, so chains of
+pipeline configurations can be used.
 
 ## Logogram recognizer
 

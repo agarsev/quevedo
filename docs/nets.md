@@ -84,7 +84,8 @@ configuration option is `task`, which can take the values `classify` or
     parameters from `net_b` will be used when no other value has been set in
     `net_a`. This can be useful to share common options when testing different
     networks, or to set a single source of truth for options that must be
-    common.
+    common. Since v1.3, "extend" is recursive, so a chain of configuration
+    inheritance can be used.
 
 ### Classifier
 

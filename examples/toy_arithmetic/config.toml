@@ -28,7 +28,6 @@ library = "darknet/libdarknet.so"
 options = [ "-dont_show", "-mjpeg_port", "8090" ]
 
 [network.numbers]
-default = true
 task = "classify"
 subject = "classify the different digits"
 tag = "value"

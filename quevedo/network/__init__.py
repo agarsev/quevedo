@@ -7,15 +7,8 @@ from .classify import ClassifyNet
 
 
 def create_network(dataset, name):
-    try:
-        config = dataset.config['network'][name]
-    except KeyError:
-        raise ValueError("No such network: {}".format(name))
-    if 'extend' in config:
-        config = {
-            **dataset.config['network'][config['extend']],
-            **config
-        }
+    '''Factory function to create a pipeline.'''
+    config = dataset.get_config('network', name)
     if config['task'] == 'detect':
         return DetectNet(dataset, name, config)
     elif config['task'] == 'classify':

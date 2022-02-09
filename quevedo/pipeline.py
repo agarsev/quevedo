@@ -13,15 +13,7 @@ def create_pipeline(dataset, name=None, config=None):
         raise ValueError("Either a pipeline configuration or a name is needed to create a pipeline")
 
     if config is None:
-        try:
-            config = dataset.config['pipeline'][name]
-        except KeyError:
-            raise ValueError("No such pipeline: {}".format(name))
-    if 'extend' in config:
-        config = {
-            **dataset.config['pipeline'][config['extend']],
-            **config
-        }
+        config = dataset.get_config('pipeline', name)
 
     if name is None:
         name = 'anonymous'
