@@ -35,11 +35,10 @@ function App ({ title, target, id, annotation_help, links, anot,
     const saveChanges = () => {
         changes.setSaving();
         setMessage(Text['saving']);
+        let body = { meta: meta.dict, tags: tags.dict };
         if (is_logo) {
-            var body = { meta: meta.dict, graphemes: graphemes.list,
-                         edges: edges.list };
-        } else {
-            var body = { meta: meta.dict, tags: tags.dict };
+            body.graphemes = graphemes.list;
+            body.edges = edges.list;
         }
         fetch(`api/save/${id.full}`, {
             method: 'POST',
@@ -135,7 +134,7 @@ function TagEditor ({ meta_tags, meta, schema, tags, flags }) {
             ${i>0?html`<th></th>`:html`<th>${Text['tags']}</th>`}
             <th>${t}:</th>
             <td><input type=text value=${tags.dict[t] || ''}
-                oninput=${e => tags.update(c, e.target.value, `TAG_${t}_UPD`)}
+                oninput=${e => tags.update(t, e.target.value, `UPD_TAG_${t}`)}
             /></td>
         </tr>`)}
         <tr class="first">

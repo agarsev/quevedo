@@ -45,7 +45,8 @@ h2 {
     font-size: 1.2em;
 }
 
-.TagEditor textarea {
+.TagEditor textarea,
+.TagEditor input[type=text] {
     font-family: monospace;
     padding: 0.5ex;
     width: 100%;
