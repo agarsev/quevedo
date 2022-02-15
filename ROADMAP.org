@@ -1,75 +1,8 @@
 #+title: Roadmap
 
-* Next (v1.3)
+* Next: v1.3.1
 
-** DONE Improve net and pipe configuration
-   CLOSED: [2022-02-09 Wed 13:44]
-
-- [X] make extend recursive, if extend extends an extension
-- [X] merge instead of replace configs
-- [X] doc
-
-** DONE Grapheme graphs in the logogram
-   CLOSED: [2022-02-09 Wed 18:53]
-
-*** DONE New dataset version (2)
-    CLOSED: [2021-12-21 Tue 20:12]
-
-warn: INCOMPATIBLE!
-
-Instead of tag_schema, now there is a schema for grapheme, logogram and edge
-annotation (g_tags, l_tags, e_tags). Meta tags stay, both for graphemes and
-logograms, they are useful for annotation rather than processing.
-
-- [X] Dataset version, migration, default_config
-- [X] Refactor tag_schema to g_tags
-- [X] Remove "default" network to use, please always specify one
-
-*** DONE Code representation
-    CLOSED: [2021-12-21 Tue 20:12]
-
-- [X] Add `tags` to logograms
-- [X] Add Edge class (parent logogram, from, to (indices), tags (dict))
-- [X] Add edge list to logogram
-- [X] Save and load from json
-
-*** DONE Web annotation
-    CLOSED: [2022-01-06 Thu 21:45]
-
-- [X] Separate meta tags and logogram tags
-- [X] Annotation mode selection: box draw, grapheme edit, edge edit 
-- [X] Drag and drop to create edges
-- [X] Edge tags table
-- [X] Save edges in backend
-- [X] Improve annotation mode: hide/show/draw toggle for graphemes and edges
-
-*** DONE Access the graph and examples
-    CLOSED: [2022-02-09 Wed 18:26]
-
-- [X] Utility functions for navigating/getting graphemes from edges
-- [X] Example script merging graphemes with some functor
-
-*** DONE Test
-    CLOSED: [2022-02-09 Wed 18:26]
-
-- [X] Test migration
-
-*** DONE Docs
-    CLOSED: [2022-02-09 Wed 18:53]
-
-- [X] Document new config and dataset version
-
-** DONE Web interface improvements
-
-*** DONE Quick filter annotations in listing according to flags.
-    CLOSED: [2022-01-13 Thu 00:06]
-
-** DONE Other
-
-*** DONE User configurable colors
-
-The color list to use in the web annotation tool can be configured in the
-config.toml.
+** Fixes and QOL
 
 * v1.4
 
