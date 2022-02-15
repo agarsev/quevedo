@@ -47,11 +47,11 @@ function App ({ title, path, description, dir_name, target,
     if (in_dir && search.length>0) {
         filterMode = _filterMode;
         if (_filterMode === 'any') {
-            view = list.filter(t => search.some(s => t.flags.includes(s)));
+            view = list.filter(t => search.some(s => t.flags[s]));
         } else if (_filterMode === 'all') {
-            view = list.filter(t => search.every(s => t.flags.includes(s)));
+            view = list.filter(t => search.every(s => t.flags[s]));
         } else if (_filterMode === 'none') {
-            view = list.filter(t => search.every(s => !t.flags.includes(s)));
+            view = list.filter(t => search.every(s => !t.flags[s]));
         }
     }
 
@@ -73,9 +73,9 @@ function Filter ({ flags, filter, setFilter, filterMode, setFilterMode }) {
     return html`<form class="Filter">
         ${Text['quick_filter']}: ${Object.keys(flags).map(f => {
             const icon = flags[f];
-            return html`<label class="flag_icon">
-                <input type="checkbox" name=${f} checked=${filter[icon]?true:false}
-                    onChange=${e => setFilter({ ...filter, [icon]: e.target.checked })} />
+            return html`<label class="flag_icon" title=${f}>
+                <input type="checkbox" name=${f} checked=${filter[f]?true:false}
+                    onChange=${e => setFilter({ ...filter, [f]: e.target.checked })} />
                 ${icon}</label>`;
         })}
         <label><input type="radio" name="filterMode" value="any"
@@ -179,7 +179,8 @@ function AnnoEntry ({ id, title, set, flags }) {
             <img src="img/${dir}/${id}.png" />
         </a>
         <p>
-            ${flags.map(f => html`<span class="flag">${f}</span>`)}
+            ${Object.keys(flags).map(f => html`<span title=${f} class="flag">
+                ${flags[f]}</span>`)}
             <span class="set">(${set})</span>
         </p>
     </li>`;

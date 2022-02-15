@@ -49,6 +49,7 @@ body > h2 {
 }
 
 .Entry .flag {
+    user-select: none;
     margin-right: 1ex;
 }
 

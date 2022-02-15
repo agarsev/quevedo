@@ -139,10 +139,11 @@ function TagEditor ({ meta_tags, meta, schema, tags, flags }) {
             /></td>
         </tr>`)}
         <tr class="first">
-            <th colspan="2"></th><td>${Object.keys(flags).map(f => html`<span class="flag">
+            <th colspan="2"></th><td>${Object.keys(flags).map(f => html`<label
+                class="flag" title=${f}>
             <input type="checkbox"
                 onchange=${() => meta.update(f, !meta.dict[f], `UPD_META_${f}`)}
                 checked=${!!meta.dict[f]} /> ${flags[f]}
-        </span>`)}</td></tr>
+        </label>`)}</td></tr>
     </table>`;
 }

@@ -33,8 +33,8 @@ def annotation_info(a: Annotation):
     title_tag = app_data['meta_tags'][0]
     title = a.meta.get(title_tag, '')
     flags = app_data['flags']
-    flag_icons = [icon for f, icon in flags.items()
-                  if a.meta.get(f, False)]
+    flag_icons = {f: icon for f, icon in flags.items()
+                  if a.meta.get(f, False)}
     return {
         'id': a.id, 'flags': flag_icons,
         'set': a.fold, 'title': title
