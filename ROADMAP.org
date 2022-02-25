@@ -4,6 +4,9 @@
 
 ** Fixes and QOL
 
+*** DONE Improve CSS
+    CLOSED: [2022-02-25 Fri 18:54]
+
 * v1.4
 
 ** TODO Edge probability learning
@@ -35,11 +38,6 @@ maybe use https://developer.mozilla.org/en-US/docs/Web/HTML/Element/datalist
 
 *** TODO Improve messaging
 Remove "saved" message when doing changes (inconsistent), maybe load indicator
-
-*** TODO Improve CSS
-
-- Add CSS Normalization/reset
-- Improve the style
 
 *** TODO Documentation
 

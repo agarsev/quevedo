@@ -62,3 +62,11 @@ footer a {
     vertical-align: middle;
     margin: 0 1ex 0.3ex 0;
 }
+
+input, select, button, textarea {
+    padding: 0.2rem;
+    height: 2rem;
+}
+
+button { padding: 0.5rem; }
+input[type=color] { width: 2rem; }

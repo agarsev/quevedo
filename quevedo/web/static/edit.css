@@ -21,17 +21,17 @@ h2 {
 }
 
 .TagEditor td {
-    padding: 0 0.5ex;
+    padding: 0.3ex 0.5ex;
     width: 100%;
 }
 
 .TagEditor tr.first th, .TagEditor tr.first td {
     border-top: 1px solid #ccc;
-    padding-top: 0.5ex;
+    padding-top: 0.6ex;
 }
 
 .TagEditor tr.last th, .TagEditor tr.last td {
-    padding-bottom: 0.5ex;
+    padding-bottom: 0.6ex;
 }
 
 .TagEditor th {
@@ -48,13 +48,16 @@ h2 {
 .TagEditor textarea,
 .TagEditor input[type=text] {
     font-family: monospace;
-    padding: 0.5ex;
     width: 100%;
 }
 
 .TagEditor .flag {
     font-size: 150%;
     margin-right: 1em;
+}
+
+.TagEditor input[type=checkbox] {
+    height: auto;
 }
 
 .GraphemeList div:not(:first-child) {
