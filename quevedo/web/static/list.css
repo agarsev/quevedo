@@ -89,4 +89,5 @@ body > h2 {
 
 .Filter input {
     margin-right: 1ex;
+    height: auto;
 }
