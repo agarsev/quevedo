@@ -57,7 +57,9 @@ $ quevedo -D path/to/new/dataset create
 Then you can **cd** into the dataset directory so that the `-D` option is not
 needed.
 
-You can also download an example dataset from this repository (`examples/toy_arithmetic`).
+You can also download an example dataset from this repository
+(`examples/toy_arithmetic`), or peruse our [Corpus of Spanish
+Signwriting](https://doi.org/10.5281/zenodo.6337884).
 
 To see information about a dataset:
 

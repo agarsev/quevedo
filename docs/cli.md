@@ -264,7 +264,7 @@ Options:
   -p, --port TEXT
   -m, --mount-path TEXT     Mount path for the web application
   --browser / --no-browser  Launch browser with the web app
-  -l, --language [es|en]    Language for the UI (default from config file)
+  -l, --language [en|es]    Language for the UI (default from config file)
   --help                    Show this message and exit.
 ```
 
