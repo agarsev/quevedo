@@ -190,12 +190,12 @@ class Dataset:
         '''
         if target == Target.LOGO:
             path = self.logogram_path / subset
-            path.mkdir(exist_ok=True)
+            path.mkdir(parents=True, exist_ok=True)
             next_id = sum(1 for _ in path.glob('*.png')) + 1
             a = Logogram(path / str(next_id)).create_from(**kwds)
         elif target == Target.GRAPH:
             path = self.grapheme_path / subset
-            path.mkdir(exist_ok=True)
+            path.mkdir(parents=True, exist_ok=True)
             next_id = sum(1 for _ in path.glob('*.png')) + 1
             a = Grapheme(path / str(next_id)).create_from(**kwds)
         else:
@@ -285,7 +285,7 @@ class Dataset:
         else:
             raise ValueError('A single target is needed')
         try:
-            path.mkdir()
+            path.mkdir(parents=True)
         except FileExistsError:
             if existing is None:
                 existing = click.prompt("Target directory already exists.\n"

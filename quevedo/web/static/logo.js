@@ -125,8 +125,10 @@ export function LogogramEditor ({ id, graphemes, edges, g_tags, e_tags,
     return html`
         <h2 class="AnnotationHeader">${Text['annotation']}
             <${ModeSelect} value=${box_mode} label=${Text['boxes']} set=${setBoxMode} options=${ANNOT_OPTIONS} />
-            <${ModeSelect} value=${edge_mode} label=${Text['edges']} set=${setEdgeMode} options=${ANNOT_OPTIONS} />
-            <${ModeSelect} value=${tag_mode} label=${Text['tags']} set=${setTagMode} options=${TAG_OPTIONS} />
+            ${e_tags && e_tags.length>0 && html`
+                <${ModeSelect} value=${edge_mode} label=${Text['edges']} set=${setEdgeMode} options=${ANNOT_OPTIONS} />`}
+            ${e_tags && e_tags.length>0 && html`
+                <${ModeSelect} value=${tag_mode} label=${Text['tags']} set=${setTagMode} options=${TAG_OPTIONS} />`}
         </h2>
         <div class="GraphemeList">
         <${Annotation} ...${{id, graphemes, edges, colors, being_edited,

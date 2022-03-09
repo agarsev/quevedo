@@ -53,7 +53,14 @@ def load_dataset(dataset, language):
     resolved = dataset.path.resolve()
     app_data['path'] = resolved
     app_data['config'] = dataset.config['web']
-    app.secret_key = app_data['config']['secret_key']
+    app_data['public'] = app_data['config'].get('public', True)
+    try:
+        app.secret_key = app_data['config']['secret_key']
+    except KeyError:
+        print("Please set a secret_key in the dataset config. "
+              "A random token will be used for this session")
+        from secrets import token_hex
+        app.secret_key = token_hex(16)
     app_data['nets'] = {
         'graphemes': {n.name: None for n in dataset.list_networks() if
                       n.target == Target.GRAPH and n.is_trained()},
@@ -87,7 +94,7 @@ def run(host, port, path):
 
 @app.route('/login')
 def login_page():
-    if (app_data['config']['public'] or
+    if (app_data['public'] or
             session.get('user', None) is not None):
         return redirect(app_data['mount_path'])
     ds = app_data['dataset']
@@ -102,7 +109,7 @@ def login_page():
 def authenticated(func):
     @wraps(func)
     def check_auth(*args, **kwargs):
-        if (not app_data['config']['public'] and
+        if (not app_data['public'] and
                 session.get('user', None) is None):
             return redirect(app_data['mount_path'] + 'login')
         return func(*args, **kwargs)
