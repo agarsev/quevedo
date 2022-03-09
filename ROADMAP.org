@@ -1,13 +1,6 @@
 #+title: Roadmap
 
-* Next: v1.3.1
-
-** Fixes and QOL
-
-*** DONE Improve CSS
-    CLOSED: [2022-02-25 Fri 18:54]
-
-* v1.4
+* Next: v1.4
 
 ** TODO Edge probability learning
 

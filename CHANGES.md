@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.3.1
+
+This is a minor release with bug fixes and general quality of life improvements.
+
 ## v1.3
 
 ### New dataset version 2
